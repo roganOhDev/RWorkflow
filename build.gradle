@@ -25,16 +25,15 @@ dependencies {
     implementation "org.flywaydb:flyway-mysql"
     implementation 'com.mysql:mysql-connector-j:8.0.31'
     implementation 'org.projectlombok:lombok:1.18.20'
-    compileOnly 'org.projectlombok:lombok'
 
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-task Test_DB_Up() {
-    dockerComposeFile './docker/compose/docker-compose-metaData-db.yml'
-}
-
-task Test_DB_Down() {
-
-}
+//task Test_DB_Up() {
+//    dockerComposeFile './docker/compose/docker-compose-metaData-db.yml'
+//}
+//
+//task Test_DB_Down() {
+//
+//}
