@@ -31,6 +31,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
+task Test_DB_Up() {
+    dockerComposeFile './docker/compose/docker-compose-metaData-db.yml'
 }
