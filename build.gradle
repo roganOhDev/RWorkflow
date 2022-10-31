@@ -34,3 +34,7 @@ dependencies {
 task Test_DB_Up() {
     dockerComposeFile './docker/compose/docker-compose-metaData-db.yml'
 }
+
+task Test_DB_Down() {
+
+}
