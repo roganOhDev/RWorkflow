@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
             return null;
         }
 
-        return new UsernamePasswordAuthenticationToken(new UserToken(token), null);
+        return new UsernamePasswordAuthenticationToken(new UserTokenHeader(token), null);
     }
 
 

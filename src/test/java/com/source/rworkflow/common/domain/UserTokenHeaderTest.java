@@ -2,11 +2,14 @@ package com.source.rworkflow.common.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.source.rworkflow.Const;
+import com.source.rworkflow.RestTestFactory;
 import com.source.rworkflow.TestCase;
 import jdk.jfr.Description;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
 import org.springframework.http.HttpHeaders;
@@ -18,21 +21,17 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Collection;
 
-class UserTokenTest extends TestCase {
+class UserTokenHeaderTest extends TestCase {
     private final static String BASE_URL = "http://localhost:8080";
+//    private final static String CLASS_URL = "/"
 
+    @Disabled
     @Description("유저 토큰 테스트")
     @TestFactory
     Collection<DynamicNode> token_test(){
         return group(
                 single("a", () -> {
-                    var webClient = WebClient.builder()
-                            .baseUrl(BASE_URL)
-                            .defaultHeaders(headers -> {
-                                headers.set(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-                                headers.set(HttpHeaders.AUTHORIZATION, "a");
-                            })
-                            .build();
+                    final var webClient = RestTestFactory.client(Const.User.Admin.token);
 
                     final var body = new JSONObject();
 

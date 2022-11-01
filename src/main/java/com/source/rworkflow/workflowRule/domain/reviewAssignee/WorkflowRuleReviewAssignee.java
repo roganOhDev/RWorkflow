@@ -1,4 +1,4 @@
-package com.source.rworkflow.workflowRule.domain;
+package com.source.rworkflow.workflowRule.domain.reviewAssignee;
 
 import com.source.rworkflow.workflowRule.type.AssigneeType;
 import lombok.Getter;
@@ -13,11 +13,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "workflow_rule_execution_assignees")
+@Table(name = "workflow_rule_review_assignees")
 @Getter
 @Setter
 @Slf4j
-public class WorkflowRuleExecutionAssignee {
+public class WorkflowRuleReviewAssignee {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)

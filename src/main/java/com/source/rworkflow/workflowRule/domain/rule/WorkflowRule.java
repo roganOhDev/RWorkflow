@@ -1,4 +1,4 @@
-package com.source.rworkflow.workflowRule.domain;
+package com.source.rworkflow.workflowRule.domain.rule;
 
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.Getter;

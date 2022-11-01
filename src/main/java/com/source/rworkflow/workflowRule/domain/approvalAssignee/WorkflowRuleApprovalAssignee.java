@@ -1,4 +1,4 @@
-package com.source.rworkflow.workflowRule.domain;
+package com.source.rworkflow.workflowRule.domain.approvalAssignee;
 
 import com.source.rworkflow.workflowRule.type.AssigneeType;
 import lombok.Getter;

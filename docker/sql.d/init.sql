@@ -225,6 +225,14 @@ create table user_access_controls (
                                       foreign key (privilege_id) references privileges (id)
 );
 
+create table user_tokens (
+                             id int,
+                             token varchar(64),
+                             user_id int,
+                             primary key (id),
+                             foreign key (user_id) references users (id)
+);
+
 INSERT INTO `RWorkflow_test`.`users` (`id`, `username`, `password`, `name`, `email`, `deleted`) VALUES (1, 'SYSTEM', 'cGFzc3dvcmQ=', 'SYSTEM', 'SYSTEM@rogan.com', 0);
 INSERT INTO `RWorkflow_test`.`users` (`id`, `username`, `password`, `name`, `email`, `deleted`) VALUES (2, 'admin', 'UGFzc3dvcmQx', 'admin', 'admin@rogan.com', 0);
 INSERT INTO `RWorkflow_test`.`users` (`id`, `username`, `password`, `name`, `email`, `deleted`) VALUES (3, 'user', 'cGFzc3dvcmQ=', 'user', 'user@rogan.com', 0);
@@ -245,3 +253,7 @@ INSERT INTO `RWorkflow_test`.`user_roles` (`id`, `user_id`, `role_id`, `deleted`
 INSERT INTO `RWorkflow_test`.`user_access_controls` (`id`, `user_id`, `connection_id`, `privilege_id`, `expired`, `expiry_at`, `deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (1, 2, 1, 1, 0, '2024-11-01 11:42:55.000000', 0, '2022-11-01 11:42:55.000000', 1, '2022-11-01 11:42:55.000000', 1);
 INSERT INTO `RWorkflow_test`.`user_access_controls` (`id`, `user_id`, `connection_id`, `privilege_id`, `expired`, `expiry_at`, `deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (2, 2, 2, 1, 0, '2024-11-01 11:42:55.000000', 0, '2022-11-01 11:42:55.000000', 1, '2022-11-01 11:42:55.000000', 1);
 INSERT INTO `RWorkflow_test`.`user_access_controls` (`id`, `user_id`, `connection_id`, `privilege_id`, `expired`, `expiry_at`, `deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (3, 3, 1, 2, 0, '2024-11-01 11:42:55.000000', 0, '2022-11-01 11:42:55.000000', 1, '2022-11-01 11:42:55.000000', 1);
+
+INSERT INTO `RWorkflow`.`user_tokens` (`id`, `token`, `user_id`) VALUES (1, 'eQjq1u2X', 1);
+INSERT INTO `RWorkflow`.`user_tokens` (`id`, `token`, `user_id`) VALUES (2, 'yCPDeOmN', 2);
+INSERT INTO `RWorkflow`.`user_tokens` (`id`, `token`, `user_id`) VALUES (3, 'xVW8kjnw', 3);

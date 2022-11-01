@@ -1,6 +1,6 @@
-package com.source.rworkflow.workflowRule.domain;
+package com.source.rworkflow.workflowRule.domain.approval;
 
-import com.source.rworkflow.workflowRule.type.ApprovalType;
+import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -33,5 +33,5 @@ public class WorkflowRuleApproval {
 
     @Column(name = "approve_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ApprovalType approvalType;
+    private ApproveType approveType;
 }

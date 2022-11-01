@@ -1,6 +1,6 @@
 package com.source.rworkflow.workflowRule.type;
 
-public enum ApprovalType {
+public enum ApproveType {
     ANY,
     ALL
 }

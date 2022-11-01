@@ -17,28 +17,9 @@ import org.springframework.test.context.ContextConfiguration;
 import java.util.Collection;
 import java.util.List;
 
-//@EnableAutoConfiguration(exclude = DataSourceAutoConfiguration.class)
-//@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-//@DisplayNameGeneration(DisplayNameGenerator.ReplaceUnderscores.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(classes = RWorkflowApplication.class)
 public class TestCase {
-
-    public void execute(DynamicNode dynamicNode) {
-        if (dynamicNode instanceof DynamicTest) {
-            final var test = (DynamicTest) dynamicNode;
-
-            try {
-                test.getExecutable().execute();
-            } catch (Throwable throwable) {
-                Assertions.fail(throwable);
-            }
-        } else {
-            final var container = (DynamicContainer) dynamicNode;
-
-            container.getChildren().forEach(this::execute);
-        }
-    }
 
     public static DynamicNode single(final String displayName, final Executable executable) {
         return DynamicTest.dynamicTest(displayName, executable);
