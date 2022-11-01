@@ -30,10 +30,20 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-//task Test_DB_Up() {
-//    dockerComposeFile './docker/compose/docker-compose-metaData-db.yml'
-//}
-//
-//task Test_DB_Down() {
-//
-//}
+task testDbUp(type: Exec) {
+    group "test"
+    workingDir "${projectDir}"
+    commandLine "docker", "compose", "-f", "./docker/docker-compose-test-db.yml", "-p", "test", "up", "-d"
+    doLast {
+        println "Test Db Up!"
+    }
+}
+
+task testDbDown(type: Exec) {
+    group "test"
+    workingDir "${projectDir}"
+    commandLine "docker", "compose", "-f", "./docker/docker-compose-test-db.yml", "-p", "test", "down"
+    doLast {
+        println "Test Db Down!"
+    }
+}

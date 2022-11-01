@@ -1,15 +1,19 @@
 version: "3.7"
+
 services:
   testDb:
+    container_name: test-db
     image: mysql:8.0.31
     restart: always
-    container_name: test-db
+#    platform: linux/x86_64/v8
     ports:
       - "13307:3306"
     environment:
       - MYSQL_DATABASE=RWorkflow_test
       - MYSQL_ROOT_PASSWORD=password
-      - TZ=Asia/Seoul
-    command: # 명령어 실행
+      - TZ=UTC
+    command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./sql.d/:/docker-entrypoint-initdb.d
