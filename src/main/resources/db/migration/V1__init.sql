@@ -224,3 +224,24 @@ create table user_access_controls (
                                       foreign key (connection_id) references connection (id),
                                       foreign key (privilege_id) references privileges (id)
 );
+
+INSERT INTO `RWorkflow`.`users` (`id`, `username`, `password`, `name`, `email`, `deleted`) VALUES (1, 'SYSTEM', 'cGFzc3dvcmQ=', 'SYSTEM', 'SYSTEM@rogan.com', 0);
+INSERT INTO `RWorkflow`.`users` (`id`, `username`, `password`, `name`, `email`, `deleted`) VALUES (2, 'admin', 'UGFzc3dvcmQx', 'admin', 'admin@rogan.com', 0);
+INSERT INTO `RWorkflow`.`users` (`id`, `username`, `password`, `name`, `email`, `deleted`) VALUES (3, 'user', 'cGFzc3dvcmQ=', 'user', 'user@rogan.com', 0);
+
+INSERT INTO `RWorkflow`.`connection` (`id`, `name`, `database_type`, `host`, `port`, `username`, `password`, `deleted`) VALUES (1, 'mysqlConnection', 'MYSQL', '127.0.0.1', 3306, 'name', 'cGFzc3dvcmQ=', 0);
+INSERT INTO `RWorkflow`.`connection` (`id`, `name`, `database_type`, `host`, `port`, `username`, `password`, `deleted`) VALUES (2, 'postgresqlConnection', 'POSTGRESQL', '127.0.0.1', 5432, 'name', 'cGFzc3dvcmQ=', 0);
+
+INSERT INTO `RWorkflow`.`privileges` (`id`, `name`, `permissions`, `deleted`) VALUES (1, 'READ/WRITE', 'SELECT,DELETE,INSERT,UPDATE,MERGE_INTO,GRANT,REVOKE,COMMIT,ROLLBACK,DROP,ALTER,CREATE,RENAME,TRUNCATE,OTHERS,BEGIN,EXECUTE', 0);
+INSERT INTO `RWorkflow`.`privileges` (`id`, `name`, `permissions`, `deleted`) VALUES (2, 'READONLY', 'SELECT', 0);
+
+INSERT INTO `RWorkflow`.`roles` (`id`, `name`, `deleted`) VALUES (1, 'admin', 0);
+INSERT INTO `RWorkflow`.`roles` (`id`, `name`, `deleted`) VALUES (2, 'user', 0);
+
+INSERT INTO `RWorkflow`.`user_roles` (`id`, `user_id`, `role_id`, `deleted`) VALUES (1, 1, 1, 0);
+INSERT INTO `RWorkflow`.`user_roles` (`id`, `user_id`, `role_id`, `deleted`) VALUES (2, 2, 1, 0);
+INSERT INTO `RWorkflow`.`user_roles` (`id`, `user_id`, `role_id`, `deleted`) VALUES (3, 3, 2, 0);
+
+INSERT INTO `RWorkflow`.`user_access_controls` (`id`, `user_id`, `connection_id`, `privilege_id`, `expired`, `expiry_at`, `deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (1, 2, 1, 1, 0, '2024-11-01 11:42:55.000000', 0, '2022-11-01 11:42:55.000000', 1, '2022-11-01 11:42:55.000000', 1);
+INSERT INTO `RWorkflow`.`user_access_controls` (`id`, `user_id`, `connection_id`, `privilege_id`, `expired`, `expiry_at`, `deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (2, 2, 2, 1, 0, '2024-11-01 11:42:55.000000', 0, '2022-11-01 11:42:55.000000', 1, '2022-11-01 11:42:55.000000', 1);
+INSERT INTO `RWorkflow`.`user_access_controls` (`id`, `user_id`, `connection_id`, `privilege_id`, `expired`, `expiry_at`, `deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (3, 3, 1, 2, 0, '2024-11-01 11:42:55.000000', 0, '2022-11-01 11:42:55.000000', 1, '2022-11-01 11:42:55.000000', 1);
