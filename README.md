@@ -33,3 +33,9 @@ mysql -u root -p
 password
 create database RWorkflow;
 ```
+
+## If Test Doesn't Work, Do This
+```
+Intelij Preferences -> Build, Execution, Deployment -> BuildTools -> Gradle -> Run tests using
+change to InteliJ IDEA
+```
