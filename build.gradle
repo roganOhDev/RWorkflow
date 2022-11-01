@@ -25,6 +25,9 @@ dependencies {
     implementation "org.flywaydb:flyway-mysql"
     implementation 'com.mysql:mysql-connector-j:8.0.31'
     implementation 'org.projectlombok:lombok:1.18.20'
+    implementation 'javax.persistence:javax.persistence-api:2.2'
+    implementation 'org.springframework.data:spring-data-jpa:2.7.5'
+
 
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

@@ -1,4 +1,4 @@
-package com.source.rworkflow.exception;
+package com.source.rworkflow.common.exception;
 
 public class ExceptionCode {
     public static class Api{
