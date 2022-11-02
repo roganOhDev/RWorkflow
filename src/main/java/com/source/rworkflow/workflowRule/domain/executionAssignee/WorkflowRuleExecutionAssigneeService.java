@@ -1,6 +1,5 @@
 package com.source.rworkflow.workflowRule.domain.executionAssignee;
 
-import com.source.rworkflow.workflowRule.domain.approvalAssignee.WorkflowRuleApprovalAssignee;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +15,6 @@ public class WorkflowRuleExecutionAssigneeService {
     }
 
     public List<WorkflowRuleExecutionAssignee> find(final Long approvalId) {
-        return repository.findAllByRuleApprovalId(approvalId);
+        return repository.findAllByRuleId(approvalId);
     }
 }

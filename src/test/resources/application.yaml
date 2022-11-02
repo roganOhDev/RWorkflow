@@ -1,0 +1,15 @@
+spring:
+  flyway:
+    enabled: false
+
+datasource:
+  username: root
+  password: password
+  schema: RWorkflow_test
+  url: jdbc:mysql://localhost:13307/${datasource.schema}?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+  driver-class-name: com.mysql.cj.jdbc.Driver
+  initial-size: 3
+  max-total: 3
+  max-wait-millis: 3000
+  slow-query-threshold: 3000
+  sql-output: true

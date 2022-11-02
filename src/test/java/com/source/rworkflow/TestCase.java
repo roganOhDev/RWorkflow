@@ -1,25 +1,32 @@
 package com.source.rworkflow;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayNameGeneration;
-import org.junit.jupiter.api.DisplayNameGenerator;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.junit.jupiter.api.DynamicContainer;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.function.Executable;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
+import org.springframework.test.context.jdbc.SqlGroup;
 
 import java.util.Collection;
 import java.util.List;
 
+@SqlGroup({
+        @Sql(config = @SqlConfig(dataSource = "dataSource"), value = {"classpath:/db/drop_tables.sql", "classpath:/db/app.sql"})
+})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ContextConfiguration(classes = RWorkflowApplication.class)
 public class TestCase {
+
+    @Getter
+    @AllArgsConstructor
+    public static class Header{
+        private String token;
+    }
 
     public static DynamicNode single(final String displayName, final Executable executable) {
         return DynamicTest.dynamicTest(displayName, executable);

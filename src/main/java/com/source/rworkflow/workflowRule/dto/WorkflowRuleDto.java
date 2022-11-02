@@ -6,10 +6,10 @@ import com.source.rworkflow.workflowRule.domain.approvalAssignee.WorkflowRuleApp
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssignee;
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRule;
-import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,14 +19,19 @@ public class WorkflowRuleDto {
     public static class Create {
         @Getter
         public static class Request {
-            @NotNull
+            @NotNull(message = "need name")
             private String name;
-            @NotNull
+            @NotNull(message = "need type")
             private WorkflowRequestType type;
-            private boolean urgent;
+            @NotNull(message = "need urgent")
+            private Boolean urgent;
             private List<WorkflowRuleApprovalDto.Request> approvals;
             private List<AssigneeDto.Request> executions;
             private List<AssigneeDto.Request> reviews;
+
+            public boolean isUrgent() {
+                return this.urgent;
+            }
         }
 
         @Getter

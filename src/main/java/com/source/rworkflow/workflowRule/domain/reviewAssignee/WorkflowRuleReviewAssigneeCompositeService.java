@@ -1,6 +1,5 @@
 package com.source.rworkflow.workflowRule.domain.reviewAssignee;
 
-import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WorkflowRuleReviewAssigneeCompositeService {
     private final WorkflowRuleReviewAssigneeService service;
-}
 
     public List<WorkflowRuleReviewAssignee> createCollection(final Long ruleId, final List<AssigneeDto.Request> assignees) {
         return assignees.stream()

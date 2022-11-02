@@ -1,4 +1,5 @@
-create table workflow_requests (
+drop table if exists RWorkflow_test.workflow_requests;
+create table RWorkflow_test.workflow_requests (
                                    id int AUTO_INCREMENT,
                                    title varchar(255),
                                    type enum ('ACCESS_CONTROL', 'SQL_EXECUTION', 'DATA_EXPORT'),
@@ -21,7 +22,8 @@ create table workflow_requests (
                                    primary key (id)
 );
 
-create table workflow_request_approvals (
+drop table if exists RWorkflow_test.workflow_request_approvals;
+create table RWorkflow_test.workflow_request_approvals (
                                             id int AUTO_INCREMENT,
                                             request_id int,
                                             `order` int,
@@ -30,7 +32,8 @@ create table workflow_request_approvals (
                                             primary key (id)
 );
 
-create table workflow_request_approval_assignees (
+drop table if exists RWorkflow_test.workflow_request_approval_assignees;
+create table RWorkflow_test.workflow_request_approval_assignees (
                                                      id int AUTO_INCREMENT,
                                                      request_id int,
                                                      request_approval_id int,
@@ -41,7 +44,8 @@ create table workflow_request_approval_assignees (
                                                      primary key (id)
 );
 
-create table workflow_request_execution_assignees (
+drop table if exists RWorkflow_test.workflow_request_execution_assignees;
+create table RWorkflow_test.workflow_request_execution_assignees (
                                                       id int AUTO_INCREMENT,
                                                       request_id int,
                                                       assignee_id int,
@@ -52,7 +56,8 @@ create table workflow_request_execution_assignees (
                                                       primary key (id)
 );
 
-create table workflow_request_review_assignees (
+drop table if exists RWorkflow_test.workflow_request_review_assignees;
+create table RWorkflow_test.workflow_request_review_assignees (
                                                    id int AUTO_INCREMENT,
                                                    request_id int,
                                                    assignee_id int,
@@ -62,14 +67,16 @@ create table workflow_request_review_assignees (
                                                    primary key (id)
 );
 
-create table workflow_request_detail_access_controls (
+drop table if exists RWorkflow_test.workflow_request_detail_access_controls;
+create table RWorkflow_test.workflow_request_detail_access_controls (
                                                          id int AUTO_INCREMENT,
                                                          request_id int,
                                                          expiration_date datetime(6),
                                                          primary key (id)
 );
 
-create table workflow_request_detail_access_control_connections (
+drop table if exists RWorkflow_test.workflow_request_detail_access_control_connections;
+create table RWorkflow_test.workflow_request_detail_access_control_connections (
                                                                     id int AUTO_INCREMENT,
                                                                     detail_access_control_id int,
                                                                     connection_id int,
@@ -78,7 +85,8 @@ create table workflow_request_detail_access_control_connections (
                                                                     primary key (id)
 );
 
-create table workflow_request_detail_sql_executions (
+drop table if exists RWorkflow_test.workflow_request_detail_sql_executions;
+create table RWorkflow_test.workflow_request_detail_sql_executions (
                                                         id int AUTO_INCREMENT,
                                                         request_id int,
                                                         connection_id int,
@@ -90,7 +98,8 @@ create table workflow_request_detail_sql_executions (
                                                         primary key (id)
 );
 
-create table workflow_request_detail_data_exports (
+drop table if exists RWorkflow_test.workflow_request_detail_data_exports;
+create table RWorkflow_test.workflow_request_detail_data_exports (
                                                       id int AUTO_INCREMENT,
                                                       request_id int,
                                                       connection_id int,
@@ -102,7 +111,8 @@ create table workflow_request_detail_data_exports (
                                                       primary key (id)
 );
 
-create table workflow_rules (
+drop table if exists RWorkflow_test.workflow_rules;
+create table RWorkflow_test.workflow_rules (
                                 id int AUTO_INCREMENT,
                                 name varchar(255),
                                 request_type enum ('ACCESS_CONTROL', 'SQL_EXECUTION', 'DATA_EXPORT'),
@@ -115,7 +125,8 @@ create table workflow_rules (
                                 primary key (id)
 );
 
-create table workflow_rule_approvals (
+drop table if exists RWorkflow_test.workflow_rule_approvals;
+create table RWorkflow_test.workflow_rule_approvals (
                                          id int AUTO_INCREMENT,
                                          rule_id int,
                                          `order` int,
@@ -123,7 +134,8 @@ create table workflow_rule_approvals (
                                          primary key (id)
 );
 
-create table workflow_rule_approval_assignees (
+drop table if exists RWorkflow_test.workflow_rule_approval_assignees;
+create table RWorkflow_test.workflow_rule_approval_assignees (
                                                   id int AUTO_INCREMENT,
                                                   rule_approval_id int,
                                                   assignee_type enum ('USER', 'ROLE'),
@@ -131,7 +143,8 @@ create table workflow_rule_approval_assignees (
                                                   primary key (id)
 );
 
-create table workflow_rule_execution_assignees (
+drop table if exists RWorkflow_test.workflow_rule_execution_assignees;
+create table RWorkflow_test.workflow_rule_execution_assignees (
                                                    id int AUTO_INCREMENT,
                                                    rule_id int,
                                                    assignee_type enum ('USER', 'ROLE'),
@@ -139,7 +152,8 @@ create table workflow_rule_execution_assignees (
                                                    primary key (id)
 );
 
-create table workflow_rule_review_assignees (
+drop table if exists RWorkflow_test.workflow_rule_review_assignees;
+create table RWorkflow_test.workflow_rule_review_assignees (
                                                 id int AUTO_INCREMENT,
                                                 rule_id int,
                                                 assignee_type enum ('USER', 'ROLE'),
@@ -147,7 +161,8 @@ create table workflow_rule_review_assignees (
                                                 primary key (id)
 );
 
-create table users (
+drop table if exists RWorkflow_test.users;
+create table RWorkflow_test.users (
                        id int AUTO_INCREMENT,
                        username varchar(64),
                        password varchar(64),
@@ -157,14 +172,16 @@ create table users (
                        primary key (id)
 );
 
-create table roles (
+drop table if exists RWorkflow_test.roles;
+create table RWorkflow_test.roles (
                        id int AUTO_INCREMENT,
                        name varchar(64),
                        deleted tinyint,
                        primary key (id)
 );
 
-create table user_roles (
+drop table if exists RWorkflow_test.user_roles;
+create table RWorkflow_test.user_roles (
                             id int AUTO_INCREMENT,
                             user_id int,
                             role_id int,
@@ -172,7 +189,8 @@ create table user_roles (
                             primary key (id)
 );
 
-create table connection (
+drop table if exists RWorkflow_test.`connection`;
+create table RWorkflow_test.connection (
                             id int AUTO_INCREMENT,
                             name varchar(64),
                             database_type enum ('MYSQL', 'POSTGRESQL'),
@@ -184,7 +202,8 @@ create table connection (
                             primary key (id)
 );
 
-create table privileges (
+drop table if exists RWorkflow_test.`privileges`;
+create table RWorkflow_test.privileges (
                             id int AUTO_INCREMENT,
                             name varchar(64),
                             permissions text comment 'SELECT,INSERT,UPDATE,DELETE',
@@ -192,7 +211,8 @@ create table privileges (
                             primary key (id)
 );
 
-create table user_access_controls (
+drop table if exists RWorkflow_test.user_access_controls;
+create table RWorkflow_test.user_access_controls (
                                       id int AUTO_INCREMENT,
                                       user_id int,
                                       connection_id int,
@@ -207,7 +227,8 @@ create table user_access_controls (
                                       primary key (id)
 );
 
-create table user_tokens (
+drop table if exists RWorkflow_test.user_tokens;
+create table RWorkflow_test.user_tokens (
                              id int AUTO_INCREMENT,
                              token varchar(64),
                              user_id int,
@@ -235,6 +256,6 @@ INSERT INTO `RWorkflow_test`.`user_access_controls` (`id`, `user_id`, `connectio
 INSERT INTO `RWorkflow_test`.`user_access_controls` (`id`, `user_id`, `connection_id`, `privilege_id`, `expired`, `expiry_at`, `deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (2, 2, 2, 1, 0, '2024-11-01 11:42:55.000000', 0, '2022-11-01 11:42:55.000000', 1, '2022-11-01 11:42:55.000000', 1);
 INSERT INTO `RWorkflow_test`.`user_access_controls` (`id`, `user_id`, `connection_id`, `privilege_id`, `expired`, `expiry_at`, `deleted`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (3, 3, 1, 2, 0, '2024-11-01 11:42:55.000000', 0, '2022-11-01 11:42:55.000000', 1, '2022-11-01 11:42:55.000000', 1);
 
-INSERT INTO `RWorkflow`.`user_tokens` (`id`, `token`, `user_id`) VALUES (1, 'eQjq1u2X', 1);
-INSERT INTO `RWorkflow`.`user_tokens` (`id`, `token`, `user_id`) VALUES (2, 'yCPDeOmN', 2);
-INSERT INTO `RWorkflow`.`user_tokens` (`id`, `token`, `user_id`) VALUES (3, 'xVW8kjnw', 3);
+INSERT INTO `RWorkflow_test`.`user_tokens` (`id`, `token`, `user_id`) VALUES (1, 'eQjq1u2X', 1);
+INSERT INTO `RWorkflow_test`.`user_tokens` (`id`, `token`, `user_id`) VALUES (2, 'yCPDeOmN', 2);
+INSERT INTO `RWorkflow_test`.`user_tokens` (`id`, `token`, `user_id`) VALUES (3, 'xVW8kjnw', 3);

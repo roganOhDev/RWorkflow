@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface WorkflowRuleExecutionAssigneeRepository extends JpaRepository<WorkflowRuleExecutionAssignee, Long> {
-    List<WorkflowRuleExecutionAssignee> findAllByRuleApprovalId(final Long approvalId);
+    List<WorkflowRuleExecutionAssignee> findAllByRuleId(final Long approvalId);
 }

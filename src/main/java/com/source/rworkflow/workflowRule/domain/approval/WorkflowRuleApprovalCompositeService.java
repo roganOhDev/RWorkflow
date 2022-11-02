@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WorkflowRuleApprovalCompositeService {
     private final WorkflowRuleApprovalTriggerService triggerService;
-    private final WorkflowRuleApprovalService service;
 
     public List<WorkflowRuleApproval> createCollection(final Long ruleId, final List<WorkflowRuleApprovalDto.Request> requests) {
         return requests.stream()

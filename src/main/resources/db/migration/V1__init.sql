@@ -1,5 +1,5 @@
 create table workflow_requests (
-                                   id int,
+                                   id int AUTO_INCREMENT ,
                                    title varchar(255),
                                    type enum ('ACCESS_CONTROL', 'SQL_EXECUTION', 'DATA_EXPORT'),
                                    rule_id int,
@@ -22,7 +22,7 @@ create table workflow_requests (
 );
 
 create table workflow_request_approvals (
-                                            id int,
+                                            id int AUTO_INCREMENT,
                                             request_id int,
                                             `order` int,
                                             approve_type enum ('ANY', 'ALL'),
@@ -32,7 +32,7 @@ create table workflow_request_approvals (
 );
 
 create table workflow_request_approval_assignees (
-                                                     id int,
+                                                     id int AUTO_INCREMENT,
                                                      request_id int,
                                                      request_approval_id int,
                                                      assignee_id int,
@@ -45,7 +45,7 @@ create table workflow_request_approval_assignees (
 );
 
 create table workflow_request_execution_assignees (
-                                                      id int,
+                                                      id int AUTO_INCREMENT,
                                                       request_id int,
                                                       assignee_id int,
                                                       action_at datetime(6),
@@ -57,7 +57,7 @@ create table workflow_request_execution_assignees (
 );
 
 create table workflow_request_review_assignees (
-                                                   id int,
+                                                   id int AUTO_INCREMENT,
                                                    request_id int,
                                                    assignee_id int,
                                                    action_at datetime(6),
@@ -68,7 +68,7 @@ create table workflow_request_review_assignees (
 );
 
 create table workflow_request_detail_access_controls (
-                                                         id int,
+                                                         id int AUTO_INCREMENT,
                                                          request_id int,
                                                          expiration_date datetime(6),
                                                          primary key (id),
@@ -76,7 +76,7 @@ create table workflow_request_detail_access_controls (
 );
 
 create table workflow_request_detail_access_control_connections (
-                                                                    id int,
+                                                                    id int AUTO_INCREMENT,
                                                                     detail_access_control_id int,
                                                                     connection_id int,
                                                                     privilege_id int,
@@ -86,7 +86,7 @@ create table workflow_request_detail_access_control_connections (
 );
 
 create table workflow_request_detail_sql_executions (
-                                                        id int,
+                                                        id int AUTO_INCREMENT,
                                                         request_id int,
                                                         connection_id int,
                                                         `database` varchar(255),
@@ -99,7 +99,7 @@ create table workflow_request_detail_sql_executions (
 );
 
 create table workflow_request_detail_data_exports (
-                                                      id int,
+                                                      id int AUTO_INCREMENT,
                                                       request_id int,
                                                       connection_id int,
                                                       `database` varchar(255),
@@ -112,7 +112,7 @@ create table workflow_request_detail_data_exports (
 );
 
 create table workflow_rules (
-                                id int,
+                                id int AUTO_INCREMENT,
                                 name varchar(255),
                                 request_type enum ('ACCESS_CONTROL', 'SQL_EXECUTION', 'DATA_EXPORT'),
                                 urgent tinyint,
@@ -125,7 +125,7 @@ create table workflow_rules (
 );
 
 create table workflow_rule_approvals (
-                                         id int,
+                                         id int AUTO_INCREMENT,
                                          rule_id int,
                                          `order` int,
                                          approve_type enum ('ANY', 'ALL'),
@@ -134,7 +134,7 @@ create table workflow_rule_approvals (
 );
 
 create table workflow_rule_approval_assignees (
-                                                  id int,
+                                                  id int AUTO_INCREMENT,
                                                   rule_approval_id int,
                                                   assignee_type enum ('USER', 'ROLE'),
                                                   assignee_value int,
@@ -143,7 +143,7 @@ create table workflow_rule_approval_assignees (
 );
 
 create table workflow_rule_execution_assignees (
-                                                   id int,
+                                                   id int AUTO_INCREMENT,
                                                    rule_id int,
                                                    assignee_type enum ('USER', 'ROLE'),
                                                    assignee_value int,
@@ -152,7 +152,7 @@ create table workflow_rule_execution_assignees (
 );
 
 create table workflow_rule_review_assignees (
-                                                id int,
+                                                id int AUTO_INCREMENT,
                                                 rule_id int,
                                                 assignee_type enum ('USER', 'ROLE'),
                                                 assignee_value int,
@@ -161,7 +161,7 @@ create table workflow_rule_review_assignees (
 );
 
 create table users (
-                       id int,
+                       id int AUTO_INCREMENT,
                        username varchar(64),
                        password varchar(64),
                        name varchar(64),
@@ -171,14 +171,14 @@ create table users (
 );
 
 create table roles (
-                       id int,
+                       id int AUTO_INCREMENT,
                        name varchar(64),
                        deleted tinyint,
                        primary key (id)
 );
 
 create table user_roles (
-                            id int,
+                            id int AUTO_INCREMENT,
                             user_id int,
                             role_id int,
                             deleted tinyint,
@@ -188,7 +188,7 @@ create table user_roles (
 );
 
 create table connection (
-                            id int,
+                            id int AUTO_INCREMENT,
                             name varchar(64),
                             database_type enum ('MYSQL', 'POSTGRESQL'),
                             host varchar(512),
@@ -200,7 +200,7 @@ create table connection (
 );
 
 create table privileges (
-                            id int,
+                            id int AUTO_INCREMENT,
                             name varchar(64),
                             permissions text comment 'SELECT,INSERT,UPDATE,DELETE',
                             deleted tinyint,
@@ -208,7 +208,7 @@ create table privileges (
 );
 
 create table user_access_controls (
-                                      id int,
+                                      id int AUTO_INCREMENT,
                                       user_id int,
                                       connection_id int,
                                       privilege_id int,
@@ -226,7 +226,7 @@ create table user_access_controls (
 );
 
 create table user_tokens (
-                             id int,
+                             id int AUTO_INCREMENT,
                              token varchar(64),
                              user_id int,
                              primary key (id),

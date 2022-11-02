@@ -1,5 +1,6 @@
 package com.source.rworkflow.workflowRule;
 
+import com.source.rworkflow.common.exception.RException;
 import com.source.rworkflow.misc.user.UserTokenService;
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRuleTransferService;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
@@ -25,8 +26,8 @@ public class WorkflowRuleController {
     private final UserTokenService userTokenService;
     private final WorkflowRuleTransferService transferService;
 
-    @PutMapping(headers = "token")
-    private WorkflowRuleDto.Create.Response create(@RequestBody final @Valid WorkflowRuleDto.Create.Request request, @RequestHeader(HEADER_KEY) String userToken) {
+    @PutMapping
+    public WorkflowRuleDto.Create.Response create(final @Valid @RequestBody WorkflowRuleDto.Create.Request request, @RequestHeader(HEADER_KEY) String userToken) {
         final var sessionUserId = userTokenService.findUserId(userToken);
 
         return transferService.create(request, sessionUserId);
