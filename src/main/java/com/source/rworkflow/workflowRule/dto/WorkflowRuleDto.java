@@ -69,12 +69,6 @@ public class WorkflowRuleDto {
                         })
                         .collect(Collectors.toUnmodifiableList());
             }
-
-            private static List<WorkflowRuleApprovalAssignee> getAssigneesByApprovalId(final Long approvalId, final List<WorkflowRuleApprovalAssignee> workflowRuleApprovalAssignees) {
-                return workflowRuleApprovalAssignees.stream()
-                        .filter(assignee -> assignee.getRuleApprovalId().equals(approvalId))
-                        .collect(Collectors.toUnmodifiableList());
-            }
         }
     }
 }

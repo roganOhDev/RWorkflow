@@ -41,6 +41,8 @@ dependencies {
 
     implementation 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'com.google.guava:guava:31.1-jre'
 }
 
 task testDbUp(type: Exec) {
