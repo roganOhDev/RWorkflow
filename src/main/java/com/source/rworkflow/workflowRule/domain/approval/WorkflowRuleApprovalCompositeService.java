@@ -2,7 +2,7 @@ package com.source.rworkflow.workflowRule.domain.approval;
 
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleApprovalDto;
-import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeEmpty;
+import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeEmptyException;
 import com.source.rworkflow.workflowRule.exception.OrderValueException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -48,7 +48,7 @@ public class WorkflowRuleApprovalCompositeService {
 
     private void checkAssigneeCount(final List<AssigneeDto.Request> list) {
         if (list.size() == 0) {
-            throw new AssigneeCanNotBeEmpty();
+            throw new AssigneeCanNotBeEmptyException();
         }
 
     }

@@ -2,13 +2,12 @@ package com.source.rworkflow.workflowRule.domain.rule;
 
 import com.google.common.collect.Sets;
 import com.source.rworkflow.common.domain.SessionUserId;
-import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleApprovalDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
-import com.source.rworkflow.workflowRule.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgent;
-import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeEmpty;
-import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssignee;
-import com.source.rworkflow.workflowRule.exception.CanNotDuplicateOrder;
+import com.source.rworkflow.workflowRule.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
+import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeEmptyException;
+import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssigneeException;
+import com.source.rworkflow.workflowRule.exception.CanNotDuplicateOrderException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,14 +47,14 @@ public class WorkflowRuleCompositeService {
                 .collect(Collectors.toUnmodifiableList());
 
         if (hasDuplicateElement(orders)) {
-            throw new CanNotDuplicateOrder();
+            throw new CanNotDuplicateOrderException();
         }
     }
 
     private void checkUrgentApproval(final WorkflowRuleDto.Create.Request request) {
         if (request.isUrgent()) {
             if (request.getApprovals() != null | request.getApprovals().size() > 0) {
-                throw new ApprovalAssigneeCanNotBeCreatedWhenUrgent();
+                throw new ApprovalAssigneeCanNotBeCreatedWhenUrgentException();
             }
         }
     }
@@ -65,7 +64,7 @@ public class WorkflowRuleCompositeService {
             final var assignees = request.getApprovals().stream()
                     .flatMap(approval -> {
                         if (approval.getAssignees() == null) {
-                            throw new AssigneeCanNotBeEmpty();
+                            throw new AssigneeCanNotBeEmptyException();
                         }
 
                         return approval.getAssignees().stream();
@@ -73,19 +72,19 @@ public class WorkflowRuleCompositeService {
                     .collect(Collectors.toUnmodifiableList());
 
             if (hasDuplicateElement(assignees)) {
-                throw new CanNotDuplicateAssignee();
+                throw new CanNotDuplicateAssigneeException();
             }
         }
 
         if (request.getExecutions() != null) {
             if (hasDuplicateElement(request.getExecutions())) {
-                throw new CanNotDuplicateAssignee();
+                throw new CanNotDuplicateAssigneeException();
             }
         }
 
         if (request.getReviews() != null) {
             if (hasDuplicateElement(request.getReviews())) {
-                throw new CanNotDuplicateAssignee();
+                throw new CanNotDuplicateAssigneeException();
             }
         }
     }

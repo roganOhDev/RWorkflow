@@ -1,4 +1,4 @@
-package com.source.rworkflow.workflowRule.success;
+package com.source.rworkflow.workflowRule.fail;
 
 import com.source.rworkflow.ClientFactory;
 import com.source.rworkflow.Const;
@@ -9,7 +9,6 @@ import com.source.rworkflow.workflowRule.type.ApproveType;
 import com.source.rworkflow.workflowRule.type.AssigneeType;
 import jdk.jfr.Description;
 import org.json.JSONObject;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.DynamicNode;
 import org.junit.jupiter.api.TestFactory;
@@ -17,23 +16,29 @@ import org.junit.jupiter.api.TestFactory;
 import java.util.Collection;
 import java.util.List;
 
-class WorkflowRuleControllerTest extends TestCase {
+class WorkflowRoleControllerTest extends TestCase {
     private final static String CLASS_URL = "/workflow-rule";
 
-    @Description("생성테스트")
+    @Description("name, type, urgent 중 null 을 넣으면 fail 해야 한다.")
     @TestFactory
     Collection<DynamicNode> simple_create() {
         return group(
-                single("simple create", () -> {
+                single("urgent null", () -> {
                     final var body = new JSONObject();
 
                     body.put("name", "name");
                     body.put("type", WorkflowRequestType.ACCESS_CONTROL.name());
+
+                    ClientFactory.put(CLASS_URL, body, Const.User.Admin.token);
+                }),
+
+                single("type null", () -> {
+                    final var body = new JSONObject();
+
+                    body.put("name", "name");
                     body.put("urgent", false);
 
-                    final var actual = ClientFactory.put(CLASS_URL, body, Const.User.Admin.token);
-
-                    assertSimpleRule(body, actual, "rule");
+                    ClientFactory.put(CLASS_URL, body, Const.User.Admin.token);
                 })
         );
     }
@@ -47,7 +52,7 @@ class WorkflowRuleControllerTest extends TestCase {
 
                     body.put("name", "name");
                     body.put("type", WorkflowRequestType.ACCESS_CONTROL.name());
-                    body.put("urgent", false);
+                    body.put("urgent", true);
 
                     final var assignee1 = WorkflowRuleControllerTestCommon.create_assignee(AssigneeType.USER, 2L);
                     final var assignee2 = WorkflowRuleControllerTestCommon.create_assignee(AssigneeType.USER, 3L);
@@ -60,14 +65,6 @@ class WorkflowRuleControllerTest extends TestCase {
 
                     ClientFactory.put(CLASS_URL, body, Const.User.Admin.token);
                 })
-        );
-    }
-
-    private void assertSimpleRule(final JSONObject expected, final JSONObject actual, final String message) {
-        Assertions.assertAll(
-                () -> Assertions.assertEquals(expected.get("name"), actual.get("name"), message + "name"),
-                () -> Assertions.assertEquals(expected.get("type"), actual.get("type"), message + "type"),
-                () -> Assertions.assertEquals(expected.get("urgent"), actual.get("urgent"), message + "urgent")
         );
     }
 
