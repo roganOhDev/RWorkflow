@@ -122,7 +122,6 @@ public class ClientFactory {
     private static void handleException(final ClientResponse rawResponse, final String uri, final String httpMethod) {
         if (rawResponse.statusCode().is4xxClientError()) {
             Assertions.fail(httpMethod + " " + BASE_URL + uri + " failed (api server error)");
-
         } else if (rawResponse.statusCode().is5xxServerError()) {
             Assertions.fail(httpMethod + " " + BASE_URL + uri + " " + rawResponse.statusCode().value() + " error : " + rawResponse.statusCode().getReasonPhrase());
         }

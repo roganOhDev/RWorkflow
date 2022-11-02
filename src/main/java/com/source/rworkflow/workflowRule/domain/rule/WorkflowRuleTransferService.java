@@ -12,6 +12,7 @@ import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleRevie
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ public class WorkflowRuleTransferService {
     private final WorkflowRuleExecutionAssigneeCompositeService workflowRuleExecutionAssigneeCompositeService;
     private final WorkflowRuleReviewAssigneeCompositeService workflowRuleReviewAssigneeCompositeService;
 
+    @Transactional
     public WorkflowRuleDto.Create.Response create(final WorkflowRuleDto.Create.Request request, final SessionUserId sessionUserId) {
         List<WorkflowRuleApproval> createdApprovals = List.of();
         Map<Long, List<WorkflowRuleApprovalAssignee>> createdApprovalAssignees = new HashMap<>(Map.of());

@@ -3,9 +3,10 @@ package com.source.rworkflow.workflowRule.dto;
 import com.source.rworkflow.workflowRule.domain.approval.WorkflowRuleApproval;
 import com.source.rworkflow.workflowRule.domain.approvalAssignee.WorkflowRuleApprovalAssignee;
 import com.source.rworkflow.workflowRule.type.ApproveType;
-import com.sun.istack.NotNull;
 import lombok.Getter;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +17,7 @@ public class WorkflowRuleApprovalDto {
         private ApproveType approveType;
         @NotNull
         private Long order;
-        @NotNull
+        @Valid
         private List<AssigneeDto.Request> assignees;
     }
 

@@ -27,8 +27,7 @@ create table workflow_request_approvals (
                                             `order` int,
                                             approve_type enum ('ANY', 'ALL'),
                                             status enum ('PENDING', 'IN_PROGRESS', 'APPROVED', 'REJECTED'),
-                                            primary key (id),
-                                            foreign key (request_id) references workflow_requests (id)
+                                            primary key (id)
 );
 
 create table workflow_request_approval_assignees (
@@ -39,9 +38,7 @@ create table workflow_request_approval_assignees (
                                                      action_at datetime(6),
                                                      action_by int,
                                                      status enum ('PENDING', 'APPROVED', 'REJECTED', 'CONFIRMED'),
-                                                     primary key (id),
-                                                     #     foreign key (request_id) references workflow_requests (id),
-                                                     foreign key (request_approval_id) references workflow_request_approvals (id)
+                                                     primary key (id)
 );
 
 create table workflow_request_execution_assignees (
@@ -52,8 +49,7 @@ create table workflow_request_execution_assignees (
                                                       action_by int,
                                                       finished_at datetime(6),
                                                       status enum ('PENDING', 'EXECUTED', 'SUCCEEDED', 'FAILED'),
-                                                      primary key (id),
-                                                      foreign key (request_id) references workflow_requests (id)
+                                                      primary key (id)
 );
 
 create table workflow_request_review_assignees (
@@ -63,16 +59,14 @@ create table workflow_request_review_assignees (
                                                    action_at datetime(6),
                                                    action_by int,
                                                    status enum ('PENDING', 'CONFIRMED'),
-                                                   primary key (id),
-                                                   foreign key (request_id) references workflow_requests (id)
+                                                   primary key (id)
 );
 
 create table workflow_request_detail_access_controls (
                                                          id int AUTO_INCREMENT,
                                                          request_id int,
                                                          expiration_date datetime(6),
-                                                         primary key (id),
-                                                         foreign key (request_id) references workflow_requests (id)
+                                                         primary key (id)
 );
 
 create table workflow_request_detail_access_control_connections (
@@ -81,8 +75,7 @@ create table workflow_request_detail_access_control_connections (
                                                                     connection_id int,
                                                                     privilege_id int,
                                                                     granted tinyint default 0,
-                                                                    primary key (id),
-                                                                    foreign key (detail_access_control_id) references workflow_request_detail_access_controls (id)
+                                                                    primary key (id)
 );
 
 create table workflow_request_detail_sql_executions (
@@ -94,8 +87,7 @@ create table workflow_request_detail_sql_executions (
                                                         content_value text,
                                                         execution_expiry_at datetime(6),
                                                         request_expiry_at datetime(6),
-                                                        primary key (id),
-                                                        foreign key (request_id) references workflow_requests (id)
+                                                        primary key (id)
 );
 
 create table workflow_request_detail_data_exports (
@@ -107,8 +99,7 @@ create table workflow_request_detail_data_exports (
                                                       content_value text,
                                                       execution_expiry_at datetime(6),
                                                       request_expiry_at datetime(6),
-                                                      primary key (id),
-                                                      foreign key (request_id) references workflow_requests (id)
+                                                      primary key (id)
 );
 
 create table workflow_rules (
@@ -129,8 +120,7 @@ create table workflow_rule_approvals (
                                          rule_id int,
                                          `order` int,
                                          approve_type enum ('ANY', 'ALL'),
-                                         primary key (id),
-                                         foreign key (rule_id) references workflow_rules (id)
+                                         primary key (id)
 );
 
 create table workflow_rule_approval_assignees (
@@ -138,8 +128,7 @@ create table workflow_rule_approval_assignees (
                                                   rule_approval_id int,
                                                   assignee_type enum ('USER', 'ROLE'),
                                                   assignee_value int,
-                                                  primary key (id),
-                                                  foreign key (rule_approval_id) references workflow_rule_approvals (id)
+                                                  primary key (id)
 );
 
 create table workflow_rule_execution_assignees (
@@ -147,8 +136,7 @@ create table workflow_rule_execution_assignees (
                                                    rule_id int,
                                                    assignee_type enum ('USER', 'ROLE'),
                                                    assignee_value int,
-                                                   primary key (id),
-                                                   foreign key (rule_id) references workflow_rules (id)
+                                                   primary key (id)
 );
 
 create table workflow_rule_review_assignees (
@@ -156,8 +144,7 @@ create table workflow_rule_review_assignees (
                                                 rule_id int,
                                                 assignee_type enum ('USER', 'ROLE'),
                                                 assignee_value int,
-                                                primary key (id),
-                                                foreign key (rule_id) references workflow_rules (id)
+                                                primary key (id)
 );
 
 create table users (
@@ -182,9 +169,7 @@ create table user_roles (
                             user_id int,
                             role_id int,
                             deleted tinyint,
-                            primary key (id),
-                            foreign key (user_id) references users (id),
-                            foreign key (role_id) references roles (id)
+                            primary key (id)
 );
 
 create table connection (
@@ -219,18 +204,14 @@ create table user_access_controls (
                                       created_by int,
                                       updated_at datetime(6),
                                       updated_by int,
-                                      primary key (id),
-                                      foreign key (user_id) references users (id),
-                                      foreign key (connection_id) references connection (id),
-                                      foreign key (privilege_id) references privileges (id)
+                                      primary key (id)
 );
 
 create table user_tokens (
                              id int AUTO_INCREMENT,
                              token varchar(64),
                              user_id int,
-                             primary key (id),
-                             foreign key (user_id) references users (id)
+                             primary key (id)
 );
 
 INSERT INTO `RWorkflow`.`users` (`id`, `username`, `password`, `name`, `email`, `deleted`) VALUES (1, 'SYSTEM', 'cGFzc3dvcmQ=', 'SYSTEM', 'SYSTEM@rogan.com', 0);

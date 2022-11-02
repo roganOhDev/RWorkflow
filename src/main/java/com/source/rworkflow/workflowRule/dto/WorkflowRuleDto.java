@@ -9,6 +9,7 @@ import com.source.rworkflow.workflowRule.domain.rule.WorkflowRule;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,11 @@ public class WorkflowRuleDto {
             private WorkflowRequestType type;
             @NotNull(message = "need urgent")
             private Boolean urgent;
+            @Valid
             private List<WorkflowRuleApprovalDto.Request> approvals;
+            @Valid
             private List<AssigneeDto.Request> executions;
+            @Valid
             private List<AssigneeDto.Request> reviews;
 
             public boolean isUrgent() {

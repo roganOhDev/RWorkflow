@@ -4,11 +4,14 @@ import com.source.rworkflow.workflowRule.domain.approvalAssignee.WorkflowRuleApp
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssignee;
 import com.source.rworkflow.workflowRule.type.AssigneeType;
-import com.sun.istack.NotNull;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+
+import javax.validation.constraints.NotNull;
 
 public class AssigneeDto {
     @Getter
+    @EqualsAndHashCode()
     public static class Request{
         @NotNull
         private AssigneeType type;
