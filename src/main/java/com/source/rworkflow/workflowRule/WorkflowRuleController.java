@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 import static com.source.rworkflow.common.domain.UserTokenHeader.HEADER_KEY;
 
 @Slf4j
@@ -24,19 +26,10 @@ public class WorkflowRuleController {
     private final WorkflowRuleTransferService transferService;
 
     @PutMapping(headers = "token")
-    private WorkflowRuleDto.Create.Response create(@RequestBody final WorkflowRuleDto.Create.Request request, @RequestHeader(HEADER_KEY) String userToken) {
+    private WorkflowRuleDto.Create.Response create(@RequestBody final @Valid WorkflowRuleDto.Create.Request request, @RequestHeader(HEADER_KEY) String userToken) {
         final var sessionUserId = userTokenService.findUserId(userToken);
-        transferService.create(request, sessionUserId);
 
-        return new WorkflowRuleDto.Create.Response();
+        return transferService.create(request, sessionUserId);
     }
-
-    @GetMapping
-    private WorkflowRuleDto.Create.Response a(@RequestHeader("token") String userToken) {
-        userTokenService.findUserId(userToken);
-
-        return new WorkflowRuleDto.Create.Response();
-    }
-
 
 }
