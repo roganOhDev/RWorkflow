@@ -6,8 +6,8 @@ import com.source.rworkflow.workflowRule.domain.approvalAssignee.WorkflowRuleApp
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssignee;
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRule;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -39,7 +39,6 @@ public class WorkflowRuleDto {
         }
 
         @Getter
-        @Setter
         public static class Response {
             private String name;
             private WorkflowRequestType type;
@@ -78,6 +77,17 @@ public class WorkflowRuleDto {
                         })
                         .collect(Collectors.toUnmodifiableList());
             }
+        }
+    }
+
+    @Getter
+    public static class Delete {
+        @Getter
+        @AllArgsConstructor
+        public static class Response {
+            private Long id;
+            private String name;
+            private WorkflowRequestType workflowType;
         }
     }
 }

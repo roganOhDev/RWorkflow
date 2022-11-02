@@ -15,4 +15,10 @@ public class WorkflowRuleApprovalTrigger {
     public void afterCreate(final Long approvalId, final List<AssigneeDto.Request> assignees) {
         approvalAssigneeCompositeService.createCollection(approvalId, assignees);
     }
+
+    public void beforeDelete(final WorkflowRuleApproval approval) {
+        final var assignees = approvalAssigneeCompositeService.find(approval.getId());
+
+        approvalAssigneeCompositeService.deleteCollection(assignees);
+    }
 }

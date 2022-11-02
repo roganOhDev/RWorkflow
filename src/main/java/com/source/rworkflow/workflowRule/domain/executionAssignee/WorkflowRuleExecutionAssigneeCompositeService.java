@@ -18,6 +18,14 @@ public class WorkflowRuleExecutionAssigneeCompositeService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    public void deleteCollection(final List<WorkflowRuleExecutionAssignee> assignees) {
+        assignees.forEach(this::delete);
+    }
+
+    public List<WorkflowRuleExecutionAssignee> findAllByRuleId(final Long ruleId) {
+        return service.find(ruleId);
+    }
+
     private WorkflowRuleExecutionAssignee create(final Long ruleId, final AssigneeDto.Request request) {
         final var assignee = new WorkflowRuleExecutionAssignee();
 
@@ -26,5 +34,9 @@ public class WorkflowRuleExecutionAssigneeCompositeService {
         assignee.setAssigneeValue(request.getValue());
 
         return service.create(assignee);
+    }
+
+    private void delete(final WorkflowRuleExecutionAssignee assignee) {
+        service.delete(assignee);
     }
 }

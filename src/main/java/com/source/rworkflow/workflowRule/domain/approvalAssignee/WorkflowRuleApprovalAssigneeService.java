@@ -17,4 +17,8 @@ public class WorkflowRuleApprovalAssigneeService {
     public List<WorkflowRuleApprovalAssignee> find(final Long approvalId) {
         return repository.findAllByRuleApprovalId(approvalId);
     }
+
+    public void delete(final WorkflowRuleApprovalAssignee assignee) {
+        repository.delete(assignee);
+    }
 }

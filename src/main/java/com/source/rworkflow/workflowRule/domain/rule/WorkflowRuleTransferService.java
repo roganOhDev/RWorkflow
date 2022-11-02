@@ -70,6 +70,12 @@ public class WorkflowRuleTransferService {
         return WorkflowRuleDto.Create.Response.from(created, createdApprovals, createdApprovalAssignees, createdExecutions, createdReviews);
     }
 
+    public WorkflowRuleDto.Delete.Response delete(final Long id, final SessionUserId sessionUserId) {
+        final var deleted = compositeService.delete(id, sessionUserId);
+
+        return new WorkflowRuleDto.Delete.Response(deleted.getId(), deleted.getName(), deleted.getRequestType());
+    }
+
     private void assigneeValidate(final AssigneeDto.Request request) {
         switch (request.getType()) {
             case USER:

@@ -15,12 +15,20 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WorkflowRuleApprovalCompositeService {
     private final WorkflowRuleApprovalTriggerService triggerService;
+    private final WorkflowRuleApprovalService service;
 
     @Transactional
     public List<WorkflowRuleApproval> createCollection(final Long ruleId, final List<WorkflowRuleApprovalDto.Request> requests) {
         return requests.stream()
                 .map(request -> create(ruleId, request))
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Transactional
+    public void deleteCollection(final Long ruleId) {
+        final var workflowRuleApprovals = findAllByRuleId(ruleId);
+
+        workflowRuleApprovals.forEach(triggerService::delete);
     }
 
     private WorkflowRuleApproval create(final Long ruleId, final WorkflowRuleApprovalDto.Request request) {
@@ -33,6 +41,10 @@ public class WorkflowRuleApprovalCompositeService {
         approval.setApproveType(request.getApproveType());
 
         return triggerService.create(approval, request.getAssignees());
+    }
+
+    public List<WorkflowRuleApproval> findAllByRuleId(final Long ruleId) {
+        return service.findAllByRuleId(ruleId);
     }
 
     private void validate(final WorkflowRuleApprovalDto.Request request) {

@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class WorkflowRuleCompositeService {
+    private final WorkflowRuleTriggerService triggerService;
     private final WorkflowRuleService service;
 
     @Transactional
@@ -29,10 +30,19 @@ public class WorkflowRuleCompositeService {
         workflowRule.setName(request.getName());
         workflowRule.setRequestType(request.getType());
         workflowRule.setUrgent(request.isUrgent());
-        workflowRule.setCreatedBy(sessionUserId.getId());
-        workflowRule.setUpdatedBy(sessionUserId.getId());
+        workflowRule.setDeleted(false);
 
-        return service.create(workflowRule);
+
+        return service.create(workflowRule, sessionUserId);
+    }
+
+    @Transactional
+    public WorkflowRule delete(final Long id, final SessionUserId sessionUserId) {
+        final var workflowRule = service.find(id);
+
+        workflowRule.setDeleted(true);
+
+        return triggerService.delete(workflowRule, sessionUserId);
     }
 
     private void validate(final WorkflowRuleDto.Create.Request request, final SessionUserId sessionUserId) {
