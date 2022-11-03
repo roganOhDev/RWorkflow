@@ -1,8 +1,7 @@
 package com.source.rworkflow.workflowRule.domain.approval;
 
-import com.source.rworkflow.workflowRule.dto.AssigneeDto;
+import com.source.rworkflow.common.util.Comparer;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleApprovalDto;
-import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeEmptyException;
 import com.source.rworkflow.workflowRule.exception.OrderValueException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,8 +30,20 @@ public class WorkflowRuleApprovalCompositeService {
         workflowRuleApprovals.forEach(triggerService::delete);
     }
 
+    @Transactional
+    public List<WorkflowRuleApproval> updateCollection(final Long ruleId, List<WorkflowRuleApprovalDto.Request> requests) {
+        final var approvals = findAllByRuleId(ruleId);
+
+        final var results = Comparer.compare(approvals, requests, (approval, request) -> approval.getId().equals(request.getId()));
+
+        return results.execute(
+                createRequest -> this.create(ruleId, createRequest),
+                triggerService::delete
+        );
+    }
+
     private WorkflowRuleApproval create(final Long ruleId, final WorkflowRuleApprovalDto.Request request) {
-        validate(request);
+        validateCreate(request);
 
         final var approval = new WorkflowRuleApproval();
 
@@ -47,21 +58,13 @@ public class WorkflowRuleApprovalCompositeService {
         return service.findAllByRuleId(ruleId);
     }
 
-    private void validate(final WorkflowRuleApprovalDto.Request request) {
+    private void validateCreate(final WorkflowRuleApprovalDto.Request request) {
         checkOrder(request.getOrder());
-        checkAssigneeCount(request.getAssignees());
     }
 
     private void checkOrder(final Long order) {
         if (order > 3 | order <= 0) {
             throw new OrderValueException();
         }
-    }
-
-    private void checkAssigneeCount(final List<AssigneeDto.Request> list) {
-        if (list.size() == 0) {
-            throw new AssigneeCanNotBeEmptyException();
-        }
-
     }
 }

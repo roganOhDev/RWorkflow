@@ -41,4 +41,13 @@ public class WorkflowRuleService {
 
         return workflowRule;
     }
+
+    public WorkflowRule update(final WorkflowRule workflowRule, final SessionUserId sessionUserId) {
+        final var now = LocalDateTime.now();
+
+        workflowRule.setUpdatedAt(now);
+        workflowRule.setUpdatedBy(sessionUserId.getId());
+
+        return repository.save(workflowRule);
+    }
 }

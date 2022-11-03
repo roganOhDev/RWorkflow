@@ -1,24 +1,20 @@
 package com.source.rworkflow.workflowRule.domain.rule;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.common.collect.Sets;
 import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.common.util.Patch;
+import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleApprovalDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
 import com.source.rworkflow.workflowRule.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
-import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeEmptyException;
+import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeNullException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssigneeException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateOrderException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +25,7 @@ public class WorkflowRuleCompositeService {
 
     @Transactional
     public WorkflowRule create(final WorkflowRuleDto.Create.Request request, final SessionUserId sessionUserId) {
-        validate(request, sessionUserId);
+        validateCreate(request);
 
         final var workflowRule = new WorkflowRule();
 
@@ -50,14 +46,35 @@ public class WorkflowRuleCompositeService {
     }
 
     @Transactional
-    public WorkflowRule update(final WorkflowRule workflowRule,final WorkflowRuleDto.Update.Request request, final SessionUserId sessionUserId) {
-        return Patch.of(workflowRule, WorkflowRule.class, request);
+    public WorkflowRule update(final WorkflowRule workflowRule, final WorkflowRuleDto.Update.Request request, final boolean hasApproval, final SessionUserId sessionUserId) {
+        validateUpdate(request);
+
+        final var updated = Patch.entityByRequest(workflowRule, WorkflowRule.class, request);
+
+        checkUrgentApproval(request.getUrgent(), hasApproval);
+
+        return service.update(updated, sessionUserId);
     }
 
-    private void validate(final WorkflowRuleDto.Create.Request request, final SessionUserId sessionUserId) {
+    private void validateCreate(final WorkflowRuleDto.Create.Request request) {
+        checkAssigneeNull(request);
         checkUrgentApproval(request);
-        checkDuplicateAssignee(request);
+        checkDuplicateAssignee(request.getApprovals(), request.getExecutions(), request.getReviews());
         checkDuplicateOrder(request.getApprovals());
+    }
+
+    private void validateUpdate(final WorkflowRuleDto.Update.Request request) {
+        checkDuplicateAssignee(request.getApprovals(), request.getExecutions(), request.getReviews());
+
+        if (request.getApprovals() != null) {
+            checkDuplicateOrder(request.getApprovals());
+        }
+    }
+
+    private void checkAssigneeNull(final WorkflowRuleDto.Create.Request request) {
+        if (request.getApprovals() == null | request.getExecutions() == null | request.getReviews() == null) {
+            throw new AssigneeCanNotBeNullException();
+        }
     }
 
     private void checkDuplicateOrder(final List<WorkflowRuleApprovalDto.Request> requests) {
@@ -65,52 +82,53 @@ public class WorkflowRuleCompositeService {
                 .map(WorkflowRuleApprovalDto.Request::getOrder)
                 .collect(Collectors.toUnmodifiableList());
 
-        if (hasDuplicateElement(orders)) {
+        if (ListUtil.hasDuplicateElement(orders)) {
             throw new CanNotDuplicateOrderException();
+        }
+    }
+
+    private void checkUrgentApproval(final boolean isUrgent, final boolean hasApproval) {
+        if (isUrgent != hasApproval) {
+            throw new ApprovalAssigneeCanNotBeCreatedWhenUrgentException();
         }
     }
 
     private void checkUrgentApproval(final WorkflowRuleDto.Create.Request request) {
         if (request.isUrgent()) {
-            if (request.getApprovals() != null | request.getApprovals().size() > 0) {
+            if (request.getApprovals() == null | request.getApprovals().size() > 0) {
                 throw new ApprovalAssigneeCanNotBeCreatedWhenUrgentException();
             }
         }
     }
 
-    private void checkDuplicateAssignee(final WorkflowRuleDto.Create.Request request) {
-        if (request.getApprovals() != null) {
-            final var assignees = request.getApprovals().stream()
+    private void checkDuplicateAssignee(final List<WorkflowRuleApprovalDto.Request> workflowRuleApprovals, final List<AssigneeDto.Request> executions, final List<AssigneeDto.Request> reviews) {
+        if (workflowRuleApprovals != null) {
+            final var assignees = workflowRuleApprovals.stream()
                     .flatMap(approval -> {
                         if (approval.getAssignees() == null) {
-                            throw new AssigneeCanNotBeEmptyException();
+                            throw new AssigneeCanNotBeNullException();
                         }
 
                         return approval.getAssignees().stream();
                     })
                     .collect(Collectors.toUnmodifiableList());
 
-            if (hasDuplicateElement(assignees)) {
+            if (ListUtil.hasDuplicateElement(assignees)) {
                 throw new CanNotDuplicateAssigneeException();
             }
         }
 
-        if (request.getExecutions() != null) {
-            if (hasDuplicateElement(request.getExecutions())) {
+        if (executions != null) {
+            if (ListUtil.hasDuplicateElement(executions)) {
                 throw new CanNotDuplicateAssigneeException();
             }
         }
 
-        if (request.getReviews() != null) {
-            if (hasDuplicateElement(request.getReviews())) {
+        if (reviews != null) {
+            if (ListUtil.hasDuplicateElement(reviews)) {
                 throw new CanNotDuplicateAssigneeException();
             }
         }
-    }
-
-    private boolean hasDuplicateElement(final List<?> list) {
-        final var set = Sets.newHashSet(list);
-        return set.size() != list.size();
     }
 
 }

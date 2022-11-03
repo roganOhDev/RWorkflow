@@ -7,7 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.Map;
 
 public class Patch {
-    public static <EntityT, EntityClass, RequestT> EntityClass of(EntityT entity, Class<EntityClass> entityClazz, RequestT request){
+    public static <EntityT, EntityClass, RequestT> EntityClass entityByRequest(EntityT entity, Class<EntityClass> entityClazz, RequestT request){
         final var entityMapper = new ObjectMapper();
 
         Map<String, Object> entityAsMap = mapper(entity, entityMapper);

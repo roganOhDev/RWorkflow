@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 public class WorkflowRuleApprovalDto {
     @Getter
     public static class Request {
+        private Long id;
         @NotNull
         private ApproveType approveType;
         @NotNull

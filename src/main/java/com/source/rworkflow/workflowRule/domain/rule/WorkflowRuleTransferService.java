@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class WorkflowRuleTransferService {
     private final RoleService roleService;
 
     @Transactional
-    public WorkflowRuleDto.Create.Response create(final WorkflowRuleDto.Create.Request request, final SessionUserId sessionUserId) {
+    public WorkflowRuleDto.Response create(final WorkflowRuleDto.Create.Request request, final SessionUserId sessionUserId) {
         List<WorkflowRuleApproval> createdApprovals = List.of();
         Map<Long, List<WorkflowRuleApprovalAssignee>> createdApprovalAssignees = new HashMap<>(Map.of());
         List<WorkflowRuleExecutionAssignee> createdExecutions = List.of();
@@ -56,19 +57,13 @@ public class WorkflowRuleTransferService {
                     });
         }
 
-        if (request.getExecutions() != null) {
-            request.getExecutions().forEach(this::assigneeValidate);
+        request.getExecutions().forEach(this::assigneeValidate);
+        createdExecutions = workflowRuleExecutionAssigneeCompositeService.createCollection(created.getId(), request.getExecutions());
 
-            createdExecutions = workflowRuleExecutionAssigneeCompositeService.createCollection(created.getId(), request.getExecutions());
-        }
+        request.getReviews().forEach(this::assigneeValidate);
+        createdReviews = workflowRuleReviewAssigneeCompositeService.createCollection(created.getId(), request.getReviews());
 
-        if (request.getReviews() != null) {
-            request.getReviews().forEach(this::assigneeValidate);
-
-            createdReviews = workflowRuleReviewAssigneeCompositeService.createCollection(created.getId(), request.getExecutions());
-        }
-
-        return WorkflowRuleDto.Create.Response.from(created, createdApprovals, createdApprovalAssignees, createdExecutions, createdReviews);
+        return WorkflowRuleDto.Response.from(created, createdApprovals, createdApprovalAssignees, createdExecutions, createdReviews);
     }
 
     public WorkflowRuleDto.Delete.Response delete(final Long id, final SessionUserId sessionUserId) {
@@ -78,13 +73,53 @@ public class WorkflowRuleTransferService {
         return new WorkflowRuleDto.Delete.Response(deleted.getId(), deleted.getName(), deleted.getRequestType());
     }
 
-    public WorkflowRuleDto.Update.Response update(final Long id, final WorkflowRuleDto.Update.Request request, final SessionUserId sessionUserId) {
-        final var workflowRule = service.find(id);
+    public WorkflowRuleDto.Response update(final WorkflowRuleDto.Update.Request request, final SessionUserId sessionUserId) {
+        List<WorkflowRuleApproval> updatedApprovals = List.of();
+        Map<Long, List<WorkflowRuleApprovalAssignee>> updatedApprovalAssignees = new HashMap<>(Map.of());
+        List<WorkflowRuleExecutionAssignee> updatedExecutions = List.of();
+        List<WorkflowRuleReviewAssignee> updatedReviews = List.of();
 
-        final var updated = compositeService.update(workflowRule, request, sessionUserId);
+        final var ruleId = request.getId();
+        final var workflowRule = service.find(ruleId);
 
-        return null;
+        final var hasApproval = workflowRuleApprovalCompositeService.findAllByRuleId(ruleId).size() > 0;
+
+        final var updated = compositeService.update(workflowRule, request, hasApproval, sessionUserId);
+
+        if (request.getApprovals() != null) {
+            request.getApprovals().forEach(approval -> {
+                approval.getAssignees().forEach(this::assigneeValidate);
+            });
+
+            updatedApprovals = workflowRuleApprovalCompositeService.updateCollection(ruleId, request.getApprovals());
+
+            updatedApprovals
+                    .forEach(approval -> {
+                        final var assignees = workflowRuleApprovalAssigneeCompositeService.find(approval.getId());
+                        updatedApprovalAssignees.put(approval.getId(), assignees);
+                    });
+        }
+
+        if (request.getExecutions() != null) {
+            request.getExecutions().forEach(this::assigneeValidate);
+            updatedExecutions = workflowRuleExecutionAssigneeCompositeService.updateCollection(ruleId, request.getExecutions());
+        }
+
+        if (request.getReviews() != null) {
+            request.getReviews().forEach(this::assigneeValidate);
+            updatedReviews = workflowRuleReviewAssigneeCompositeService.updateCollection(ruleId, request.getReviews());
+        }
+
+        return WorkflowRuleDto.Response.from(updated, updatedApprovals, updatedApprovalAssignees, updatedExecutions, updatedReviews);
     }
+
+//    public WorkflowRuleDto.Read.Response list() {
+//        stream.collection(Collectors.groupingBy(e -> e.getType()))
+//    }
+//
+//    public WorkflowRuleDto.Response find() {
+//
+//    }
 
     private void assigneeValidate(final AssigneeDto.Request request) {
         switch (request.getType()) {

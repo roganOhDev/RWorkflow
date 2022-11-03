@@ -13,6 +13,7 @@ public class AssigneeDto {
     @Getter
     @EqualsAndHashCode()
     public static class Request{
+        private Long id;
         @NotNull
         private AssigneeType type;
         @NotNull

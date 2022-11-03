@@ -1,12 +1,14 @@
 package com.source.rworkflow.workflowRule.domain.approvalAssignee;
 
+import com.source.rworkflow.common.util.Comparer;
+import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
+import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssigneeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -14,10 +16,21 @@ public class WorkflowRuleApprovalAssigneeCompositeService {
     private final WorkflowRuleApprovalAssigneeService service;
 
     @Transactional
-    public List<WorkflowRuleApprovalAssignee> createCollection(final Long approvalId, final List<AssigneeDto.Request> assignees) {
-        return assignees.stream()
-                .map(assignee -> create(approvalId, assignee))
-                .collect(Collectors.toUnmodifiableList());
+    public List<WorkflowRuleApprovalAssignee> createCollection(final Long approvalId, final List<AssigneeDto.Request> requests) {
+        final var existingAssignees = service.find(approvalId);
+
+        final var results = Comparer.compare(existingAssignees, requests, (approval, request) -> approval.getId().equals(request.getId()));
+
+        final var assginees = results.execute(
+                createRequest -> this.create(approvalId, createRequest),
+                this::delete
+        );
+
+        if(ListUtil.hasDuplicateElement(assginees)) {
+            throw new CanNotDuplicateAssigneeException();
+        };
+
+        return assginees;
     }
 
     @Transactional

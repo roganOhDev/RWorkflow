@@ -1,6 +1,9 @@
 package com.source.rworkflow.workflowRule.domain.reviewAssignee;
 
+import com.source.rworkflow.common.util.Comparer;
+import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
+import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssigneeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,24 @@ public class WorkflowRuleReviewAssigneeCompositeService {
     @Transactional
     public void deleteCollection(final List<WorkflowRuleReviewAssignee> assignees) {
         assignees.forEach(this::delete);
+    }
+
+    @Transactional
+    public List<WorkflowRuleReviewAssignee> updateCollection(final Long ruleId, List<AssigneeDto.Request> requests) {
+        final var existingAssignees = findAllByRuleId(ruleId);
+
+        final var results = Comparer.compare(existingAssignees, requests, (approval, request) -> approval.getId().equals(request.getId()));
+
+        final var assignees = results.execute(
+                createRequest -> this.create(ruleId, createRequest),
+                this::delete
+        );
+
+        if (ListUtil.hasDuplicateElement(assignees)) {
+            throw new CanNotDuplicateAssigneeException();
+        }
+
+        return assignees;
     }
 
     @Transactional(readOnly = true)

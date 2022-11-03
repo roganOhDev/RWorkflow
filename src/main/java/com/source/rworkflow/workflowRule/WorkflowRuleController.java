@@ -3,16 +3,19 @@ package com.source.rworkflow.workflowRule;
 import com.source.rworkflow.misc.user.UserTokenService;
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRuleTransferService;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -28,7 +31,7 @@ public class WorkflowRuleController {
     private final WorkflowRuleTransferService transferService;
 
     @PutMapping
-    public WorkflowRuleDto.Create.Response create(final @Valid @RequestBody WorkflowRuleDto.Create.Request request, @RequestHeader(HEADER_KEY) String userToken) {
+    public WorkflowRuleDto.Response create(final @Valid @RequestBody WorkflowRuleDto.Create.Request request, @RequestHeader(HEADER_KEY) String userToken) {
         final var sessionUserId = userTokenService.findUserId(userToken);
 
         return transferService.create(request, sessionUserId);
@@ -41,11 +44,25 @@ public class WorkflowRuleController {
         return transferService.delete(id, sessionUserId);
     }
 
-    @PatchMapping(path = "/{id}")
-    public WorkflowRuleDto.Update.Response update(final @PathVariable Long id, final @RequestBody WorkflowRuleDto.Update.Request request, @RequestHeader(HEADER_KEY) String userToken) {
+    @PatchMapping
+    public WorkflowRuleDto.Response update(final @RequestBody WorkflowRuleDto.Update.Request request, @RequestHeader(HEADER_KEY) String userToken) {
         final var sessionUserId = userTokenService.findUserId(userToken);
 
-        return transferService.update(id, request, sessionUserId);
+        return transferService.update(request, sessionUserId);
     }
+
+//    @GetMapping
+//    public WorkflowRuleDto.Read.Response list(final @RequestParam String workflowRequestType, @RequestHeader(HEADER_KEY) String userToken) {
+//        final var sessionUserId = userTokenService.findUserId(userToken);
+//
+//        return transferService.list(workflowRequestType, sessionUserId);
+//    }
+//
+//    @GetMapping(path = "{id}")
+//    public WorkflowRuleDto.Response find(final @RequestParam Long id, @RequestHeader(HEADER_KEY) String userToken) {
+//        final var sessionUserId = userTokenService.findUserId(userToken);
+//
+//        return transferService.find(workflowRequestType, sessionUserId);
+//    }
 
 }

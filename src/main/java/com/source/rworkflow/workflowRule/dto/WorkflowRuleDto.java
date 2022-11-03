@@ -8,6 +8,7 @@ import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleRevie
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -38,58 +39,19 @@ public class WorkflowRuleDto {
             }
         }
 
-        @Getter
-        public static class Response {
-            private String name;
-            private WorkflowRequestType type;
-            private boolean urgent;
-            private List<WorkflowRuleApprovalDto.Response> approvals;
-            private List<AssigneeDto.Response> executions;
-            private List<AssigneeDto.Response> reviews;
-
-            public static Response from(final WorkflowRule workflowRule, final List<WorkflowRuleApproval> workflowRuleApprovals,
-                                        final Map<Long, List<WorkflowRuleApprovalAssignee>> workflowRuleApprovalAssignees,
-                                        final List<WorkflowRuleExecutionAssignee> workflowRuleExecutionAssignees,
-                                        final List<WorkflowRuleReviewAssignee> workflowRuleReviewAssignees) {
-                final var response = new Response();
-
-                response.name = workflowRule.getName();
-                response.type = workflowRule.getRequestType();
-                response.urgent = workflowRule.isUrgent();
-
-                response.approvals = approvals(workflowRuleApprovals, workflowRuleApprovalAssignees);
-                response.executions = workflowRuleExecutionAssignees.stream()
-                        .map(AssigneeDto.Response::from)
-                        .collect(Collectors.toUnmodifiableList());
-                response.reviews = workflowRuleReviewAssignees.stream()
-                        .map(AssigneeDto.Response::from)
-                        .collect(Collectors.toUnmodifiableList());
-
-                return response;
-            }
-
-            private static List<WorkflowRuleApprovalDto.Response> approvals(final List<WorkflowRuleApproval> workflowRuleApprovals,
-                                                                            final Map<Long, List<WorkflowRuleApprovalAssignee>> workflowRuleApprovalAssignees) {
-                return workflowRuleApprovals.stream()
-                        .map(approval -> {
-                            final var assignees = workflowRuleApprovalAssignees.get(approval.getId());
-                            return WorkflowRuleApprovalDto.Response.from(approval, assignees);
-                        })
-                        .collect(Collectors.toUnmodifiableList());
-            }
-        }
     }
 
     @Getter
     public static class Update {
         @Getter
-        public static class Request{
+        public static class Request {
+            private Long id;
             private String name;
-        }
-
-        @Getter
-        public static class Response {
-
+            private WorkflowRequestType type;
+            private Boolean urgent;
+            private List<WorkflowRuleApprovalDto.Request> approvals;
+            private List<AssigneeDto.Request> executions;
+            private List<AssigneeDto.Request> reviews;
         }
     }
 
@@ -101,6 +63,59 @@ public class WorkflowRuleDto {
             private Long id;
             private String name;
             private WorkflowRequestType workflowType;
+        }
+    }
+
+    @Getter
+    public static class Response {
+        private Long id;
+        private String name;
+        private WorkflowRequestType type;
+        private boolean urgent;
+        private List<WorkflowRuleApprovalDto.Response> approvals;
+        private List<AssigneeDto.Response> executions;
+        private List<AssigneeDto.Response> reviews;
+
+        public static Response from(final WorkflowRule workflowRule, final List<WorkflowRuleApproval> workflowRuleApprovals,
+                                    final Map<Long, List<WorkflowRuleApprovalAssignee>> workflowRuleApprovalAssignees,
+                                    final List<WorkflowRuleExecutionAssignee> workflowRuleExecutionAssignees,
+                                    final List<WorkflowRuleReviewAssignee> workflowRuleReviewAssignees) {
+            final var response = new Response();
+
+            response.id = workflowRule.getId();
+            response.name = workflowRule.getName();
+            response.type = workflowRule.getRequestType();
+            response.urgent = workflowRule.isUrgent();
+
+            response.approvals = approvals(workflowRuleApprovals, workflowRuleApprovalAssignees);
+            response.executions = workflowRuleExecutionAssignees.stream()
+                    .map(AssigneeDto.Response::from)
+                    .collect(Collectors.toUnmodifiableList());
+            response.reviews = workflowRuleReviewAssignees.stream()
+                    .map(AssigneeDto.Response::from)
+                    .collect(Collectors.toUnmodifiableList());
+
+            return response;
+        }
+
+        private static List<WorkflowRuleApprovalDto.Response> approvals(final List<WorkflowRuleApproval> workflowRuleApprovals,
+                                                                        final Map<Long, List<WorkflowRuleApprovalAssignee>> workflowRuleApprovalAssignees) {
+            return workflowRuleApprovals.stream()
+                    .map(approval -> {
+                        final var assignees = workflowRuleApprovalAssignees.get(approval.getId());
+                        return WorkflowRuleApprovalDto.Response.from(approval, assignees);
+                    })
+                    .collect(Collectors.toUnmodifiableList());
+        }
+    }
+
+    @Getter
+    public static class Read{
+
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class Response {
+            private List<Response> rules;
         }
     }
 }
