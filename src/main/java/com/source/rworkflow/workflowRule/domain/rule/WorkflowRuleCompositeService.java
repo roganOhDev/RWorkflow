@@ -1,7 +1,11 @@
 package com.source.rworkflow.workflowRule.domain.rule;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.collect.Sets;
 import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.common.util.Patch;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleApprovalDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
 import com.source.rworkflow.workflowRule.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
@@ -12,7 +16,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,12 +43,15 @@ public class WorkflowRuleCompositeService {
     }
 
     @Transactional
-    public WorkflowRule delete(final Long id, final SessionUserId sessionUserId) {
-        final var workflowRule = service.find(id);
-
+    public WorkflowRule delete(final WorkflowRule workflowRule, final SessionUserId sessionUserId) {
         workflowRule.setDeleted(true);
 
         return triggerService.delete(workflowRule, sessionUserId);
+    }
+
+    @Transactional
+    public WorkflowRule update(final WorkflowRule workflowRule,final WorkflowRuleDto.Update.Request request, final SessionUserId sessionUserId) {
+        return Patch.of(workflowRule, WorkflowRule.class, request);
     }
 
     private void validate(final WorkflowRuleDto.Create.Request request, final SessionUserId sessionUserId) {

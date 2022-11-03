@@ -25,6 +25,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class WorkflowRuleTransferService {
     private final WorkflowRuleCompositeService compositeService;
+    private final WorkflowRuleService service;
     private final WorkflowRuleApprovalCompositeService workflowRuleApprovalCompositeService;
     private final WorkflowRuleApprovalAssigneeCompositeService workflowRuleApprovalAssigneeCompositeService;
     private final WorkflowRuleExecutionAssigneeCompositeService workflowRuleExecutionAssigneeCompositeService;
@@ -71,9 +72,18 @@ public class WorkflowRuleTransferService {
     }
 
     public WorkflowRuleDto.Delete.Response delete(final Long id, final SessionUserId sessionUserId) {
-        final var deleted = compositeService.delete(id, sessionUserId);
+        final var workflowRule = service.find(id);
+        final var deleted = compositeService.delete(workflowRule, sessionUserId);
 
         return new WorkflowRuleDto.Delete.Response(deleted.getId(), deleted.getName(), deleted.getRequestType());
+    }
+
+    public WorkflowRuleDto.Update.Response update(final Long id, final WorkflowRuleDto.Update.Request request, final SessionUserId sessionUserId) {
+        final var workflowRule = service.find(id);
+
+        final var updated = compositeService.update(workflowRule, request, sessionUserId);
+
+        return null;
     }
 
     private void assigneeValidate(final AssigneeDto.Request request) {

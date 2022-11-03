@@ -37,6 +37,8 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 
     implementation 'com.google.guava:guava:31.1-jre'
+
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.4'
 }
 
 task testDbUp(type: Exec) {

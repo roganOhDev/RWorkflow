@@ -81,6 +81,19 @@ public class WorkflowRuleDto {
     }
 
     @Getter
+    public static class Update {
+        @Getter
+        public static class Request{
+            private String name;
+        }
+
+        @Getter
+        public static class Response {
+
+        }
+    }
+
+    @Getter
     public static class Delete {
         @Getter
         @AllArgsConstructor

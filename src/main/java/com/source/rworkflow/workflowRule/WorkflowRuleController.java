@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +39,13 @@ public class WorkflowRuleController {
         final var sessionUserId = userTokenService.findUserId(userToken);
 
         return transferService.delete(id, sessionUserId);
+    }
+
+    @PatchMapping(path = "/{id}")
+    public WorkflowRuleDto.Update.Response update(final @PathVariable Long id, final @RequestBody WorkflowRuleDto.Update.Request request, @RequestHeader(HEADER_KEY) String userToken) {
+        final var sessionUserId = userTokenService.findUserId(userToken);
+
+        return transferService.update(id, request, sessionUserId);
     }
 
 }

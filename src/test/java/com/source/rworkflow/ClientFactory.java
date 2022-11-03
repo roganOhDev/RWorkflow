@@ -21,7 +21,7 @@ public class ClientFactory {
     public static WebClient client(final String token) {
         return WebClient.builder()
                 .filter(ExchangeFilterFunction.ofResponseProcessor((clientResponse -> {
-                    if (clientResponse.statusCode().isError()){
+                    if (clientResponse.statusCode().isError()) {
                         Assertions.fail(clientResponse.bodyToMono(String.class).toString());
                     }
                     return Mono.just(clientResponse);
