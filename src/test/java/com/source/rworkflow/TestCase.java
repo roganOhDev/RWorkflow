@@ -18,13 +18,13 @@ import java.util.List;
 @SqlGroup({
         @Sql(config = @SqlConfig(dataSource = "dataSource"), value = {"classpath:/db/drop_tables.sql", "classpath:/db/app.sql"})
 })
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, properties = "spring.config.location=" + "classpath:/application.yaml")
 @ContextConfiguration(classes = RWorkflowApplication.class)
 public class TestCase {
 
     @Getter
     @AllArgsConstructor
-    public static class Header{
+    public static class Header {
         private String token;
     }
 
