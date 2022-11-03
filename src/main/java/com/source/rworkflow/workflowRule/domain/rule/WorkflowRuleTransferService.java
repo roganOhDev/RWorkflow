@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,7 +52,7 @@ public class WorkflowRuleTransferService {
             ruleSuite.getApprovals()
                     .forEach(approval -> {
                         final var assignees = workflowRuleApprovalAssigneeCompositeService.find(approval.getId());
-                        ruleSuite.setApprovalAssignees(Map.of(approval.getId(), assignees));
+                        ruleSuite.putApprovalAssignees(new HashMap<>(Map.of(approval.getId(), assignees)));
                     });
         }
 
@@ -91,7 +92,7 @@ public class WorkflowRuleTransferService {
             ruleSuite.getApprovals()
                     .forEach(approval -> {
                         final var assignees = workflowRuleApprovalAssigneeCompositeService.find(approval.getId());
-                        ruleSuite.setApprovalAssignees(Map.of(approval.getId(), assignees));
+                        ruleSuite.putApprovalAssignees(new HashMap<>(Map.of(approval.getId(), assignees)));
                     });
         }
 
@@ -128,7 +129,7 @@ public class WorkflowRuleTransferService {
         final var ruleSuite = new RuleSuite();
 
         ruleSuite.setApprovals(workflowRuleApprovalCompositeService.findAllByRuleId(rule.getId()).stream()
-                .peek(approval -> ruleSuite.setApprovalAssignees(Map.of(approval.getId(), workflowRuleApprovalAssigneeCompositeService.find(approval.getId()))))
+                .peek(approval -> ruleSuite.putApprovalAssignees(new HashMap<>(Map.of(approval.getId(), workflowRuleApprovalAssigneeCompositeService.find(approval.getId())))))
                 .collect(Collectors.toUnmodifiableList()));
 
         ruleSuite.setExecutionAssignees(workflowRuleExecutionAssigneeCompositeService.findAllByRuleId(rule.getId()));
@@ -152,7 +153,7 @@ public class WorkflowRuleTransferService {
     @Getter
     public static class RuleSuite {
         private List<WorkflowRuleApproval> approvals;
-        private Map<Long, List<WorkflowRuleApprovalAssignee>> approvalAssignees;
+        private HashMap<Long, List<WorkflowRuleApprovalAssignee>> approvalAssignees;
         private List<WorkflowRuleExecutionAssignee> executionAssignees;
         private List<WorkflowRuleReviewAssignee> reviewAssignees;
 
@@ -160,8 +161,12 @@ public class WorkflowRuleTransferService {
             this.approvals = approvals;
         }
 
-        public void setApprovalAssignees(Map<Long, List<WorkflowRuleApprovalAssignee>> approvalAssignees) {
-            this.approvalAssignees = approvalAssignees;
+        public void putApprovalAssignees(HashMap<Long, List<WorkflowRuleApprovalAssignee>> approvalAssignees) {
+            if (this.approvalAssignees == null) {
+                this.approvalAssignees = approvalAssignees;
+            } else {
+                this.approvalAssignees.putAll(approvalAssignees);
+            }
         }
 
         public void setExecutionAssignees(List<WorkflowRuleExecutionAssignee> executionAssignees) {
