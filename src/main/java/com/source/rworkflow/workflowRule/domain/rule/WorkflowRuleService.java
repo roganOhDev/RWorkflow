@@ -1,11 +1,13 @@
 package com.source.rworkflow.workflowRule.domain.rule;
 
 import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.exception.WorkflowRuleNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,14 @@ public class WorkflowRuleService {
         workflowRule.setUpdatedBy(sessionUserId.getId());
 
         return repository.save(workflowRule);
+    }
+
+    public List<WorkflowRule> find(final WorkflowRequestType type) {
+        return repository.findAllByRequestTypeAndDeletedIsFalse(type);
+    }
+
+    public List<WorkflowRule> findAll() {
+        return repository.findAll();
     }
 
     public WorkflowRule find(final Long id) {

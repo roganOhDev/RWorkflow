@@ -59,12 +59,12 @@ public class WorkflowRuleCompositeService {
     private void validateCreate(final WorkflowRuleDto.Create.Request request) {
         checkAssigneeNull(request);
         checkUrgentApproval(request);
-        checkDuplicateAssignee(request.getApprovals(), request.getExecutions(), request.getReviews());
+        checkDuplicateAssignee(request.getApprovals(), request.getExecutionAssignees(), request.getReviewAssignees());
         checkDuplicateOrder(request.getApprovals());
     }
 
     private void validateUpdate(final WorkflowRuleDto.Update.Request request) {
-        checkDuplicateAssignee(request.getApprovals(), request.getExecutions(), request.getReviews());
+        checkDuplicateAssignee(request.getApprovals(), request.getExecutionAssignees(), request.getReviewAssignees());
 
         if (request.getApprovals() != null) {
             checkDuplicateOrder(request.getApprovals());
@@ -72,7 +72,7 @@ public class WorkflowRuleCompositeService {
     }
 
     private void checkAssigneeNull(final WorkflowRuleDto.Create.Request request) {
-        if (request.getApprovals() == null | request.getExecutions() == null | request.getReviews() == null) {
+        if (request.getApprovals() == null | request.getExecutionAssignees() == null | request.getReviewAssignees() == null) {
             throw new AssigneeCanNotBeNullException();
         }
     }

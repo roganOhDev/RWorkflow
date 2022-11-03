@@ -30,9 +30,9 @@ public class WorkflowRuleDto {
             @Valid
             private List<WorkflowRuleApprovalDto.Request> approvals;
             @Valid
-            private List<AssigneeDto.Request> executions;
+            private List<AssigneeDto.Request> executionAssignees;
             @Valid
-            private List<AssigneeDto.Request> reviews;
+            private List<AssigneeDto.Request> reviewAssignees;
 
             public boolean isUrgent() {
                 return this.urgent;
@@ -50,8 +50,8 @@ public class WorkflowRuleDto {
             private WorkflowRequestType type;
             private Boolean urgent;
             private List<WorkflowRuleApprovalDto.Request> approvals;
-            private List<AssigneeDto.Request> executions;
-            private List<AssigneeDto.Request> reviews;
+            private List<AssigneeDto.Request> executionAssignees;
+            private List<AssigneeDto.Request> reviewAssignees;
         }
     }
 
@@ -73,8 +73,8 @@ public class WorkflowRuleDto {
         private WorkflowRequestType type;
         private boolean urgent;
         private List<WorkflowRuleApprovalDto.Response> approvals;
-        private List<AssigneeDto.Response> executions;
-        private List<AssigneeDto.Response> reviews;
+        private List<AssigneeDto.Response> executionAssignees;
+        private List<AssigneeDto.Response> reviewAssignees;
 
         public static Response from(final WorkflowRule workflowRule, final List<WorkflowRuleApproval> workflowRuleApprovals,
                                     final Map<Long, List<WorkflowRuleApprovalAssignee>> workflowRuleApprovalAssignees,
@@ -88,10 +88,10 @@ public class WorkflowRuleDto {
             response.urgent = workflowRule.isUrgent();
 
             response.approvals = approvals(workflowRuleApprovals, workflowRuleApprovalAssignees);
-            response.executions = workflowRuleExecutionAssignees.stream()
+            response.executionAssignees = workflowRuleExecutionAssignees.stream()
                     .map(AssigneeDto.Response::from)
                     .collect(Collectors.toUnmodifiableList());
-            response.reviews = workflowRuleReviewAssignees.stream()
+            response.reviewAssignees = workflowRuleReviewAssignees.stream()
                     .map(AssigneeDto.Response::from)
                     .collect(Collectors.toUnmodifiableList());
 
@@ -115,7 +115,7 @@ public class WorkflowRuleDto {
         @AllArgsConstructor
         @NoArgsConstructor
         public static class Response {
-            private List<Response> rules;
+            private List<WorkflowRuleDto.Response> rules;
         }
     }
 }

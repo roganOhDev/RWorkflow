@@ -51,18 +51,18 @@ public class WorkflowRuleController {
         return transferService.update(request, sessionUserId);
     }
 
-//    @GetMapping
-//    public WorkflowRuleDto.Read.Response list(final @RequestParam String workflowRequestType, @RequestHeader(HEADER_KEY) String userToken) {
-//        final var sessionUserId = userTokenService.findUserId(userToken);
-//
-//        return transferService.list(workflowRequestType, sessionUserId);
-//    }
-//
-//    @GetMapping(path = "{id}")
-//    public WorkflowRuleDto.Response find(final @RequestParam Long id, @RequestHeader(HEADER_KEY) String userToken) {
-//        final var sessionUserId = userTokenService.findUserId(userToken);
-//
-//        return transferService.find(workflowRequestType, sessionUserId);
-//    }
+    @GetMapping(path = "list/{workflowRequestType}")
+    public WorkflowRuleDto.Read.Response list(final @PathVariable(required = false) String workflowRequestType, @RequestHeader(HEADER_KEY) String userToken) {
+        final var sessionUserId = userTokenService.findUserId(userToken);
+
+        return transferService.list(workflowRequestType);
+    }
+
+    @GetMapping(path = "{id}")
+    public WorkflowRuleDto.Response find(final @PathVariable Long id, @RequestHeader(HEADER_KEY) String userToken) {
+        final var sessionUserId = userTokenService.findUserId(userToken);
+
+        return transferService.find(id);
+    }
 
 }
