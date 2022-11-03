@@ -49,10 +49,8 @@ public class WorkflowRuleController {
         return transferService.update(request, sessionUserId);
     }
 
-    @GetMapping(path = "list/{workflowRequestType}")
-    public WorkflowRuleDto.Read.Response list(final @PathVariable(required = false) String workflowRequestType, @RequestHeader(HEADER_KEY) String userToken) {
-        final var sessionUserId = userTokenService.findUserId(userToken);
-
+    @GetMapping(path = {"list/{workflowRequestType}", "list"})
+    public WorkflowRuleDto.Read.Response list(final @PathVariable(required = false) String workflowRequestType) {
         return transferService.list(workflowRequestType);
     }
 

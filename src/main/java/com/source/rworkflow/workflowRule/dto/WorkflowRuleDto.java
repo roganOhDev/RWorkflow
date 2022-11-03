@@ -8,7 +8,6 @@ import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleRevie
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRule;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -59,6 +58,7 @@ public class WorkflowRuleDto {
                 return dto;
             }
         }
+
         @Getter
         public static class Request {
             @NotNull
@@ -126,12 +126,17 @@ public class WorkflowRuleDto {
     }
 
     @Getter
-    public static class Read{
+    public static class Read {
 
-        @AllArgsConstructor
-        @NoArgsConstructor
+        @Getter
         public static class Response {
+            Long count;
             private List<WorkflowRuleDto.Response> rules;
+
+            public Response(List<WorkflowRuleDto.Response> rules) {
+                this.count = (long) rules.size();
+                this.rules = rules;
+            }
         }
     }
 }

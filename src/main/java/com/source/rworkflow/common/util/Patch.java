@@ -18,7 +18,7 @@ public class Patch {
         return entityMapper.convertValue(entityAsMap, entityClazz);
     }
 
-    final static void merge(final Map<String, Object> entityAsMap, final Map<String, Object> requestAsMap) {
+    private static void merge(final Map<String, Object> entityAsMap, final Map<String, Object> requestAsMap) {
         for (String key : entityAsMap.keySet()) {
             final var sourceValue = requestAsMap.get(key);
             if (sourceValue != null) {

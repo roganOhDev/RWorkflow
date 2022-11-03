@@ -39,7 +39,7 @@ public class WorkflowRuleService {
     }
 
     public List<WorkflowRule> findAll() {
-        return repository.findAll();
+        return repository.findAllByDeletedIsFalse();
     }
 
     public WorkflowRule find(final Long id) {

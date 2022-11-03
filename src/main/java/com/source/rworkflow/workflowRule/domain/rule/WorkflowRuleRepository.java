@@ -10,6 +10,8 @@ import java.util.List;
 public interface WorkflowRuleRepository extends JpaRepository<WorkflowRule, Long> {
     List<WorkflowRule> findAllByRequestTypeAndDeletedIsFalse(WorkflowRequestType requestType);
 
+    List<WorkflowRule> findAllByDeletedIsFalse();
+
     WorkflowRule findByIdAndDeletedIsFalse(Long id);
 
 }

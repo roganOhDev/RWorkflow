@@ -139,6 +139,7 @@ public class WorkflowRuleTransferService {
 
         ruleSuite.setReviewAssignees(workflowRuleReviewAssigneeCompositeService.findAllByRuleId(rule.getId()));
 
+        System.out.println(ruleSuite);
         return WorkflowRuleDto.Response.from(rule, ruleSuite.getApprovals(), ruleSuite.getApprovalAssignees(), ruleSuite.getExecutionAssignees(), ruleSuite.getReviewAssignees());
     }
 
