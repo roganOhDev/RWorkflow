@@ -1,5 +1,6 @@
 package com.source.rworkflow.workflowRule.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.source.rworkflow.workflowRule.domain.approvalAssignee.WorkflowRuleApprovalAssignee;
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssignee;
@@ -13,6 +14,7 @@ public class AssigneeDto {
     @Getter
     @EqualsAndHashCode()
     public static class Request{
+        @JsonIgnore
         private Long id;
         @NotNull
         private AssigneeType type;

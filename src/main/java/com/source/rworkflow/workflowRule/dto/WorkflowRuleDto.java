@@ -44,10 +44,26 @@ public class WorkflowRuleDto {
     @Getter
     public static class Update {
         @Getter
-        public static class Request {
+        public static class EntityMapperDto {
             private Long id;
             private String name;
-            private WorkflowRequestType type;
+            private Boolean urgent;
+
+            public static EntityMapperDto from(final Request request) {
+                final var dto = new EntityMapperDto();
+
+                dto.id = request.id;
+                dto.name = request.name;
+                dto.urgent = request.urgent;
+
+                return dto;
+            }
+        }
+        @Getter
+        public static class Request {
+            @NotNull
+            private Long id;
+            private String name;
             private Boolean urgent;
             private List<WorkflowRuleApprovalDto.Request> approvals;
             private List<AssigneeDto.Request> executionAssignees;

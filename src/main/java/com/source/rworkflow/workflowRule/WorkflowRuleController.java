@@ -3,7 +3,6 @@ package com.source.rworkflow.workflowRule;
 import com.source.rworkflow.misc.user.UserTokenService;
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRuleTransferService;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -44,7 +43,7 @@ public class WorkflowRuleController {
     }
 
     @PatchMapping
-    public WorkflowRuleDto.Response update(final @RequestBody WorkflowRuleDto.Update.Request request, @RequestHeader(HEADER_KEY) String userToken) {
+    public WorkflowRuleDto.Response update(final @Valid @RequestBody WorkflowRuleDto.Update.Request request, @RequestHeader(HEADER_KEY) String userToken) {
         final var sessionUserId = userTokenService.findUserId(userToken);
 
         return transferService.update(request, sessionUserId);

@@ -14,11 +14,13 @@ import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleRevie
 import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssigneeCompositeService;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
+import com.source.rworkflow.workflowRule.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,9 +80,7 @@ public class WorkflowRuleTransferService {
         final var ruleId = request.getId();
         final var workflowRule = service.find(ruleId);
 
-        final var hasApproval = workflowRuleApprovalCompositeService.findAllByRuleId(ruleId).size() > 0;
-
-        final var updated = compositeService.update(workflowRule, request, hasApproval, sessionUserId);
+        final var updated = compositeService.update(workflowRule, request, sessionUserId);
 
         if (request.getApprovals() != null) {
             request.getApprovals().forEach(approval -> {
@@ -95,6 +95,9 @@ public class WorkflowRuleTransferService {
                         ruleSuite.putApprovalAssignees(new HashMap<>(Map.of(approval.getId(), assignees)));
                     });
         }
+
+        final var hasApproval = workflowRuleApprovalCompositeService.findAllByRuleId(ruleId).size() > 0;
+        checkUrgentApproval(updated.isUrgent(), hasApproval);
 
         if (request.getExecutionAssignees() != null) {
             request.getExecutionAssignees().forEach(this::assigneeValidate);
@@ -150,6 +153,12 @@ public class WorkflowRuleTransferService {
         }
     }
 
+    private void checkUrgentApproval(final boolean isUrgent, final boolean hasApproval) {
+        if (isUrgent && hasApproval) {
+            throw new ApprovalAssigneeCanNotBeCreatedWhenUrgentException();
+        }
+    }
+
     @Getter
     public static class RuleSuite {
         private List<WorkflowRuleApproval> approvals;
@@ -157,16 +166,19 @@ public class WorkflowRuleTransferService {
         private List<WorkflowRuleExecutionAssignee> executionAssignees;
         private List<WorkflowRuleReviewAssignee> reviewAssignees;
 
+        public RuleSuite() {
+            approvals = new ArrayList<>();
+            approvalAssignees = new HashMap<>();
+            executionAssignees = new ArrayList<>();
+            reviewAssignees = new ArrayList<>();
+        }
+
         public void setApprovals(List<WorkflowRuleApproval> approvals) {
             this.approvals = approvals;
         }
 
         public void putApprovalAssignees(HashMap<Long, List<WorkflowRuleApprovalAssignee>> approvalAssignees) {
-            if (this.approvalAssignees == null) {
-                this.approvalAssignees = approvalAssignees;
-            } else {
-                this.approvalAssignees.putAll(approvalAssignees);
-            }
+            this.approvalAssignees.putAll(approvalAssignees);
         }
 
         public void setExecutionAssignees(List<WorkflowRuleExecutionAssignee> executionAssignees) {

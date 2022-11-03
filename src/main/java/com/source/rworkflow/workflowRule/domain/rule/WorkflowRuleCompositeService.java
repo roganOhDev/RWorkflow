@@ -47,12 +47,11 @@ public class WorkflowRuleCompositeService {
     }
 
     @Transactional
-    public WorkflowRule update(final WorkflowRule workflowRule, final WorkflowRuleDto.Update.Request request, final boolean hasApproval, final SessionUserId sessionUserId) {
+    public WorkflowRule update(final WorkflowRule workflowRule, final WorkflowRuleDto.Update.Request request, final SessionUserId sessionUserId) {
         validateUpdate(request);
 
-        final var updated = Patch.entityByRequest(workflowRule, WorkflowRule.class, request);
-
-        checkUrgentApproval(request.getUrgent(), hasApproval);
+        final var entityMapperDto = WorkflowRuleDto.Update.EntityMapperDto.from(request);
+        final var updated = Patch.entityByRequest(workflowRule, WorkflowRule.class, entityMapperDto);
 
         return service.update(updated, sessionUserId);
     }
@@ -88,12 +87,6 @@ public class WorkflowRuleCompositeService {
 
         if (ListUtil.hasDuplicateElement(orders)) {
             throw new CanNotDuplicateOrderException();
-        }
-    }
-
-    private void checkUrgentApproval(final boolean isUrgent, final boolean hasApproval) {
-        if (isUrgent != hasApproval) {
-            throw new ApprovalAssigneeCanNotBeCreatedWhenUrgentException();
         }
     }
 

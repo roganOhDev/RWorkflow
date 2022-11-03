@@ -7,24 +7,34 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.Map;
 
 public class Patch {
-    public static <EntityT, EntityClass, RequestT> EntityClass entityByRequest(EntityT entity, Class<EntityClass> entityClazz, RequestT request){
+    public static <EntityT, EntityClass, RequestT> EntityClass entityByRequest(EntityT entity, Class<EntityClass> entityClazz, RequestT request) {
         final var entityMapper = new ObjectMapper();
 
         Map<String, Object> entityAsMap = mapper(entity, entityMapper);
         Map<String, Object> requestAsMap = mapper(request);
 
-        entityAsMap.putAll(requestAsMap);
+        merge(entityAsMap, requestAsMap);
 
         return entityMapper.convertValue(entityAsMap, entityClazz);
+    }
+
+    final static void merge(final Map<String, Object> entityAsMap, final Map<String, Object> requestAsMap) {
+        for (String key : entityAsMap.keySet()) {
+            final var sourceValue = requestAsMap.get(key);
+            if (sourceValue != null) {
+                entityAsMap.put(key, sourceValue);
+            }
+        }
     }
 
     private static <T> Map<String, Object> mapper(T o, ObjectMapper mapper) {
         mapper.registerModule(new JavaTimeModule());
 
-        return mapper.convertValue(o, new TypeReference<Map<String, Object>>() {});
+        return mapper.convertValue(o, new TypeReference<Map<String, Object>>() {
+        });
     }
 
-    private static <T> Map<String, Object> mapper(T o){
+    private static <T> Map<String, Object> mapper(T o) {
         final var mapper = new ObjectMapper();
         return mapper(o, mapper);
     }
