@@ -9,7 +9,7 @@ public enum AssigneeStatusType {
     SUCCEEDED(false, true, false),
     FAILED(false, true, false),
     AUTO_CONFIRMED(true, true, false),
-    EXPIRED(true, true, true);
+    EXPIRED(true, true, false);
 
     boolean approval;
     boolean execution;

@@ -26,4 +26,8 @@ public class ExceptionCode {
         final public static String ASSIGNEE_CAN_NOT_BE_NULL = "Assignee Field Cannot Be Null";
         final public static String CANNOT_DUPLICATE_ORDER = "Order Can Not Be Duplicated";
     }
+
+    public static class WorkflowRequest{
+        final public static String WORKFLOW_REQUEST_ORDER_MUST_MATCH_WITH_ORDER_OF_RULE = "Order Must Match With Rule's Order";
+    }
 }

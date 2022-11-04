@@ -56,6 +56,11 @@ public class WorkflowRuleCompositeService {
         return service.update(updated, sessionUserId);
     }
 
+    @Transactional(readOnly = true)
+    public WorkflowRule find(final Long id) {
+        return service.find(id);
+    }
+
     private void validateCreate(final WorkflowRuleDto.Create.Request request) {
         checkAssigneeNull(request);
         checkUrgentApproval(request);
@@ -98,7 +103,7 @@ public class WorkflowRuleCompositeService {
         }
     }
 
-    private void checkDuplicateAssignee(final List<WorkflowRuleApprovalDto.Request> workflowRuleApprovals, final List<AssigneeDto.Request> executions, final List<AssigneeDto.Request> reviews) {
+    private void checkDuplicateAssignee(final List<WorkflowRuleApprovalDto.Request> workflowRuleApprovals, final List<AssigneeDto.Request> executionAssignees, final List<AssigneeDto.Request> reviewAssignees) {
         if (workflowRuleApprovals != null) {
             final var assignees = workflowRuleApprovals.stream()
                     .flatMap(approval -> {
@@ -115,14 +120,14 @@ public class WorkflowRuleCompositeService {
             }
         }
 
-        if (executions != null) {
-            if (ListUtil.hasDuplicateElement(executions)) {
+        if (executionAssignees != null) {
+            if (ListUtil.hasDuplicateElement(executionAssignees)) {
                 throw new CanNotDuplicateAssigneeException();
             }
         }
 
-        if (reviews != null) {
-            if (ListUtil.hasDuplicateElement(reviews)) {
+        if (reviewAssignees != null) {
+            if (ListUtil.hasDuplicateElement(reviewAssignees)) {
                 throw new CanNotDuplicateAssigneeException();
             }
         }

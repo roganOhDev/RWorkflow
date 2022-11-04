@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.domain.approval;
 
 import com.source.rworkflow.workflow.type.ApprovalStatusType;
+import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +27,14 @@ public class WorkflowRequestApproval {
     private Long id;
 
     @Column(name = "request_Id", nullable = false)
-    private Long request_id;
+    private Long requestId;
 
     @Column(name = "order", nullable = false)
-    private boolean order;
+    private Long order;
 
     @Column(name = "approve_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private ApprovalStatusType approveType;
+    private ApproveType approveType;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

@@ -2,7 +2,6 @@ alter table
     workflow_requests
     modify column
     approval_status enum(
-    'NONE',
     'PENDING',
     'IN_PROGRESS',
     'APPROVED',

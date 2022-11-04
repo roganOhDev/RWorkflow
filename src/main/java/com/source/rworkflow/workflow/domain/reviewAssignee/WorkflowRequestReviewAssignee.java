@@ -1,5 +1,6 @@
 package com.source.rworkflow.workflow.domain.reviewAssignee;
 
+import com.source.rworkflow.workflow.domain.Assignee;
 import com.source.rworkflow.workflow.type.AssigneeStatusType;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Slf4j
-public class WorkflowRequestReviewAssignee {
+public class WorkflowRequestReviewAssignee extends Assignee {
     @Id
     @Column(name = "id", nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,16 +30,13 @@ public class WorkflowRequestReviewAssignee {
     @Column(name = "request_id", nullable = false)
     private Long requestId;
 
-    @Column(name = "assignee_id", nullable = false)
-    private Long assigneeId;
-
     @Column(name = "action_at", nullable = false)
     private LocalDateTime actionAt;
 
-    @Column(name = "action_by", nullable = false)
+    @Column(name = "action_by")
     private Long actionBy;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private AssigneeStatusType status;
 }

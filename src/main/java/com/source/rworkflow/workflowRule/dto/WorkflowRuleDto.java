@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflowRule.dto;
 
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
+import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflowRule.domain.approval.WorkflowRuleApproval;
 import com.source.rworkflow.workflowRule.domain.approval.assignee.WorkflowRuleApprovalAssignee;
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
@@ -92,10 +93,7 @@ public class WorkflowRuleDto {
         private List<AssigneeDto.Response> executionAssignees;
         private List<AssigneeDto.Response> reviewAssignees;
 
-        public static Response from(final WorkflowRule workflowRule, final List<WorkflowRuleApproval> workflowRuleApprovals,
-                                    final Map<Long, List<WorkflowRuleApprovalAssignee>> workflowRuleApprovalAssignees,
-                                    final List<WorkflowRuleExecutionAssignee> workflowRuleExecutionAssignees,
-                                    final List<WorkflowRuleReviewAssignee> workflowRuleReviewAssignees) {
+        public static Response from(final WorkflowRule workflowRule, final WorkflowRuleSuite ruleSuite) {
             final var response = new Response();
 
             response.id = workflowRule.getId();
@@ -103,11 +101,11 @@ public class WorkflowRuleDto {
             response.type = workflowRule.getRequestType();
             response.urgent = workflowRule.isUrgent();
 
-            response.approvals = approvals(workflowRuleApprovals, workflowRuleApprovalAssignees);
-            response.executionAssignees = workflowRuleExecutionAssignees.stream()
+            response.approvals = approvals(ruleSuite.getApprovals(), ruleSuite.getApprovalAssignees());
+            response.executionAssignees = ruleSuite.getExecutionAssignees().stream()
                     .map(AssigneeDto.Response::from)
                     .collect(Collectors.toUnmodifiableList());
-            response.reviewAssignees = workflowRuleReviewAssignees.stream()
+            response.reviewAssignees = ruleSuite.getReviewAssignees().stream()
                     .map(AssigneeDto.Response::from)
                     .collect(Collectors.toUnmodifiableList());
 

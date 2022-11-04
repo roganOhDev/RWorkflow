@@ -70,10 +70,10 @@ public class WorkflowRequest {
     @Column(name = "canceled", nullable = false)
     private boolean canceled;
 
-    @Column(name = "canceled_at", nullable = false)
+    @Column(name = "canceled_at")
     private LocalDateTime canceldAt;
 
-    @Column(name = "canceled_by", nullable = false)
+    @Column(name = "canceled_by")
     private Long canceledBy;
 
     @Column(name = "created_at", nullable = false)

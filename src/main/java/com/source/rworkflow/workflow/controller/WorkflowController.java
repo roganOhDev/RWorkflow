@@ -30,7 +30,7 @@ public class WorkflowController {
     private final UserTokenService userTokenService;
 
     @PutMapping
-    public WorkflowRequestDto.SaveResponse create(final @Valid @RequestBody WorkflowRequestDto.Create.Request createRequest, @RequestHeader(HEADER_KEY) String userToken) {
+    public WorkflowRequestDto.Create.Response create(final @Valid @RequestBody WorkflowRequestDto.Create.Request createRequest, @RequestHeader(HEADER_KEY) String userToken) {
         final var sessionUserId = userTokenService.findUserId(userToken);
 
         return transferService.create(createRequest, sessionUserId);
