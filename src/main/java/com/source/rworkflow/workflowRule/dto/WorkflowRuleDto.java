@@ -2,7 +2,7 @@ package com.source.rworkflow.workflowRule.dto;
 
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.domain.approval.WorkflowRuleApproval;
-import com.source.rworkflow.workflowRule.domain.approvalAssignee.WorkflowRuleApprovalAssignee;
+import com.source.rworkflow.workflowRule.domain.approval.assignee.WorkflowRuleApprovalAssignee;
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssignee;
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRule;

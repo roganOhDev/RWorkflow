@@ -238,3 +238,84 @@ INSERT INTO `RWorkflow_test`.`user_access_controls` (`id`, `user_id`, `connectio
 INSERT INTO `RWorkflow`.`user_tokens` (`id`, `token`, `user_id`) VALUES (1, 'eQjq1u2X', 1);
 INSERT INTO `RWorkflow`.`user_tokens` (`id`, `token`, `user_id`) VALUES (2, 'yCPDeOmN', 2);
 INSERT INTO `RWorkflow`.`user_tokens` (`id`, `token`, `user_id`) VALUES (3, 'xVW8kjnw', 3);
+
+alter table
+    workflow_requests
+    modify column
+    approval_status enum(
+    'NONE',
+    'PENDING',
+    'IN_PROGRESS',
+    'APPROVED',
+    'REJECTED'
+    );
+
+alter table
+    workflow_requests
+    modify column
+    execution_status enum(
+    'NONE',
+    'PENDING',
+    'IN_PROGRESS',
+    'SUCCEEDED',
+    'FAILED'
+    );
+
+alter table
+    workflow_requests
+    modify column
+    review_status enum(
+    'NONE',
+    'PENDING',
+    'CONFIRMED'
+    );
+
+alter table
+    workflow_request_approvals
+    modify column
+    `status` enum(
+    'NONE',
+    'PENDING',
+    'IN_PROGRESS',
+    'APPROVED',
+    'REJECTED'
+    );
+
+alter table
+    workflow_request_approval_assignees
+    modify column
+    `status` enum(
+    'None',
+    'PENDING',
+    'APPROVED',
+    'REJECTED',
+    'IN_PROGRESS',
+    'SUCCEEDED',
+    'FAILED'
+    );
+
+alter table
+    workflow_request_execution_assignees
+    modify column
+    `status` enum(
+    'None',
+    'PENDING',
+    'APPROVED',
+    'REJECTED',
+    'IN_PROGRESS',
+    'SUCCEEDED',
+    'FAILED'
+    );
+
+alter table
+    workflow_request_review_assignees
+    modify column
+    `status` enum(
+    'None',
+    'PENDING',
+    'APPROVED',
+    'REJECTED',
+    'IN_PROGRESS',
+    'SUCCEEDED',
+    'FAILED'
+    );

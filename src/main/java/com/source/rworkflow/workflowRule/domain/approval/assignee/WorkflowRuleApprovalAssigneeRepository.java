@@ -1,4 +1,4 @@
-package com.source.rworkflow.workflowRule.domain.approvalAssignee;
+package com.source.rworkflow.workflowRule.domain.approval.assignee;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

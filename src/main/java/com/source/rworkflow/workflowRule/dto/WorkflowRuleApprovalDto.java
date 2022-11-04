@@ -1,7 +1,7 @@
 package com.source.rworkflow.workflowRule.dto;
 
 import com.source.rworkflow.workflowRule.domain.approval.WorkflowRuleApproval;
-import com.source.rworkflow.workflowRule.domain.approvalAssignee.WorkflowRuleApprovalAssignee;
+import com.source.rworkflow.workflowRule.domain.approval.assignee.WorkflowRuleApprovalAssignee;
 import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.Getter;
 

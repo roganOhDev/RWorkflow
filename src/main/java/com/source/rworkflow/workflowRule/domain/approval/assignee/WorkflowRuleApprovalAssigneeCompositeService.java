@@ -1,4 +1,4 @@
-package com.source.rworkflow.workflowRule.domain.approvalAssignee;
+package com.source.rworkflow.workflowRule.domain.approval.assignee;
 
 import com.source.rworkflow.common.util.Comparer;
 import com.source.rworkflow.common.util.ListUtil;

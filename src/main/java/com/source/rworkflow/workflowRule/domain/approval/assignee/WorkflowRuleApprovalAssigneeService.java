@@ -1,4 +1,4 @@
-package com.source.rworkflow.workflowRule.domain.approvalAssignee;
+package com.source.rworkflow.workflowRule.domain.approval.assignee;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
