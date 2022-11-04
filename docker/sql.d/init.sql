@@ -247,7 +247,8 @@ alter table
     'PENDING',
     'IN_PROGRESS',
     'APPROVED',
-    'REJECTED'
+    'REJECTED',
+    'EXPIRED'
     );
 
 alter table
@@ -258,7 +259,8 @@ alter table
     'PENDING',
     'IN_PROGRESS',
     'SUCCEEDED',
-    'FAILED'
+    'FAILED',
+    'EXPIRED'
     );
 
 alter table
@@ -267,7 +269,8 @@ alter table
     review_status enum(
     'NONE',
     'PENDING',
-    'CONFIRMED'
+    'CONFIRMED',
+    'EXPIRED'
     );
 
 alter table
@@ -278,7 +281,8 @@ alter table
     'PENDING',
     'IN_PROGRESS',
     'APPROVED',
-    'REJECTED'
+    'REJECTED',
+    'EXPIRED'
     );
 
 alter table
@@ -291,7 +295,9 @@ alter table
     'REJECTED',
     'IN_PROGRESS',
     'SUCCEEDED',
-    'FAILED'
+    'FAILED',
+    'AUTO_CONFIRMED',
+    'EXPIRED'
     );
 
 alter table
@@ -304,7 +310,9 @@ alter table
     'REJECTED',
     'IN_PROGRESS',
     'SUCCEEDED',
-    'FAILED'
+    'FAILED',
+    'AUTO_CONFIRMED',
+    'EXPIRED'
     );
 
 alter table
@@ -317,5 +325,8 @@ alter table
     'REJECTED',
     'IN_PROGRESS',
     'SUCCEEDED',
-    'FAILED'
+    'FAILED',
+    'AUTO_CONFIRMED',
+    'EXPIRED'
     );
+

@@ -1,4 +1,4 @@
-package com.source.rworkflow.workflowRule.domain.rule;
+package com.source.rworkflow.workflowRule;
 
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.misc.role.RoleService;
@@ -12,6 +12,9 @@ import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleEx
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssigneeCompositeService;
 import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssignee;
 import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssigneeCompositeService;
+import com.source.rworkflow.workflowRule.domain.rule.WorkflowRule;
+import com.source.rworkflow.workflowRule.domain.rule.WorkflowRuleCompositeService;
+import com.source.rworkflow.workflowRule.domain.rule.WorkflowRuleService;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
 import com.source.rworkflow.workflowRule.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;

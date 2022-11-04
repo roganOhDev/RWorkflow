@@ -1,13 +1,15 @@
 package com.source.rworkflow.workflow.type;
 
 public enum AssigneeStatusType {
-    None (false, true, true),
-    PENDING (true, true, true),
-    APPROVED (true, true, true),
-    REJECTED (true, true, true),
-    IN_PROGRESS (false, true, true),
-    SUCCEEDED (false, true, false),
-    FAILED (false, true, false);
+    None(false, true, true),
+    PENDING(true, true, true),
+    APPROVED(true, true, true),
+    REJECTED(true, true, true),
+    IN_PROGRESS(false, true, true),
+    SUCCEEDED(false, true, false),
+    FAILED(false, true, false),
+    AUTO_CONFIRMED(true, true, false),
+    EXPIRED(true, true, true);
 
     boolean approval;
     boolean execution;
@@ -16,7 +18,7 @@ public enum AssigneeStatusType {
     AssigneeStatusType(boolean approval, boolean execution, boolean review) {
     }
 
-    public boolean canUsedForApprovalAssignee(AssigneeStatusType type){
+    public boolean canUsedForApprovalAssignee(AssigneeStatusType type) {
         return type.approval;
     }
 

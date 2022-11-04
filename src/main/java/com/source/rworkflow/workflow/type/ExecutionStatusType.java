@@ -5,5 +5,6 @@ public enum ExecutionStatusType {
     PENDING,
     IN_PROGRESS,
     SUCCEEDED,
-    FAILED
+    FAILED,
+    EXPIRED
 }
