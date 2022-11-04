@@ -27,7 +27,7 @@ alter table
     review_status enum(
     'NONE',
     'PENDING',
-    'CONFIRMED',
+    'IN_PROGRESS',
     'EXPIRED'
     );
 
@@ -35,7 +35,6 @@ alter table
     workflow_request_approvals
     modify column
     `status` enum(
-    'NONE',
     'PENDING',
     'IN_PROGRESS',
     'APPROVED',

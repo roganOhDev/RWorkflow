@@ -20,6 +20,6 @@ public class UserService {
             throw new UserNotFoundException(id);
         }
 
-        return user
+        return user;
     }
 }
