@@ -4,11 +4,11 @@ import com.source.rworkflow.workflow.type.SqlContentType;
 import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 public class SqlExecutionDto {
     @Getter
     public static class Request {
+        @NotNull(message = "Must Have ConnectionId")
         private Long connectionId;
         private String database;
         @NotNull(message = "Must Have ContentType")

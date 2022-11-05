@@ -6,10 +6,8 @@ import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.ExecutionExpirationDateMustBeAfterRequestExpirationDateException;
 import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
-import com.source.rworkflow.workflow.exception.OrderMustMatchWithOrderOfRuleException;
-import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
-import com.source.rworkflow.workflowRule.domain.approval.WorkflowRuleApproval;
+import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
 import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeNullException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssigneeException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateOrderException;
@@ -52,11 +50,11 @@ public class WorkflowRequestCompositeService {
 
         final var detail = request.getDetail();
 
-        if (request.getDetail().getRequestExpiryAt() == null) {
+        if (detail.getRequestExpiryAt() == null) {
             detail.setDefaultRequestExpiryAt();
         }
 
-        if (request.getType().isNotAutoExecution() && detail.getExecutionExpiryAt() == null) {
+        if (detail.getExecutionExpiryAt() == null) {
             detail.setDefaultExecutionExpiryAt();
         }
 
@@ -81,30 +79,22 @@ public class WorkflowRequestCompositeService {
     }
 
     private void validateCreate(final WorkflowRequestDto.Create.Request request, final WorkflowRuleSuite workflowRuleSuite) {
+        checkUrgentApproval(request);
         checkDuplicateAssignee(request.getApprovals(), request.getExecutionAssignees(), request.getReviewAssignees());
         validateOrder(request.getApprovals(), workflowRuleSuite);
         checkDuplicateOrder(request.getApprovals());
     }
 
-    private void validateOrder(final List<WorkflowApprovalDto.Create.Request> requests, final WorkflowRuleSuite workflowRuleSuite) {
-        if (workflowRuleSuite != null) {
-            checkOrderMatch(requests, workflowRuleSuite.getApprovals());
+    private void checkUrgentApproval(final WorkflowRequestDto.Create.Request request) {
+        if (request.isUrgent()) {
+            if (request.getApprovals() == null || request.getApprovals().size() > 0) {
+                throw new ApprovalAssigneeCanNotBeCreatedWhenUrgentException();
+            }
         }
-        checkDuplicateOrder(requests);
     }
 
-    private void checkOrderMatch(final List<WorkflowApprovalDto.Create.Request> requests, final List<WorkflowRuleApproval> ruleApprovals) {
-        final var requestOrders = requests.stream()
-                .map(WorkflowApprovalDto.Create.Request::getOrder)
-                .collect(Collectors.toUnmodifiableList());
-
-        final var ruleOrders = ruleApprovals.stream()
-                .map(WorkflowRuleApproval::getOrder)
-                .collect(Collectors.toUnmodifiableList());
-
-        if (!requestOrders.equals(ruleOrders)) {
-            throw new OrderMustMatchWithOrderOfRuleException();
-        }
+    private void validateOrder(final List<WorkflowApprovalDto.Create.Request> requests, final WorkflowRuleSuite workflowRuleSuite) {
+        checkDuplicateOrder(requests);
     }
 
     private void checkDuplicateOrder(final List<WorkflowApprovalDto.Create.Request> requests) {

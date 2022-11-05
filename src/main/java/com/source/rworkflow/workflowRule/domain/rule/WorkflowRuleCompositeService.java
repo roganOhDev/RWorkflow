@@ -7,7 +7,7 @@ import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleApprovalDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
-import com.source.rworkflow.workflowRule.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
+import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
 import com.source.rworkflow.workflowRule.exception.ApprovalCanNotBeNullException;
 import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeNullException;
 import com.source.rworkflow.workflowRule.exception.CanNotDeleteWorkflowRuleException;

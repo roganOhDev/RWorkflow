@@ -1,8 +1,10 @@
 package com.source.rworkflow.workflow.domain.reviewAssignee;
 
+import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecutionAssignee;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
+import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +19,11 @@ public class WorkflowRequestReviewAssigneeCompositeService {
     private final WorkflowRequestReviewAssigneeService service;
 
     @Transactional
-    public List<WorkflowRequestReviewAssignee> createCollection(final Long requestId, final List<Long> createRequests, final WorkflowRuleSuite workflowRuleSuite) {
-        final var assignees = new ArrayList<>(createRequests);
+    public List<WorkflowRequestReviewAssignee> createCollection(final Long requestId, final List<Long> reviewAssignees, final WorkflowRuleSuite workflowRuleSuite) {
+        var assignees = reviewAssignees;
 
         if (workflowRuleSuite != null) {
-            assignees.addAll(workflowRuleSuite.getExecutionAssigneeIds());
+            assignees = mergeAssignees(workflowRuleSuite, reviewAssignees);
         }
 
         final var resultList = assignees.stream()
@@ -38,5 +40,15 @@ public class WorkflowRequestReviewAssigneeCompositeService {
         assignee.setAssigneeId(createRequest);
 
         return service.create(assignee);
+    }
+
+    private List<Long> mergeAssignees(final WorkflowRuleSuite workflowRuleSuite, List<Long> reviewAssignees) {
+        final var ruleAssignees = new ArrayList<>(workflowRuleSuite.getExecutionAssignees().stream()
+                .map(WorkflowRuleExecutionAssignee::getAssigneeValue)
+                .collect(Collectors.toUnmodifiableList()));
+
+        ruleAssignees.addAll(reviewAssignees);
+
+        return ListUtil.removeDuplicateElement(ruleAssignees);
     }
 }

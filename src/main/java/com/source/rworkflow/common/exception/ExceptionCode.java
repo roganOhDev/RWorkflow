@@ -35,5 +35,7 @@ public class ExceptionCode {
         final public static String REQUEST_DETAIL_NULL_EXCEPTION = "Request Doesn't Have Suitable Detail Request";
         final public static String EXPIRATION_DATE_IS_BEFORE_NOW = "Expiration Date Is Before Then Now";
         final public static String SELF_APPROVE_EXCEPTION = "Cannot Opperate Self Approve";
+        final public static String URGENT_VALUE_NOT_MATCH_EXCEPTION = "Urgent Value Must Match With Rule's";
+        final public static String TYPE_NOT_MATCH_EXCEPTION = "Type Must Match With Rule's";
     }
 }

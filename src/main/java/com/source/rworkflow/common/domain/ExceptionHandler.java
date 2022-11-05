@@ -4,6 +4,7 @@ import com.source.rworkflow.common.exception.RException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.support.WebExchangeBindException;
 
 import javax.validation.ConstraintViolationException;
 
@@ -22,6 +23,11 @@ public class ExceptionHandler {
 
     @org.springframework.web.bind.annotation.ExceptionHandler(RException.class)
     public ResponseEntity<ExceptionDto> exception(RException e) {
+        return ResponseEntity.badRequest().body(new ExceptionDto(e));
+    }
+
+    @org.springframework.web.bind.annotation.ExceptionHandler(WebExchangeBindException.class)
+    public ResponseEntity<ExceptionDto> exception(WebExchangeBindException e) {
         return ResponseEntity.badRequest().body(new ExceptionDto(e));
     }
 }

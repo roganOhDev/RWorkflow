@@ -24,10 +24,13 @@ public class WorkflowRequestTrigger {
         switch (request.getType()){
             case ACCESS_CONTROL:
                 createAccessControl(requestId, request.getDetail());
-            case SQl_EXECUTION:
+                break;
+            case SQL_EXECUTION:
                 createSqlExecution(requestId, request.getDetail());
+                break;
             case DATA_EXPORT:
                 createDataExport(requestId, request.getDetail());
+                break;
         }
     }
 

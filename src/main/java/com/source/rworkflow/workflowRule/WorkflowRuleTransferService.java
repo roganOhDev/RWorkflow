@@ -16,7 +16,7 @@ import com.source.rworkflow.workflowRule.domain.rule.WorkflowRuleCompositeServic
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRuleService;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
-import com.source.rworkflow.workflowRule.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
+import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

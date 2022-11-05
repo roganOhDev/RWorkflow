@@ -5,7 +5,6 @@ import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.Getter;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -26,7 +25,6 @@ public class WorkflowApprovalDto {
             @NotNull(message = "Must Have ApproveType")
             private ApproveType approveType;
 
-            @Valid
             @Size(min = 1)
             private List<Long> assignees;
         }

@@ -43,11 +43,9 @@ public class WorkflowRequestApprovalCompositeService {
                                            final List<Long> assigneesByRule, final SessionUserId sessionUserId) {
         final var workflowRequestApproval = getNewWorkflowRequestApproval(requestId, creatRequest);
 
-        final var resultList = new ArrayList<>(creatRequest.getAssignees());
-        resultList.addAll(assigneesByRule);
-        final var assignees = ListUtil.removeDuplicateElement(resultList);
+        validateSelfApprove(creatRequest.getAssignees(), sessionUserId);
 
-        validateSelfApprove(assignees, sessionUserId);
+        final var assignees = mergeAssignees(creatRequest, assigneesByRule, sessionUserId);
 
         return triggerService.create(assignees, requestId, workflowRequestApproval);
     }
@@ -56,6 +54,21 @@ public class WorkflowRequestApprovalCompositeService {
         if (assignees.contains(sessionUserId.getId())) {
             throw new SelfApproveException(sessionUserId);
         }
+    }
+
+    private List<Long> mergeAssignees(WorkflowApprovalDto.Create.Request creatRequest, List<Long> assigneesByRule, SessionUserId sessionUserId) {
+        final var ruleAssignees = removeSelfFromAssigneesByRule(assigneesByRule, sessionUserId);
+
+        final var resultList = new ArrayList<>(creatRequest.getAssignees());
+        resultList.addAll(ruleAssignees);
+        return ListUtil.removeDuplicateElement(resultList);
+    }
+
+    private List<Long> removeSelfFromAssigneesByRule(List<Long> assigneesByRule, SessionUserId sessionUserId) {
+        final var mutableAssigneesByRule = new ArrayList<>(assigneesByRule);
+        mutableAssigneesByRule.remove(sessionUserId.getId());
+
+        return mutableAssigneesByRule;
     }
 
     private WorkflowRequestApproval getNewWorkflowRequestApproval(final Long requestId,  final WorkflowApprovalDto.Create.Request creatRequest){

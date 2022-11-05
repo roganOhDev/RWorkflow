@@ -9,8 +9,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class WorkflowRequestDetailAccessControlTriggerService {
-    private WorkflowRequestDetailAccessControlTrigger trigger;
-    private WorkflowRequestDetailAccessControlService service;
+    private final WorkflowRequestDetailAccessControlTrigger trigger;
+    private final WorkflowRequestDetailAccessControlService service;
 
     public WorkflowRequestDetailAccessControl create(final WorkflowRequestDetailAccessControl accessControl, final List<AccessControlConnectionDto.Request> createRequests){
         final var created = service.create(accessControl);

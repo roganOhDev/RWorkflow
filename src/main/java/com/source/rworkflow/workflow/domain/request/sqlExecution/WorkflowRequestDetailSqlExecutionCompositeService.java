@@ -21,7 +21,7 @@ public class WorkflowRequestDetailSqlExecutionCompositeService {
                                                                   final LocalDateTime executionExpiryAt, final List<SqlExecutionDto.Request> createRequests) {
 
         if (createRequests == null) {
-        throw new RequestDetailNullException(WorkflowRequestType.SQl_EXECUTION);
+        throw new RequestDetailNullException(WorkflowRequestType.SQL_EXECUTION);
     }
 
         return createRequests.stream()

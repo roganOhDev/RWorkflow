@@ -9,9 +9,15 @@ import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApp
 import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecutionAssigneeCompositeService;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequestCompositeService;
 import com.source.rworkflow.workflow.domain.reviewAssignee.WorkflowRequestReviewAssigneeCompositeService;
+import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
+import com.source.rworkflow.workflow.exception.OrderMustMatchWithOrderOfRuleException;
+import com.source.rworkflow.workflow.exception.TypeNotMatchException;
+import com.source.rworkflow.workflow.exception.UrgentValueNotMatchException;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuiteFactory;
+import com.source.rworkflow.workflowRule.domain.approval.WorkflowRuleApproval;
+import com.source.rworkflow.workflowRule.domain.rule.WorkflowRule;
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRuleCompositeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,6 +46,8 @@ public class WorkflowTransferService {
         if (createRequest.getRuleId() != null) {
             final var workflowRule = workflowRuleCompositeService.find(createRequest.getRuleId());
             workflowRuleSuite = workflowRuleSuiteFactory.of(workflowRule);
+
+            validateWithRule(workflowRule, workflowRuleSuite, createRequest);
         }
 
         final var workflowRequest = compositeService.create(createRequest, sessionUserId, workflowRuleSuite);
@@ -71,5 +79,37 @@ public class WorkflowTransferService {
 
     private UserDto getAssigneeUserDto(final Assignee assignee) {
         return UserDto.of(userService.find(assignee.getAssigneeId()));
+    }
+
+    private void validateWithRule(final WorkflowRule workflowRule,final WorkflowRuleSuite workflowRuleSuite,final WorkflowRequestDto.Create.Request createRequest) {
+        validateType(workflowRule, createRequest);
+        validateUrgent(workflowRule, createRequest);
+        validateOrder(createRequest.getApprovals(), workflowRuleSuite.getApprovals());
+    }
+
+    private void validateType(final WorkflowRule workflowRule,final WorkflowRequestDto.Create.Request createRequest) {
+        if (!workflowRule.getRequestType().equals(createRequest.getType())){
+            throw new TypeNotMatchException();
+        }
+    }
+
+    private void validateUrgent(final WorkflowRule workflowRule,final WorkflowRequestDto.Create.Request createRequest) {
+        if (workflowRule.isUrgent() != createRequest.isUrgent()){
+            throw new UrgentValueNotMatchException();
+        }
+    }
+
+    private void validateOrder(final List<WorkflowApprovalDto.Create.Request> requests, final List<WorkflowRuleApproval> ruleApprovals) {
+        final var requestOrders = requests.stream()
+                .map(WorkflowApprovalDto.Create.Request::getOrder)
+                .collect(Collectors.toUnmodifiableList());
+
+        final var ruleOrders = ruleApprovals.stream()
+                .map(WorkflowRuleApproval::getOrder)
+                .collect(Collectors.toUnmodifiableList());
+
+        if (!requestOrders.equals(ruleOrders)) {
+            throw new OrderMustMatchWithOrderOfRuleException();
+        }
     }
 }

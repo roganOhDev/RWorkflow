@@ -4,7 +4,7 @@ import com.source.rworkflow.common.exception.IllegalEnumStringException;
 
 public enum WorkflowRequestType {
     ACCESS_CONTROL,
-    SQl_EXECUTION,
+    SQL_EXECUTION,
     DATA_EXPORT;
 
     public static WorkflowRequestType of(String name){
@@ -16,6 +16,6 @@ public enum WorkflowRequestType {
     }
 
     public boolean isNotAutoExecution() {
-        return this == WorkflowRequestType.ACCESS_CONTROL;
+        return this != WorkflowRequestType.ACCESS_CONTROL;
     }
 }

@@ -3,6 +3,7 @@ package com.source.rworkflow.workflow.dto;
 import com.source.rworkflow.misc.user.UserDto;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
+import com.source.rworkflow.workflow.type.SqlContentType;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.Getter;
 
@@ -33,15 +34,13 @@ public class WorkflowRequestDto {
             @Valid
             @Size()
             private List<WorkflowApprovalDto.Create.Request> approvals;
-            @Valid
             @Size(min = 1)
             private List<Long> executionAssignees;
-            @Valid
             @Size(min = 1)
             private List<Long> reviewAssignees;
 
             @Valid
-            @NotNull
+            @NotNull(message = "Must Have detail")
             private Detail detail;
 
             @Getter

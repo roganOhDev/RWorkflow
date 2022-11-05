@@ -1,4 +1,4 @@
-package com.source.rworkflow.workflowRule.exception;
+package com.source.rworkflow.workflow.exception;
 
 import com.source.rworkflow.common.exception.ExceptionCode;
 import com.source.rworkflow.common.exception.RException;

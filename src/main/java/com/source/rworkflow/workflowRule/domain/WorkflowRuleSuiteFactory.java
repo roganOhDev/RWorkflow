@@ -15,10 +15,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class WorkflowRuleSuiteFactory {
-    private WorkflowRuleApprovalCompositeService workflowRuleApprovalCompositeService;
-    private WorkflowRuleApprovalAssigneeCompositeService workflowRuleApprovalAssigneeCompositeService;
-    private WorkflowRuleExecutionAssigneeCompositeService workflowRuleExecutionAssigneeCompositeService;
-    private WorkflowRuleReviewAssigneeCompositeService workflowRuleReviewAssigneeCompositeService;
+    private final WorkflowRuleApprovalCompositeService workflowRuleApprovalCompositeService;
+    private final WorkflowRuleApprovalAssigneeCompositeService workflowRuleApprovalAssigneeCompositeService;
+    private final WorkflowRuleExecutionAssigneeCompositeService workflowRuleExecutionAssigneeCompositeService;
+    private final WorkflowRuleReviewAssigneeCompositeService workflowRuleReviewAssigneeCompositeService;
 
 
     public WorkflowRuleSuite of(final WorkflowRule rule) {
