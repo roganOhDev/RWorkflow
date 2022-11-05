@@ -4,7 +4,6 @@ import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.misc.user.UserDto;
 import com.source.rworkflow.misc.user.UserService;
 import com.source.rworkflow.workflow.domain.Assignee;
-import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApprovalCompositeService;
 import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApprovalAssignee;
 import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApprovalAssigneeCompositeService;
@@ -119,6 +118,12 @@ public class WorkflowTransferService {
                         changeToUserDtos(reviewAssignees.get(workflowRequest.getId()))))
 
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    public WorkflowRequestDto.Cancel.Response cancel(final Long id,final SessionUserId sessionUserId){
+        final var canceled = compositeService.cancel(id, sessionUserId);
+
+        return new WorkflowRequestDto.Cancel.Response(canceled.getType(), canceled.getId(), canceled.getTitle(), canceled.isCanceled());
     }
 
     private void pushInTriple(final Map<Long, Map<Long, ArrayList<UserDto>>> mappedApprovalAssignees, WorkflowRequestApprovalAssignee assignee) {

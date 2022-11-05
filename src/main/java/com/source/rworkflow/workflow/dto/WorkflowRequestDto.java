@@ -81,6 +81,7 @@ public class WorkflowRequestDto {
         protected Long ruleId;
         protected boolean urgent;
         protected String comment;
+        protected boolean canceled;
         protected List<WorkflowApprovalDto.Create.Response> approvals;
         protected List<UserDto> executionAssignees;
         protected List<UserDto> reviewAssignees;
@@ -95,6 +96,7 @@ public class WorkflowRequestDto {
             if (!workflowRequest.isUrgent()) {
                 this.approvals = approvals(approvals, approvalAssignees);
             }
+            this.canceled = workflowRequest.isCanceled();
             this.executionAssignees = executionAssignees;
             this.reviewAssignees = reviewAssignees;
         }
@@ -167,5 +169,17 @@ public class WorkflowRequestDto {
         }
     }
 
+    @Getter
+    public static class Cancel{
+        @Getter
+        @AllArgsConstructor
+        public static class Response {
+            private WorkflowRequestType type;
+            private Long id;
+            private String title;
+            private boolean canceled;
+        }
+
+    }
 
 }

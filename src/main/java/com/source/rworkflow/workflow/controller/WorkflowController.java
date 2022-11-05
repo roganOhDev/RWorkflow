@@ -5,10 +5,8 @@ import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -50,7 +48,9 @@ public class WorkflowController {
     }
 
     @PostMapping(value = "/{id}")
-    public void cancel(@PathVariable Long id) {
+    public WorkflowRequestDto.Cancel.Response cancel(@PathVariable Long id, @RequestHeader(HEADER_KEY) String userToken) {
+        final var sessionUserId = userTokenService.findUserId(userToken);
 
+        return transferService.cancel(id, sessionUserId);
     }
 }

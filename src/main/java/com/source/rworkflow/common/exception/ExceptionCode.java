@@ -40,5 +40,6 @@ public class ExceptionCode {
         final public static String TYPE_NOT_MATCH_EXCEPTION = "Type Must Match With Rule's";
         final public static String ASSIGNEE_CAN_NOT_BE_EMPTY = "Assignee Is Empty. Please Fill It";
         final public static String CAN_NOT_DUPLICATE_REQUEST_ACCESS_CONTROL_CONNECTION_EXCEPTION = "Access Control Connection Is Duplicated In Request";
+        final public static String ONLY_CREATE_USER_CAN_CANCEL= "Only Create User Can Cancel";
     }
 }

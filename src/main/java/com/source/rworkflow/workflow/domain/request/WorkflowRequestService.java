@@ -45,7 +45,20 @@ public class WorkflowRequestService {
         }
 
         return repository.findAllByType(type);
+    }
 
+    public WorkflowRequest cancel(final WorkflowRequest request, final SessionUserId sessionUserId) {
+
+        final var now = LocalDateTime.now();
+
+        request.setCanceled(true);
+        request.setCanceledBy(sessionUserId.getId());
+        request.setCanceledAt(now);
+
+        request.setUpdatedBy(sessionUserId.getId());
+        request.setUpdatedAt(now);
+
+        return request;
     }
 
     public WorkflowRequest find(final Long id){

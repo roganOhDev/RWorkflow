@@ -19,4 +19,11 @@ public class WorkflowRequestTriggerService {
         return created;
     }
 
+    public WorkflowRequest cancel(final WorkflowRequest workflowRequest, final SessionUserId sessionUserId) {
+        trigger.beforeCancel(workflowRequest);
+
+        return service.cancel(workflowRequest, sessionUserId);
+
+    }
+
 }
