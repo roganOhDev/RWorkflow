@@ -1,8 +1,11 @@
 package com.source.rworkflow.workflow.domain.approval;
 
 import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.common.exception.RException;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
+import com.source.rworkflow.workflow.exception.ApprovalHaveToFollowItsTurnException;
+import com.source.rworkflow.workflow.exception.ApprovalNotFoundByOrderException;
 import com.source.rworkflow.workflow.exception.AssigneeCanNotBeEmpty;
 import com.source.rworkflow.workflow.exception.SelfApproveException;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
@@ -40,8 +43,39 @@ public class WorkflowRequestApprovalCompositeService {
     }
 
     @Transactional(readOnly = true)
-    public List<WorkflowRequestApproval> findByRequestId(final Long requestId){
-        return service.findByRequestId(requestId);
+    public List<WorkflowRequestApproval> findAllByRequestId(final Long requestId) {
+        return service.findAllByRequestId(requestId);
+    }
+
+
+    @Transactional
+    public int approve(final Long requestId, final Long order, final SessionUserId sessionUserId, final boolean approve) {
+
+        final var approvals = findAllByRequestId(requestId);
+
+        final var fitApproval = approvals.stream()
+                .filter(approval -> approval.getOrder().equals(order))
+                .collect(Collectors.toUnmodifiableList());
+
+        if (fitApproval.size() == 0) {
+            throw new ApprovalNotFoundByOrderException(requestId, order);
+        }
+
+        final var beforeApproval = approvals.stream()
+                .filter(approval -> approval.getOrder().equals(order - 1))
+                .findFirst();
+
+        if (beforeApproval.isPresent() && !beforeApproval.get().getStatus().isFinished()) {
+            throw new ApprovalHaveToFollowItsTurnException();
+        }
+
+        if (approve) {
+            triggerService.approveOk(fitApproval.get(0), sessionUserId);
+        } else {
+            triggerService.approveReject(fitApproval.get(0), sessionUserId);
+        }
+
+        return approvals.size();
     }
 
     private WorkflowRequestApproval create(final Long requestId, final WorkflowApprovalDto.Create.Request creatRequest, final SessionUserId sessionUserId) {
@@ -92,7 +126,7 @@ public class WorkflowRequestApprovalCompositeService {
         return mutableAssigneesByRule;
     }
 
-    private WorkflowRequestApproval getNewWorkflowRequestApproval(final Long requestId,  final WorkflowApprovalDto.Create.Request creatRequest){
+    private WorkflowRequestApproval getNewWorkflowRequestApproval(final Long requestId, final WorkflowApprovalDto.Create.Request creatRequest) {
         final var workflowRequestApproval = new WorkflowRequestApproval();
 
         workflowRequestApproval.setRequestId(requestId);

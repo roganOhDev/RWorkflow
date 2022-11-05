@@ -40,6 +40,11 @@ public class ExceptionCode {
         final public static String TYPE_NOT_MATCH_EXCEPTION = "Type Must Match With Rule's";
         final public static String ASSIGNEE_CAN_NOT_BE_EMPTY = "Assignee Is Empty. Please Fill It";
         final public static String CAN_NOT_DUPLICATE_REQUEST_ACCESS_CONTROL_CONNECTION_EXCEPTION = "Access Control Connection Is Duplicated In Request";
-        final public static String ONLY_CREATE_USER_CAN_CANCEL= "Only Create User Can Cancel";
+        final public static String APPROVAL_NOT_FOUND_BY_ORDER_EXCEPTION = "Approval Not Found By Order And Request Id";
+        final public static String CAN_NOT_FOUND_APPROVAL_ASSIGNEE = "Approval Assignee Not Found";
+        final public static String ORDERS_MUST_BE_INCREMENT = "Orders Must Be Increment";
+        final public static String APPROVAL_HAVE_TO_FOLLOW_ITS_TURN_EXCEPTION = "Approval Have To Follow Its Turn Exception";
+
+        final public static String CAN_NOT_APPROVE_BY_URGENT_EXCEPTION = "You Cannot Approve This Request BeCause Urgent. Move To Execute";
     }
 }

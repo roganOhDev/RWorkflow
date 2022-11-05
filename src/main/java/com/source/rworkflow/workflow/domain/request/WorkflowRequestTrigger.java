@@ -1,5 +1,7 @@
 package com.source.rworkflow.workflow.domain.request;
 
+import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApprovalCompositeService;
 import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControl;
 import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControlCompositeService;
 import com.source.rworkflow.workflow.domain.request.dataExport.WorkflowRequestDetailDataExport;
@@ -16,6 +18,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class WorkflowRequestTrigger {
+    private final WorkflowRequestApprovalCompositeService approvalCompositeService;
     private final WorkflowRequestDetailSqlExecutionCompositeService sqlExecutionCompositeService;
     private final WorkflowRequestDetailDataExportCompositeService dataExportCompositeService;
     private final WorkflowRequestDetailAccessControlCompositeService accessControlCompositeService;
@@ -32,6 +35,10 @@ public class WorkflowRequestTrigger {
                 createDataExport(requestId, request.getDetail());
                 break;
         }
+    }
+
+    public int beforeApprove(final Long requestId, final Long order, final SessionUserId sessionUserId, final boolean approve) {
+        return approvalCompositeService.approve(requestId, order, sessionUserId, approve);
     }
 
     private List<WorkflowRequestDetailDataExport> createDataExport(final Long requestId, final WorkflowRequestDto.Create.Request.Detail request) {

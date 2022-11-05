@@ -4,9 +4,10 @@ import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
+import com.source.rworkflow.workflow.exception.CanNotApproveByUrgentException;
 import com.source.rworkflow.workflow.exception.ExecutionExpirationDateMustBeAfterRequestExpirationDateException;
 import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
-import com.source.rworkflow.workflow.exception.OnlyCreateUserCanCancel;
+import com.source.rworkflow.workflow.exception.OrdersMustBeInCrement;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,10 +61,30 @@ public class WorkflowRequestCompositeService {
     }
 
     @Transactional
-    public WorkflowRequest cancel(final Long id,final SessionUserId sessionUserId) {
+    public WorkflowRequest cancel(final Long id, final SessionUserId sessionUserId) {
         final var workflowRequest = service.find(id);
 
         return service.cancel(workflowRequest, sessionUserId);
+    }
+
+    @Transactional
+    public WorkflowRequest approve(final Long id, final Long order, final SessionUserId sessionUserId, final boolean approve) {
+        final var workflowRequest = service.find(id);
+
+        validateUrgent(workflowRequest.isUrgent());
+
+        if (approve) {
+            return triggerService.approveOk(workflowRequest, order, sessionUserId);
+        } else {
+            return triggerService.approveReject(workflowRequest, order, sessionUserId);
+        }
+
+    }
+
+    private void validateUrgent(final boolean urgent) {
+        if (urgent) {
+            throw new CanNotApproveByUrgentException();
+        }
     }
 
     private void setDefaultExpirationDateAndValidate(final WorkflowRequestDto.Create.Request request) {
@@ -114,6 +136,18 @@ public class WorkflowRequestCompositeService {
 
     private void validateOrder(final List<WorkflowApprovalDto.Create.Request> requests, final WorkflowRuleSuite workflowRuleSuite) {
         checkDuplicateOrder(requests);
+        validateIncreasment(requests);
+    }
+
+    private void validateIncreasment(final List<WorkflowApprovalDto.Create.Request> requests) {
+        final var orders = requests.stream()
+                .map(WorkflowApprovalDto.Create.Request::getOrder)
+                .collect(Collectors.toUnmodifiableList());
+
+        if (Set.copyOf(orders).containsAll(List.of(1L, 2L, 3L)) || Set.copyOf(orders).containsAll(List.of(1L, 2L)) || orders.equals(List.of(1L))) {
+            return;
+        }
+        throw new OrdersMustBeInCrement();
     }
 
     private void checkDuplicateOrder(final List<WorkflowApprovalDto.Create.Request> requests) {

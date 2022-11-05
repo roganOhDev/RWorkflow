@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.domain.approval;
 
 import com.source.rworkflow.workflow.type.ApprovalStatusType;
+import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,11 @@ public class WorkflowRequestApprovalService {
         return repository.findAll();
     }
 
-    public List<WorkflowRequestApproval> findByRequestId(final Long requestId) {
-        return repository.findByRequestId(requestId);
+    public List<WorkflowRequestApproval> findAllByRequestId(final Long requestId) {
+        return repository.findAllByRequestId(requestId);
+    }
+
+    public WorkflowRequestApproval approve(final WorkflowRequestApproval approval) {
+        return repository.save(approval);
     }
 }

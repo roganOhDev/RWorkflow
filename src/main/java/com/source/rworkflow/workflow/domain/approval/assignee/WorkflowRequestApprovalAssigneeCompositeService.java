@@ -1,5 +1,8 @@
 package com.source.rworkflow.workflow.domain.approval.assignee;
 
+import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
+import com.source.rworkflow.workflow.exception.ApprovalAssigneeNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,17 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
     @Transactional(readOnly = true)
     public List<WorkflowRequestApprovalAssignee> findAll() {
         return service.findAll();
+    }
+
+    @Transactional
+    public WorkflowRequestApprovalAssignee approve(final WorkflowRequestApproval approval, final SessionUserId sessionUserId, final boolean approve) {
+        final var assignees = service.findAllByApprovalId(approval.getId());
+
+        final var fitAssignee = assignees.stream()
+                .filter(assignee -> assignee.getAssigneeId().equals(sessionUserId.getId()))
+                .findFirst().orElseThrow(() -> new ApprovalAssigneeNotFoundException(approval.getId(), approval.getOrder(), sessionUserId.getId()));
+
+        return service.approve(fitAssignee, sessionUserId, approve);
     }
 
     private WorkflowRequestApprovalAssignee create(final Long id, final Long requestId, final Long approvalId) {

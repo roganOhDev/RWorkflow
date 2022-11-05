@@ -1,5 +1,8 @@
 package com.source.rworkflow.workflow.domain.approval;
 
+import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.workflow.type.ApprovalStatusType;
+import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,5 +21,25 @@ public class WorkflowRequestApprovalTriggerService {
         trigger.afterCreate(assignees, requestId, created.getId());
 
         return created;
+    }
+
+    public WorkflowRequestApproval approveOk(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
+        trigger.beforeApprove(approval, sessionUserId, true);
+
+        if (approval.getApproveType().equals(ApproveType.ALL)) {
+            approval.setStatus(ApprovalStatusType.IN_PROGRESS);
+        } else {
+            approval.setStatus(ApprovalStatusType.APPROVED);
+        }
+
+        return service.approve(approval);
+    }
+
+    public WorkflowRequestApproval approveReject(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
+        trigger.beforeApprove(approval, sessionUserId, false);
+
+        approval.setStatus(ApprovalStatusType.REJECTED);
+
+        return service.approve(approval);
     }
 }

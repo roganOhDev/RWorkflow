@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface WorkflowRequestApprovalRepository extends JpaRepository<WorkflowRequestApproval, Long> {
-    List<WorkflowRequestApproval> findByRequestId(Long requestId);
+    List<WorkflowRequestApproval> findAllByRequestId(Long requestId);
 }

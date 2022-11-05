@@ -1,5 +1,6 @@
 package com.source.rworkflow.workflow.domain.approval.assignee;
 
+import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.workflow.type.AssigneeStatusType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,4 +26,13 @@ public class WorkflowRequestApprovalAssigneeService {
         return repository.findAll();
     }
 
+    public WorkflowRequestApprovalAssignee approve(final WorkflowRequestApprovalAssignee assignee, final SessionUserId sessionUserId, final boolean approve) {
+        if (approve) {
+            assignee.setStatus(AssigneeStatusType.APPROVED);
+        } else {
+            assignee.setStatus(AssigneeStatusType.REJECTED);
+        }
+
+        return repository.save(assignee);
+    }
 }

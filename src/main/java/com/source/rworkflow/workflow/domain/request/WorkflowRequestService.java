@@ -58,10 +58,19 @@ public class WorkflowRequestService {
         request.setUpdatedBy(sessionUserId.getId());
         request.setUpdatedAt(now);
 
-        return request;
+        return repository.save(request);
     }
 
-    public WorkflowRequest find(final Long id){
+    public WorkflowRequest approve(final WorkflowRequest request, final SessionUserId sessionUserId) {
+        final var now = LocalDateTime.now();
+
+        request.setUpdatedAt(now);
+        request.setUpdatedBy(sessionUserId.getId());
+
+        return repository.save(request);
+    }
+
+    public WorkflowRequest find(final Long id) {
         return repository.findById(id).orElseThrow(() -> new WorkflowRequestNotFoundException(id));
     }
 

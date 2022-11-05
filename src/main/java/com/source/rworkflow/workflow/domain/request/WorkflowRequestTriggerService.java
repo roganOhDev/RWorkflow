@@ -2,6 +2,7 @@ package com.source.rworkflow.workflow.domain.request;
 
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
+import com.source.rworkflow.workflow.type.ApprovalStatusType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,11 +20,24 @@ public class WorkflowRequestTriggerService {
         return created;
     }
 
-    public WorkflowRequest cancel(final WorkflowRequest workflowRequest, final SessionUserId sessionUserId) {
-        trigger.beforeCancel(workflowRequest);
+    public WorkflowRequest approveOk(final WorkflowRequest workflowRequest, final Long order, final SessionUserId sessionUserId) {
+        final var approvalCount = trigger.beforeApprove(workflowRequest.getId(), order, sessionUserId, true);
 
-        return service.cancel(workflowRequest, sessionUserId);
+        if (order == approvalCount) {
+            workflowRequest.setApprovalStatus(ApprovalStatusType.APPROVED);
+        } else {
+            workflowRequest.setApprovalStatus(ApprovalStatusType.IN_PROGRESS);
+        }
 
+        return service.approve(workflowRequest, sessionUserId);
+    }
+
+    public WorkflowRequest approveReject(final WorkflowRequest workflowRequest, final Long order, final SessionUserId sessionUserId) {
+        trigger.beforeApprove(workflowRequest.getId(), order, sessionUserId, false);
+
+        workflowRequest.setApprovalStatus(ApprovalStatusType.REJECTED);
+
+        return service.approve(workflowRequest, sessionUserId);
     }
 
 }

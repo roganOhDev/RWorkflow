@@ -4,10 +4,12 @@ import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.misc.user.UserDto;
 import com.source.rworkflow.misc.user.UserService;
 import com.source.rworkflow.workflow.domain.Assignee;
+import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApprovalCompositeService;
 import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApprovalAssignee;
 import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApprovalAssigneeCompositeService;
 import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecutionAssigneeCompositeService;
+import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequestCompositeService;
 import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControlCompositeService;
 import com.source.rworkflow.workflow.domain.request.accessControl.connection.WorkflowRequestDetailAccessControlConnectionCompositeService;
@@ -80,7 +82,7 @@ public class WorkflowTransferService {
         final var approvalAssignees = new HashMap<Long, List<UserDto>>();
 
         final var workflowRequest = compositeService.find(id);
-        final var approvals = workflowRequestApprovalCompositeService.findByRequestId(workflowRequest.getId());
+        final var approvals = workflowRequestApprovalCompositeService.findAllByRequestId(workflowRequest.getId());
         approvals.forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
         final var executionAssignees = changeToUserDtos(workflowRequestExecutionAssigneeCompositeService.findByRequestId(workflowRequest.getId()));
         final var reviewAssignees = changeToUserDtos(workflowRequestReviewAssigneeCompositeService.findByRequestId(workflowRequest.getId()));
@@ -120,10 +122,22 @@ public class WorkflowTransferService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public WorkflowRequestDto.Cancel.Response cancel(final Long id,final SessionUserId sessionUserId){
+    public WorkflowRequestDto.Cancel.Response cancel(final Long id, final SessionUserId sessionUserId) {
         final var canceled = compositeService.cancel(id, sessionUserId);
 
         return new WorkflowRequestDto.Cancel.Response(canceled.getType(), canceled.getId(), canceled.getTitle(), canceled.isCanceled());
+    }
+
+    public WorkflowRequestDto.Approve.Response approve(final Long id, final Long order, final SessionUserId sessionUserId, final boolean approve) {
+        final var updated = compositeService.approve(id, order, sessionUserId, approve);
+
+        final var approvalAssignees = new HashMap<Long, List<UserDto>>();
+
+        final var approvals = workflowRequestApprovalCompositeService.findAllByRequestId(id);
+        approvals
+                .forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
+
+        return WorkflowRequestDto.Approve.Response.from(updated, approvals, approvalAssignees);
     }
 
     private void pushInTriple(final Map<Long, Map<Long, ArrayList<UserDto>>> mappedApprovalAssignees, WorkflowRequestApprovalAssignee assignee) {

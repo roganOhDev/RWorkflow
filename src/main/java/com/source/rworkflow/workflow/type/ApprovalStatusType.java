@@ -14,6 +14,10 @@ public enum ApprovalStatusType {
     @Getter
     private boolean proceeding;
 
+    public boolean isFinished() {
+        return !this.proceeding && !this.equals(ApprovalStatusType.APPROVED);
+    }
+
     ApprovalStatusType(boolean proceeding) {
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.source.rworkflow.common.util.DateFormat;
 import com.source.rworkflow.misc.user.UserDto;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
+import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApprovalAssignee;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
 import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControl;
 import com.source.rworkflow.workflow.domain.request.accessControl.connection.WorkflowRequestDetailAccessControlConnection;
@@ -17,6 +18,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -170,7 +172,7 @@ public class WorkflowRequestDto {
     }
 
     @Getter
-    public static class Cancel{
+    public static class Cancel {
         @Getter
         @AllArgsConstructor
         public static class Response {
@@ -180,6 +182,42 @@ public class WorkflowRequestDto {
             private boolean canceled;
         }
 
+    }
+
+    @Getter
+    public static class Approve {
+        @Getter
+        public static class Response {
+            protected Long id;
+            protected String title;
+            protected WorkflowRequestType type;
+            protected Long ruleId;
+            protected String comment;
+            protected boolean canceled;
+            protected List<WorkflowApprovalDto.Create.Response> approvals;
+
+            public static Response from(final WorkflowRequest request, List<WorkflowRequestApproval> approvals, Map<Long, List<UserDto>> approvalAssignees) {
+                final var response = new Response();
+
+                response.id = request.getId();
+                response.title = request.getTitle();
+                response.type = request.getType();
+                response.ruleId = request.getRuleId();
+                response.comment = request.getComment();
+                response.canceled = request.isCanceled();
+                response.approvals = approvals(approvals, approvalAssignees);
+
+                return response;
+
+            }
+
+            private static List<WorkflowApprovalDto.Create.Response> approvals(final List<WorkflowRequestApproval> approvals, final Map<Long, ? extends List<UserDto>> approvalAssignee) {
+                return approvals.stream()
+                        .map(approval -> WorkflowApprovalDto.Create.Response.from(approval, approvalAssignee.get(approval.getId())))
+                        .collect(Collectors.toUnmodifiableList());
+            }
+
+        }
     }
 
 }
