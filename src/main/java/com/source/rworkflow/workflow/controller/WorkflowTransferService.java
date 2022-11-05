@@ -1,11 +1,12 @@
 package com.source.rworkflow.workflow.controller;
 
 import com.source.rworkflow.common.domain.SessionUserId;
-import com.source.rworkflow.common.util.Triple;
 import com.source.rworkflow.misc.user.UserDto;
 import com.source.rworkflow.misc.user.UserService;
 import com.source.rworkflow.workflow.domain.Assignee;
+import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApprovalCompositeService;
+import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApprovalAssignee;
 import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApprovalAssigneeCompositeService;
 import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecutionAssigneeCompositeService;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequestCompositeService;
@@ -101,9 +102,9 @@ public class WorkflowTransferService {
 
         final var approvals = workflowRequestApprovalCompositeService.findAll();
 
-        final var mappedApprovalAssignees = new Triple<Long, Long, ArrayList<UserDto>>();
+        final var mappedApprovalAssignees = new HashMap<Long, Map<Long, ArrayList<UserDto>>>();
         workflowRequestApprovalAssigneeCompositeService.findAll()
-                .forEach(e -> mappedApprovalAssignees.put(e.getRequestId(), e.getRequestApprovalId(), new ArrayList<>(List.of(this.changeToUserDto(e)))));
+                .forEach(assignee -> pushInTriple(mappedApprovalAssignees, assignee));
 
         final var executionAssignees = workflowRequestExecutionAssigneeCompositeService.findAll().stream()
                 .collect(Collectors.groupingBy(Assignee::getRequestId));
@@ -118,6 +119,23 @@ public class WorkflowTransferService {
                         changeToUserDtos(reviewAssignees.get(workflowRequest.getId()))))
 
                 .collect(Collectors.toUnmodifiableList());
+    }
+
+    private void pushInTriple(final Map<Long, Map<Long, ArrayList<UserDto>>> mappedApprovalAssignees, WorkflowRequestApprovalAssignee assignee) {
+        final var first = assignee.getRequestId();
+        final var second = assignee.getRequestApprovalId();
+        final var third = changeToUserDto(assignee);
+
+        if (mappedApprovalAssignees.containsKey(first)) {
+            if (mappedApprovalAssignees.get(first).containsKey(second)) {
+                mappedApprovalAssignees.get(first).get(second).add(third);
+
+            } else {
+                mappedApprovalAssignees.get(first).put(second, new ArrayList<>(List.of(third)));
+            }
+        } else {
+            mappedApprovalAssignees.put(first, Map.of(second, new ArrayList<>(List.of(third))));
+        }
     }
 
     private Map<Long, List<UserDto>> approvalAssigneeMap(final Long approvalId) {
