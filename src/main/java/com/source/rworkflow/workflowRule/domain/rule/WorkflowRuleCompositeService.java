@@ -3,12 +3,14 @@ package com.source.rworkflow.workflowRule.domain.rule;
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.common.util.Patch;
+import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleApprovalDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
 import com.source.rworkflow.workflowRule.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
 import com.source.rworkflow.workflowRule.exception.ApprovalCanNotBeNullException;
 import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeNullException;
+import com.source.rworkflow.workflowRule.exception.CanNotDeleteWorkflowRuleException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssigneeException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateOrderException;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +42,11 @@ public class WorkflowRuleCompositeService {
     }
 
     @Transactional
-    public WorkflowRule delete(final WorkflowRule workflowRule, final SessionUserId sessionUserId) {
+    public WorkflowRule delete(final Long id, final List<WorkflowRequest> usedWorkflowRequests, final SessionUserId sessionUserId) {
+        validateDelete(usedWorkflowRequests);
+
+        final var workflowRule = service.find(id);
+
         workflowRule.setDeleted(true);
 
         return triggerService.delete(workflowRule, sessionUserId);
@@ -59,6 +65,12 @@ public class WorkflowRuleCompositeService {
     @Transactional(readOnly = true)
     public WorkflowRule find(final Long id) {
         return service.find(id);
+    }
+
+    private void validateDelete(final List<WorkflowRequest> usingWorkflowRequests) {
+        if (usingWorkflowRequests.size() > 0 ) {
+            throw new CanNotDeleteWorkflowRuleException("Rule Is Used In " + usingWorkflowRequests.size() + " Workflows");
+        }
     }
 
     private void validateCreate(final WorkflowRuleDto.Create.Request request) {
@@ -80,7 +92,7 @@ public class WorkflowRuleCompositeService {
         if (request.getApprovals() == null) {
             throw new ApprovalCanNotBeNullException();
         }
-        if (request.getApprovals() == null | request.getExecutionAssignees() == null | request.getReviewAssignees() == null) {
+        if (request.getExecutionAssignees() == null || request.getReviewAssignees() == null) {
             throw new AssigneeCanNotBeNullException();
         }
     }
@@ -97,7 +109,7 @@ public class WorkflowRuleCompositeService {
 
     private void checkUrgentApproval(final WorkflowRuleDto.Create.Request request) {
         if (request.isUrgent()) {
-            if (request.getApprovals() == null | request.getApprovals().size() > 0) {
+            if (request.getApprovals() == null || request.getApprovals().size() > 0) {
                 throw new ApprovalAssigneeCanNotBeCreatedWhenUrgentException();
             }
         }

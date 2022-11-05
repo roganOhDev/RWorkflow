@@ -19,6 +19,7 @@ public class WorkflowRuleApprovalDto {
         @NotNull
         private Long order;
         @Valid
+        @NotNull
         private List<AssigneeDto.Request> assignees;
     }
 

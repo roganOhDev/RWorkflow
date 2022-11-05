@@ -3,6 +3,7 @@ package com.source.rworkflow.workflowRule;
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.misc.role.RoleService;
 import com.source.rworkflow.misc.user.UserService;
+import com.source.rworkflow.workflow.domain.request.WorkflowRequestCompositeService;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuiteFactory;
@@ -34,6 +35,7 @@ public class WorkflowRuleTransferService {
     private final WorkflowRuleExecutionAssigneeCompositeService workflowRuleExecutionAssigneeCompositeService;
     private final WorkflowRuleReviewAssigneeCompositeService workflowRuleReviewAssigneeCompositeService;
     private final WorkflowRuleSuiteFactory workflowRuleSuiteFactory;
+    private final WorkflowRequestCompositeService workflowRequestCompositeService;
     private final UserService userService;
     private final RoleService roleService;
 
@@ -67,8 +69,9 @@ public class WorkflowRuleTransferService {
     }
 
     public WorkflowRuleDto.Delete.Response delete(final Long id, final SessionUserId sessionUserId) {
-        final var workflowRule = service.find(id);
-        final var deleted = compositeService.delete(workflowRule, sessionUserId);
+        final var workflowRequests = workflowRequestCompositeService.findByRuleId(id);
+
+        final var deleted = compositeService.delete(id, workflowRequests, sessionUserId);
 
         return new WorkflowRuleDto.Delete.Response(deleted.getId(), deleted.getName(), deleted.getRequestType());
     }

@@ -1,7 +1,6 @@
 package com.source.rworkflow.workflow.domain.request;
 
 import com.source.rworkflow.common.domain.SessionUserId;
-import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.type.ApprovalStatusType;
 import com.source.rworkflow.workflow.type.ExecutionStatusType;
 import com.source.rworkflow.workflow.type.ReviewStatusType;
@@ -9,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +31,10 @@ public class WorkflowRequestService {
         workflowRequest.setUpdatedBy(sessionUserId.getId());
 
         return repository.save(workflowRequest);
+    }
+
+    public List<WorkflowRequest> findByRuleId(final Long ruleId) {
+        return repository.findAllByRuleId(ruleId);
     }
 
 }

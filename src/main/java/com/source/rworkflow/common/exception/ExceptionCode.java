@@ -26,6 +26,7 @@ public class ExceptionCode {
         final public static String ORDER_VALUE_EXCEPTION = "Only 0 < {value} < 4 Can Be Order Value";
         final public static String ASSIGNEE_CAN_NOT_BE_NULL = "Assignee Field Cannot Be Null";
         final public static String CANNOT_DUPLICATE_ORDER = "Order Can Not Be Duplicated";
+        final public static String CANNOT_DELETE = "Can Not Delete";
     }
 
     public static class WorkflowRequest{

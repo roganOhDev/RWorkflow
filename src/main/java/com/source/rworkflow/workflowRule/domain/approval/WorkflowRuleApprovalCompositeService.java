@@ -65,7 +65,7 @@ public class WorkflowRuleApprovalCompositeService {
     }
 
     private void checkOrder(final Long order) {
-        if (order > 3 | order <= 0) {
+        if (order > 3 || order <= 0) {
             throw new OrderValueException();
         }
     }

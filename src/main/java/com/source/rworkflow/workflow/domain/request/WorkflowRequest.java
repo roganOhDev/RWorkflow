@@ -71,7 +71,7 @@ public class WorkflowRequest {
     private boolean canceled;
 
     @Column(name = "canceled_at")
-    private LocalDateTime canceldAt;
+    private LocalDateTime canceledAt;
 
     @Column(name = "canceled_by")
     private Long canceledBy;
@@ -87,4 +87,12 @@ public class WorkflowRequest {
 
     @Column(name = "updated_by", nullable = false)
     private Long updatedBy;
+
+    public boolean isProceeding(){
+        if (!this.canceled && (this.approvalStatus.isProceeding() || this.executionStatus.isProceeding() || this.reviewStatus.isProceeding())) {
+            return false;
+        }
+
+        return true;
+    }
 }

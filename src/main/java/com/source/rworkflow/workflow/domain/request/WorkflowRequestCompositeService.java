@@ -43,6 +43,11 @@ public class WorkflowRequestCompositeService {
         return triggerService.create(workflowRequest, request, sessionUserId);
     }
 
+    @Transactional(readOnly = true)
+    public List<WorkflowRequest> findByRuleId(final Long ruleId) {
+        return service.findByRuleId(ruleId);
+    }
+
     private void setDefaultExpirationDateAndValidate(final WorkflowRequestDto.Create.Request request) {
 
         final var detail = request.getDetail();
