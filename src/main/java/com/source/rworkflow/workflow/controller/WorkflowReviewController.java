@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/workflow", produces = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = "/workflow/review/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class WorkflowReviewController {
     private final WorkflowTransferService transferService;
     private final UserTokenService userTokenService;
 
-    @PostMapping(value = "/{id}/review")
+    @PostMapping
     public void review(@PathVariable Long id) {
 
     }

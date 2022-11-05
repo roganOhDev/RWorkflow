@@ -12,22 +12,22 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(value = "/workflow", produces = {MediaType.APPLICATION_JSON_VALUE})
+@RequestMapping(value = "/workflow/execute/{id}", produces = {MediaType.APPLICATION_JSON_VALUE})
 public class WorkflowExecutionController {
     private final WorkflowTransferService transferService;
     private final UserTokenService userTokenService;
 
-    @PostMapping(value = "/{id}/execute")
+    @PostMapping
     public void execute(@PathVariable Long id){
 
     }
 
-    @PostMapping(value = "/{id}/execute/success")
+    @PostMapping(value = "/success")
     public void executeSuccess(@PathVariable Long id) {
 
     }
 
-    @PostMapping(value = "/{id}/exeucte/fail")
+    @PostMapping(value = "/fail")
     public void executeFail(@PathVariable Long id) {
     }
 }

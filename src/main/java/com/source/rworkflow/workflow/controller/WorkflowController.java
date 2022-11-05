@@ -49,11 +49,6 @@ public class WorkflowController {
         return transferService.list(type);
     }
 
-    @PatchMapping
-    public void update() {
-
-    }
-
     @PostMapping(value = "/{id}")
     public void cancel(@PathVariable Long id) {
 
