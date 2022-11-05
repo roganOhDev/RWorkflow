@@ -12,6 +12,7 @@ public class ExceptionCode {
 
     public static class User{
         final public static String USER_NOT_FOUND_EXCEPTION = "User Not Found";
+        final public static String SYSTEM_USER_CAN_NOT_DO_THAT = "System User Can Not Do That";
     }
 
     public static class Role {

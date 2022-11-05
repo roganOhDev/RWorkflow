@@ -1,7 +1,6 @@
 package com.source.rworkflow.workflow.controller;
 
-import com.source.rworkflow.common.exception.RException;
-import com.source.rworkflow.misc.user.UserTokenService;
+import com.source.rworkflow.misc.user.token.UserTokenService;
 import com.source.rworkflow.misc.user.exception.UserNotFoundException;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import lombok.RequiredArgsConstructor;

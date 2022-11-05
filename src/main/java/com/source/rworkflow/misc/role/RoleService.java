@@ -1,6 +1,6 @@
 package com.source.rworkflow.misc.role;
 
-import com.source.rworkflow.misc.user.exception.RoleNotFoundException;
+import com.source.rworkflow.misc.role.exception.RoleNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

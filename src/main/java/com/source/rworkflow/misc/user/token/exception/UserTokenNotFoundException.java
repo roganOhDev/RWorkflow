@@ -1,4 +1,4 @@
-package com.source.rworkflow.misc.user.exception;
+package com.source.rworkflow.misc.user.token.exception;
 
 import com.source.rworkflow.common.exception.ExceptionCode;
 import com.source.rworkflow.common.exception.RException;

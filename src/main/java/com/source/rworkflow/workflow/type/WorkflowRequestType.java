@@ -1,6 +1,6 @@
 package com.source.rworkflow.workflow.type;
 
-import com.source.rworkflow.misc.user.exception.IllegalEnumStringException;
+import com.source.rworkflow.common.exception.IllegalEnumStringException;
 
 public enum WorkflowRequestType {
     ACCESS_CONTROL,

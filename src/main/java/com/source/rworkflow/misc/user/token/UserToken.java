@@ -1,4 +1,4 @@
-package com.source.rworkflow.misc.user;
+package com.source.rworkflow.misc.user.token;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -26,5 +26,5 @@ public class UserToken {
     private String token;
 
     @Column(name = "user_id", nullable = false)
-    private String userId;
+    private Long userId;
 }

@@ -1,7 +1,8 @@
-package com.source.rworkflow.misc.user;
+package com.source.rworkflow.misc.user.token;
 
 import com.source.rworkflow.common.domain.SessionUserId;
-import com.source.rworkflow.misc.user.exception.UserTokenNotFoundException;
+import com.source.rworkflow.misc.user.exception.SystemUserCanNotDoThatException;
+import com.source.rworkflow.misc.user.token.exception.UserTokenNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,10 @@ public class UserTokenService {
             throw new UserTokenNotFoundException(token);
         }
 
-        return new SessionUserId(userToken.getId());
+        if (userToken.getUserId() == 1L) {
+            throw new SystemUserCanNotDoThatException();
+        }
+
+        return new SessionUserId(userToken.getUserId());
     }
 }

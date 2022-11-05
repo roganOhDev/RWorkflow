@@ -1,5 +1,6 @@
-package com.source.rworkflow.misc.user;
+package com.source.rworkflow.misc.user.token;
 
+import com.source.rworkflow.misc.user.token.UserToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

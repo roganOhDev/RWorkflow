@@ -1,6 +1,6 @@
 package com.source.rworkflow.workflowRule;
 
-import com.source.rworkflow.misc.user.UserTokenService;
+import com.source.rworkflow.misc.user.token.UserTokenService;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

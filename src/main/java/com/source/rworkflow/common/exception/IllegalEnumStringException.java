@@ -1,7 +1,4 @@
-package com.source.rworkflow.misc.user.exception;
-
-import com.source.rworkflow.common.exception.ExceptionCode;
-import com.source.rworkflow.common.exception.RException;
+package com.source.rworkflow.common.exception;
 
 public class IllegalEnumStringException extends RException {
     private final static String exceptionCode = ExceptionCode.Api.ILLEGAL_ENUM_STRING_EXCEPTION;
