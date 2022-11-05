@@ -30,7 +30,7 @@ public class WorkflowRequestDetailAccessControlConnectionCompositeService {
 
         connection.setConnectionId(request.getConnectionId());
         connection.setPrivilegeId(request.getPrivilegeId());
-        connection.setConnectionId(accessControlId);
+        connection.setDetailAccessControlId(accessControlId);
 
         return service.create(connection);
     }

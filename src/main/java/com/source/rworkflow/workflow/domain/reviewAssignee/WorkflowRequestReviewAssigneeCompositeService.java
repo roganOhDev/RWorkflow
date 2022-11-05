@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.domain.reviewAssignee;
 
 import com.source.rworkflow.common.util.ListUtil;
+import com.source.rworkflow.workflow.exception.AssigneeCanNotBeEmpty;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,8 @@ public class WorkflowRequestReviewAssigneeCompositeService {
             assignees = mergeAssignees(workflowRuleSuite, reviewAssignees);
         }
 
+        validateAssigneeCount((long) assignees.size());
+
         final var resultList = assignees.stream()
                 .map(assignee -> create(requestId, assignee))
                 .collect(Collectors.toUnmodifiableList());
@@ -39,6 +42,12 @@ public class WorkflowRequestReviewAssigneeCompositeService {
     @Transactional(readOnly = true)
     public List<WorkflowRequestReviewAssignee> findByRequestId(final Long requestId) {
         return service.findByRequestId(requestId);
+    }
+
+    private void validateAssigneeCount(final Long size) {
+        if (size == 0) {
+            throw new AssigneeCanNotBeEmpty("Review");
+        }
     }
 
     private WorkflowRequestReviewAssignee create(final Long requestId, final Long createRequest) {

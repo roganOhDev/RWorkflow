@@ -28,4 +28,7 @@ public class WorkflowRequestDetailAccessControl {
 
     @Column(name = "request_expiry_at", nullable = false)
     private LocalDateTime requestExpiryAt;
+
+    @Column(name = "expiration_date", nullable = false)
+    private LocalDateTime expirationDate;
 }

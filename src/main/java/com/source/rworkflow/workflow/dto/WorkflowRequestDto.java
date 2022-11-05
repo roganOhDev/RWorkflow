@@ -92,7 +92,9 @@ public class WorkflowRequestDto {
             this.ruleId = workflowRequest.getRuleId();
             this.urgent = workflowRequest.isUrgent();
             this.comment = workflowRequest.getComment();
-            this.approvals = approvals(approvals, approvalAssignees);
+            if (!workflowRequest.isUrgent()) {
+                this.approvals = approvals(approvals, approvalAssignees);
+            }
             this.executionAssignees = executionAssignees;
             this.reviewAssignees = reviewAssignees;
         }
@@ -129,7 +131,7 @@ public class WorkflowRequestDto {
                     case ACCESS_CONTROL:
                         setExpiryAt(this, null, accessControl.getRequestExpiryAt());
                         this.accessControl = accessControlConnections.stream()
-                                .map(AccessControlConnectionDto.Response::from)
+                                .map(connection -> AccessControlConnectionDto.Response.from(connection, accessControl.getExpirationDate()))
                                 .collect(Collectors.toUnmodifiableList());
                         break;
                     case SQL_EXECUTION:
@@ -139,7 +141,7 @@ public class WorkflowRequestDto {
                                 .collect(Collectors.toUnmodifiableList());
                         break;
                     case DATA_EXPORT:
-                        setExpiryAt(this,dataExecutions.get(0).getExecutionExpiryAt(), dataExecutions.get(0).getRequestExpiryAt());
+                        setExpiryAt(this, dataExecutions.get(0).getExecutionExpiryAt(), dataExecutions.get(0).getRequestExpiryAt());
                         this.dataExports = dataExecutions.stream()
                                 .map(DataExportDto.Response::from)
                                 .collect(Collectors.toUnmodifiableList());

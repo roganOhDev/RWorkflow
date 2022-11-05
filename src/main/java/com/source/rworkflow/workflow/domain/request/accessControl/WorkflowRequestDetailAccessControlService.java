@@ -9,6 +9,7 @@ public class WorkflowRequestDetailAccessControlService {
     private final WorkflowRequestDetailAccessControlRepository repository;
 
     public WorkflowRequestDetailAccessControl create(final WorkflowRequestDetailAccessControl request) {
+
         return repository.save(request);
     }
 

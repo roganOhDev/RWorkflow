@@ -110,7 +110,7 @@ public class WorkflowTransferService {
                 .collect(Collectors.groupingBy(Assignee::getRequestId));
 
         final var reviewAssignees = workflowRequestReviewAssigneeCompositeService.findAll().stream()
-                .collect(Collectors.groupingBy(Assignee::getAssigneeId));
+                .collect(Collectors.groupingBy(Assignee::getRequestId));
 
 
         return workflowRequests.stream()

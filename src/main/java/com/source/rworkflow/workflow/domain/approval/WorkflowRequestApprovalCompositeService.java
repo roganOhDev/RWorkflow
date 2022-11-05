@@ -3,6 +3,7 @@ package com.source.rworkflow.workflow.domain.approval;
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
+import com.source.rworkflow.workflow.exception.AssigneeCanNotBeEmpty;
 import com.source.rworkflow.workflow.exception.SelfApproveException;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,7 @@ public class WorkflowRequestApprovalCompositeService {
         final var workflowRequestApproval = getNewWorkflowRequestApproval(requestId, creatRequest);
 
         validateSelfApprove(creatRequest.getAssignees(), sessionUserId);
+        validateAssigneeCount((long) creatRequest.getAssignees().size());
 
         return triggerService.create(creatRequest.getAssignees(), requestId, workflowRequestApproval);
     }
@@ -58,8 +60,15 @@ public class WorkflowRequestApprovalCompositeService {
         validateSelfApprove(creatRequest.getAssignees(), sessionUserId);
 
         final var assignees = mergeAssignees(creatRequest, assigneesByRule, sessionUserId);
+        validateAssigneeCount((long) assignees.size());
 
         return triggerService.create(assignees, requestId, workflowRequestApproval);
+    }
+
+    private void validateAssigneeCount(final Long size) {
+        if (size == 0) {
+            throw new AssigneeCanNotBeEmpty("Execution");
+        }
     }
 
     private void validateSelfApprove(final List<Long> assignees, final SessionUserId sessionUserId) {
