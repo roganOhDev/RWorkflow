@@ -11,4 +11,8 @@ public class WorkflowRequestDetailAccessControlService {
     public WorkflowRequestDetailAccessControl create(final WorkflowRequestDetailAccessControl request) {
         return repository.save(request);
     }
+
+    public WorkflowRequestDetailAccessControl findByRequestId(final Long requestId) {
+        return repository.findByRequestId(requestId);
+    }
 }

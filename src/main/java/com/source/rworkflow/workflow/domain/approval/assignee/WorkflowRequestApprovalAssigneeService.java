@@ -21,4 +21,8 @@ public class WorkflowRequestApprovalAssigneeService {
         return repository.findAllByRequestApprovalId(approvalId);
     }
 
+    public List<WorkflowRequestApprovalAssignee> findAll() {
+        return repository.findAll();
+    }
+
 }

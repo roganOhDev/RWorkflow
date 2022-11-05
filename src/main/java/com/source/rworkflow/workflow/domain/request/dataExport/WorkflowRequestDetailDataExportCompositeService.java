@@ -29,6 +29,11 @@ public class WorkflowRequestDetailDataExportCompositeService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestDetailDataExport> findAllByRequestId(final Long requestId) {
+        return service.findAllByRequestId(requestId);
+    }
+
     private WorkflowRequestDetailDataExport create(final Long requestId, final LocalDateTime requestExpiryAt,
                                                    final LocalDateTime executionExpiryAt, final DataExportDto.Request createRequest) {
         final var dataExport = new WorkflowRequestDetailDataExport();

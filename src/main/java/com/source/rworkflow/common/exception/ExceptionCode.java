@@ -30,10 +30,11 @@ public class ExceptionCode {
     }
 
     public static class WorkflowRequest{
+        final public static String WORKFLOW_REQUEST_NOT_FOUND = "Workflow Request Not Found";
         final public static String WORKFLOW_REQUEST_ORDER_MUST_MATCH_WITH_ORDER_OF_RULE = "Order Must Match With Rule's Order";
         final public static String EXECUTION_EXPIRATION_DATE_MUST_BE_AFTER_REQUEST_EXPIRATION_DATE = "Execution Expiration Date Must Be After Request Expiration Date";
         final public static String REQUEST_DETAIL_NULL_EXCEPTION = "Request Doesn't Have Suitable Detail Request";
-        final public static String EXPIRATION_DATE_IS_BEFORE_NOW = "Expiration Date Is Before Then Now";
+        final public static String EXPIRATION_DATE_IS_BEFORE_NOW = "Expiration Date Is Before Than Now";
         final public static String SELF_APPROVE_EXCEPTION = "Cannot Opperate Self Approve";
         final public static String URGENT_VALUE_NOT_MATCH_EXCEPTION = "Urgent Value Must Match With Rule's";
         final public static String TYPE_NOT_MATCH_EXCEPTION = "Type Must Match With Rule's";

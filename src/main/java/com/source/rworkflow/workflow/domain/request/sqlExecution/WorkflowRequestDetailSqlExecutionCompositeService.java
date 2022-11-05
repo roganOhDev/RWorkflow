@@ -18,16 +18,21 @@ public class WorkflowRequestDetailSqlExecutionCompositeService {
 
     @Transactional
     public List<WorkflowRequestDetailSqlExecution> createCollection(final Long requestId, final LocalDateTime requestExpiryAt,
-                                                                  final LocalDateTime executionExpiryAt, final List<SqlExecutionDto.Request> createRequests) {
+                                                                    final LocalDateTime executionExpiryAt, final List<SqlExecutionDto.Request> createRequests) {
 
         if (createRequests == null) {
-        throw new RequestDetailNullException(WorkflowRequestType.SQL_EXECUTION);
-    }
+            throw new RequestDetailNullException(WorkflowRequestType.SQL_EXECUTION);
+        }
 
         return createRequests.stream()
                 .map(createRequest -> create(requestId, requestExpiryAt, executionExpiryAt, createRequest))
-            .collect(Collectors.toUnmodifiableList());
-}
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestDetailSqlExecution> findAllByRequestId(final Long requestId) {
+        return service.findAllByRequestId(requestId);
+    }
 
     private WorkflowRequestDetailSqlExecution create(final Long requestId, final LocalDateTime requestExpiryAt,
                                                      final LocalDateTime executionExpiryAt, final SqlExecutionDto.Request createRequest) {

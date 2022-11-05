@@ -1,8 +1,6 @@
 package com.source.rworkflow.workflow.domain.executeAssignee;
 
-import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
-import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +30,16 @@ public class WorkflowRequestExecutionAssigneeCompositeService {
                 .collect(Collectors.toUnmodifiableList());
 
         return ListUtil.removeDuplicateElement(resultList);
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestExecutionAssignee> findAll() {
+        return service.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestExecutionAssignee> findByRequestId(final Long requestId) {
+        return service.findByRequestId(requestId);
     }
 
     private WorkflowRequestExecutionAssignee create(final Long requestId, final Long createRequest) {

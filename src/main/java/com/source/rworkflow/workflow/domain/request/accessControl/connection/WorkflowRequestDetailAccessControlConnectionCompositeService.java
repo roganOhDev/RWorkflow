@@ -20,6 +20,11 @@ public class WorkflowRequestDetailAccessControlConnectionCompositeService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestDetailAccessControlConnection> findAllByDetailAccessControlId(final Long accessControlId) {
+        return service.findAllByDetailAccessControlId(accessControlId);
+    }
+
     private WorkflowRequestDetailAccessControlConnection create(final Long accessControlId, final AccessControlConnectionDto.Request request) {
         final var connection = new WorkflowRequestDetailAccessControlConnection();
 

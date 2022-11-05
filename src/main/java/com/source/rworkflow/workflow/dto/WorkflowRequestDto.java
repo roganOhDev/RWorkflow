@@ -1,10 +1,16 @@
 package com.source.rworkflow.workflow.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.source.rworkflow.common.util.DateFormat;
 import com.source.rworkflow.misc.user.UserDto;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
-import com.source.rworkflow.workflow.type.SqlContentType;
+import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControl;
+import com.source.rworkflow.workflow.domain.request.accessControl.connection.WorkflowRequestDetailAccessControlConnection;
+import com.source.rworkflow.workflow.domain.request.dataExport.WorkflowRequestDetailDataExport;
+import com.source.rworkflow.workflow.domain.request.sqlExecution.WorkflowRequestDetailSqlExecution;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import javax.validation.Valid;
@@ -17,9 +23,9 @@ import java.util.stream.Collectors;
 
 public class WorkflowRequestDto {
     @Getter
-    public static class Create{
+    public static class Create {
         @Getter
-        public static class Request{
+        public static class Request {
             @NotNull(message = "Must Have Title")
             private String title;
             @NotNull(message = "Must Have WorkflowRequestType")
@@ -44,8 +50,10 @@ public class WorkflowRequestDto {
             private Detail detail;
 
             @Getter
-            public static class Detail{
+            public static class Detail {
+                @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateFormat.FORMAT, timezone = "Asia/Seoul")
                 private LocalDateTime executionExpiryAt;
+                @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateFormat.FORMAT, timezone = "Asia/Seoul")
                 private LocalDateTime requestExpiryAt;
                 @Valid
                 private AccessControlDto.Request accessControl;
@@ -63,42 +71,99 @@ public class WorkflowRequestDto {
                 }
             }
         }
+    }
 
-        @Getter
-        public static class Response{
-            private Long id;
-            private String title;
-            private WorkflowRequestType type;
-            private Long ruleId;
-            private boolean urgent;
-            private String comment;
-            private List<WorkflowApprovalDto.Create.Response> approvals;
-            private List<UserDto> executionAssignees;
-            private List<UserDto> reviewAssignees;
+    @Getter
+    public static class Response {
+        protected Long id;
+        protected String title;
+        protected WorkflowRequestType type;
+        protected Long ruleId;
+        protected boolean urgent;
+        protected String comment;
+        protected List<WorkflowApprovalDto.Create.Response> approvals;
+        protected List<UserDto> executionAssignees;
+        protected List<UserDto> reviewAssignees;
 
-            public static Response from(final WorkflowRequest workflowRequest, final List<WorkflowRequestApproval> approvals,
-                                        final Map<Long, List<UserDto>> approvalAssignees, final List<UserDto> executionAssignees,
-                                        final List<UserDto> reviewAssignees) {
-                final var response =new Response();
+        public Response(WorkflowRequest workflowRequest, List<WorkflowRequestApproval> approvals, Map<Long, ? extends List<UserDto>> approvalAssignees, List<UserDto> executionAssignees, List<UserDto> reviewAssignees) {
+            this.id = workflowRequest.getId();
+            this.title = workflowRequest.getTitle();
+            this.type = workflowRequest.getType();
+            this.ruleId = workflowRequest.getRuleId();
+            this.urgent = workflowRequest.isUrgent();
+            this.comment = workflowRequest.getComment();
+            this.approvals = approvals(approvals, approvalAssignees);
+            this.executionAssignees = executionAssignees;
+            this.reviewAssignees = reviewAssignees;
+        }
 
-                response.id = workflowRequest.getId();
-                response.title = workflowRequest.getTitle();
-                response.type = workflowRequest.getType();
-                response.ruleId = workflowRequest.getRuleId();
-                response.urgent = workflowRequest.isUrgent();
-                response.comment = workflowRequest.getComment();
-                response.approvals = approvals(approvals, approvalAssignees);
-                response.executionAssignees = executionAssignees;
-                response.reviewAssignees = reviewAssignees;
-
-                return response;
-            }
-
-            private static List<WorkflowApprovalDto.Create.Response> approvals(final List<WorkflowRequestApproval> approvals, final Map<Long, List<UserDto>> approvalAssignee) {
-                return approvals.stream()
-                        .map(approval -> WorkflowApprovalDto.Create.Response.from(approval, approvalAssignee.get(approval.getId())))
-                        .collect(Collectors.toUnmodifiableList());
-            }
+        protected static List<WorkflowApprovalDto.Create.Response> approvals(final List<WorkflowRequestApproval> approvals, final Map<Long, ? extends List<UserDto>> approvalAssignee) {
+            return approvals.stream()
+                    .map(approval -> WorkflowApprovalDto.Create.Response.from(approval, approvalAssignee.get(approval.getId())))
+                    .collect(Collectors.toUnmodifiableList());
         }
     }
+
+    @Getter
+    public static class DetailResponse extends Response {
+        private Detail detail;
+
+        @Getter
+        @AllArgsConstructor
+        public static class Detail {
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateFormat.FORMAT, timezone = "Asia/Seoul")
+            private LocalDateTime executionExpiryAt;
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateFormat.FORMAT, timezone = "Asia/Seoul")
+            private LocalDateTime requestExpiryAt;
+            private List<AccessControlConnectionDto.Response> accessControl;
+            private List<SqlExecutionDto.Response> sqlExecutions;
+            private List<DataExportDto.Response> dataExports;
+
+            public Detail(WorkflowRequest request, WorkflowRequestDetailAccessControl accessControl,
+                          List<WorkflowRequestDetailAccessControlConnection> accessControlConnections, List<WorkflowRequestDetailSqlExecution> sqlExecutions,
+                          List<WorkflowRequestDetailDataExport> dataExecutions) {
+
+                final var type = request.getType();
+
+                switch (type) {
+                    case ACCESS_CONTROL:
+                        setExpiryAt(this, null, accessControl.getRequestExpiryAt());
+                        this.accessControl = accessControlConnections.stream()
+                                .map(AccessControlConnectionDto.Response::from)
+                                .collect(Collectors.toUnmodifiableList());
+                        break;
+                    case SQL_EXECUTION:
+                        setExpiryAt(this, sqlExecutions.get(0).getExecutionExpiryAt(), sqlExecutions.get(0).getRequestExpiryAt());
+                        this.sqlExecutions = sqlExecutions.stream()
+                                .map(SqlExecutionDto.Response::from)
+                                .collect(Collectors.toUnmodifiableList());
+                        break;
+                    case DATA_EXPORT:
+                        setExpiryAt(this,dataExecutions.get(0).getExecutionExpiryAt(), dataExecutions.get(0).getRequestExpiryAt());
+                        this.dataExports = dataExecutions.stream()
+                                .map(DataExportDto.Response::from)
+                                .collect(Collectors.toUnmodifiableList());
+                        break;
+                }
+            }
+
+            private void setExpiryAt(Detail detail, final LocalDateTime executionExpiryAt, final LocalDateTime requestExpiryAt) {
+                detail.executionExpiryAt = executionExpiryAt;
+                detail.requestExpiryAt = requestExpiryAt;
+            }
+        }
+
+        public DetailResponse(final WorkflowRequest workflowRequest, final List<WorkflowRequestApproval> approvals,
+                              final Map<Long, ? extends List<UserDto>> approvalAssignees, final List<UserDto> executionAssignees,
+                              final List<UserDto> reviewAssignees, final WorkflowRequestDetailAccessControl detailAccessControl,
+                              final List<WorkflowRequestDetailAccessControlConnection> detailAccessControlConnections, final List<WorkflowRequestDetailSqlExecution> detailSqlExecutions,
+                              final List<WorkflowRequestDetailDataExport> detailDataExecutions) {
+
+            super(workflowRequest, approvals, approvalAssignees, executionAssignees, reviewAssignees);
+
+            this.detail = new Detail(workflowRequest, detailAccessControl, detailAccessControlConnections, detailSqlExecutions, detailDataExecutions);
+        }
+    }
+
+
 }

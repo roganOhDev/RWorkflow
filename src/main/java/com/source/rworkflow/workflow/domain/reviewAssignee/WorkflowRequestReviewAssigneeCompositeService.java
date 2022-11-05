@@ -1,8 +1,6 @@
 package com.source.rworkflow.workflow.domain.reviewAssignee;
 
-import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
-import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecutionAssignee;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +29,16 @@ public class WorkflowRequestReviewAssigneeCompositeService {
                 .collect(Collectors.toUnmodifiableList());
 
         return ListUtil.removeDuplicateElement(resultList);
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestReviewAssignee> findAll() {
+        return service.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestReviewAssignee> findByRequestId(final Long requestId) {
+        return service.findByRequestId(requestId);
     }
 
     private WorkflowRequestReviewAssignee create(final Long requestId, final Long createRequest) {

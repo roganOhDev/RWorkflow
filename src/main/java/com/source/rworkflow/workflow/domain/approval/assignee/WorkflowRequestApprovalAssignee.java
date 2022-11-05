@@ -27,9 +27,6 @@ public class WorkflowRequestApprovalAssignee extends Assignee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "request_id", nullable = false)
-    private Long requestId;
-
     @Column(name = "request_approval_id", nullable = false)
     private Long requestApprovalId;
 

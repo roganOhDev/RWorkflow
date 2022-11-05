@@ -4,6 +4,8 @@ import com.source.rworkflow.workflow.type.AssigneeStatusType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class WorkflowRequestExecutionAssigneeService {
@@ -14,4 +16,13 @@ public class WorkflowRequestExecutionAssigneeService {
 
         return repository.save(assignee);
     }
+
+    public List<WorkflowRequestExecutionAssignee> findAll() {
+        return repository.findAll();
+    }
+
+    public List<WorkflowRequestExecutionAssignee> findByRequestId(final Long requestId) {
+        return repository.findByRequestId(requestId);
+    }
+
 }

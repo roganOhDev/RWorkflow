@@ -27,9 +27,6 @@ public class WorkflowRequestExecutionAssignee extends Assignee {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "request_Id", nullable = false)
-    private Long requestId;
-
     @Column(name = "action_at")
     private LocalDateTime actionAt;
 

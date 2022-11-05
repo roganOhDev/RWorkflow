@@ -10,7 +10,7 @@ docker pull mysql:8.0.31
 
 #### MySQL server start
 ```
-docker run -d -p 13306:3306 -e MYSQL_ROOT_PASSWORD=password --name RWorkflow {MYSQL_IMAGE_ID} --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+docker run -d -p 13306:3306 -e MYSQL_ROOT_PASSWORD=password -v /etc/timezone:/etc/timezone -v /etc/localtime:/etc/localtime --name RWorkflow {MYSQL_IMAGE_ID} --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
 
 ###### MySQL start/stop/restart

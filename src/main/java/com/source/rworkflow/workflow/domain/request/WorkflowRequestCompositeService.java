@@ -6,6 +6,7 @@ import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.ExecutionExpirationDateMustBeAfterRequestExpirationDateException;
 import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
+import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
 import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeNullException;
@@ -42,8 +43,18 @@ public class WorkflowRequestCompositeService {
     }
 
     @Transactional(readOnly = true)
+    public List<WorkflowRequest> findAllByType(WorkflowRequestType type) {
+        return service.findAllByType(type);
+    }
+
+    @Transactional(readOnly = true)
     public List<WorkflowRequest> findByRuleId(final Long ruleId) {
         return service.findByRuleId(ruleId);
+    }
+
+    @Transactional(readOnly = true)
+    public WorkflowRequest find(final Long id) {
+        return service.find(id);
     }
 
     private void setDefaultExpirationDateAndValidate(final WorkflowRequestDto.Create.Request request) {

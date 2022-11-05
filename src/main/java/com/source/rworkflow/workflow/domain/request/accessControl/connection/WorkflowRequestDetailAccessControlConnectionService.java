@@ -3,6 +3,8 @@ package com.source.rworkflow.workflow.domain.request.accessControl.connection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class WorkflowRequestDetailAccessControlConnectionService {
@@ -12,5 +14,9 @@ public class WorkflowRequestDetailAccessControlConnectionService {
         request.setGranted(false);
 
         return repository.save(request);
+    }
+
+    public List<WorkflowRequestDetailAccessControlConnection> findAllByDetailAccessControlId(final Long accessControlId) {
+        return repository.findAllByDetailAccessControlId(accessControlId);
     }
 }

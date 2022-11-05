@@ -1,10 +1,11 @@
 package com.source.rworkflow.workflow.controller;
 
 import com.source.rworkflow.misc.user.token.UserTokenService;
-import com.source.rworkflow.misc.user.exception.UserNotFoundException;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
+import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -14,9 +15,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static com.source.rworkflow.common.domain.UserTokenHeader.HEADER_KEY;
 
@@ -29,21 +33,20 @@ public class WorkflowController {
     private final UserTokenService userTokenService;
 
     @PutMapping
-    public WorkflowRequestDto.Create.Response create(final @Valid @RequestBody WorkflowRequestDto.Create.Request createRequest, @RequestHeader(HEADER_KEY) String userToken) {
+    public WorkflowRequestDto.Response create(final @Valid @RequestBody WorkflowRequestDto.Create.Request createRequest, @RequestHeader(HEADER_KEY) String userToken) {
         final var sessionUserId = userTokenService.findUserId(userToken);
 
         return transferService.create(createRequest, sessionUserId);
     }
 
     @GetMapping(value = "/{id}")
-    public void find(@PathVariable Long id) {
-
+    public WorkflowRequestDto.DetailResponse find(@PathVariable Long id) {
+        return transferService.find(id);
     }
 
     @GetMapping
-    public void list() {
-        throw new UserNotFoundException(3L);
-
+    public List<WorkflowRequestDto.Response> list(@RequestParam(required = false) WorkflowRequestType type) {
+        return transferService.list(type);
     }
 
     @PatchMapping

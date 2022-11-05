@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,6 +30,17 @@ public class WorkflowRequestApprovalCompositeService {
                 .collect(Collectors.toUnmodifiableList());
 
         return ListUtil.removeDuplicateElement(resultList);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<Long, List<WorkflowRequestApproval>> findAll() {
+        return service.findAll().stream()
+                .collect(Collectors.groupingBy(WorkflowRequestApproval::getRequestId));
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestApproval> findByRequestId(final Long requestId){
+        return service.findByRequestId(requestId);
     }
 
     private WorkflowRequestApproval create(final Long requestId, final WorkflowApprovalDto.Create.Request creatRequest, final SessionUserId sessionUserId) {

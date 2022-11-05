@@ -24,6 +24,11 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
         return service.findAllByApprovalId(approvalId);
     }
 
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestApprovalAssignee> findAll() {
+        return service.findAll();
+    }
+
     private WorkflowRequestApprovalAssignee create(final Long id, final Long requestId, final Long approvalId) {
         final var assignee = new WorkflowRequestApprovalAssignee();
 

@@ -30,4 +30,9 @@ public class WorkflowRequestDetailAccessControlCompositeService {
 
         return triggerService.create(accessControl, createRequest.getConnections());
     }
+
+    @Transactional(readOnly = true)
+    public WorkflowRequestDetailAccessControl findByRequestId(final Long requestId){
+        return service.findByRequestId(requestId);
+    }
 }

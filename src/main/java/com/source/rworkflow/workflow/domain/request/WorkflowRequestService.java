@@ -1,9 +1,11 @@
 package com.source.rworkflow.workflow.domain.request;
 
 import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.workflow.exception.WorkflowRequestNotFoundException;
 import com.source.rworkflow.workflow.type.ApprovalStatusType;
 import com.source.rworkflow.workflow.type.ExecutionStatusType;
 import com.source.rworkflow.workflow.type.ReviewStatusType;
+import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,19 @@ public class WorkflowRequestService {
 
     public List<WorkflowRequest> findByRuleId(final Long ruleId) {
         return repository.findAllByRuleId(ruleId);
+    }
+
+    public List<WorkflowRequest> findAllByType(final WorkflowRequestType type) {
+        if (type == null) {
+            return repository.findAll();
+        }
+
+        return repository.findAllByType(type);
+
+    }
+
+    public WorkflowRequest find(final Long id){
+        return repository.findById(id).orElseThrow(() -> new WorkflowRequestNotFoundException(id));
     }
 
 }
