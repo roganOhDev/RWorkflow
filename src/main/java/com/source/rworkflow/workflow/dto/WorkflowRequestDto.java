@@ -2,15 +2,14 @@ package com.source.rworkflow.workflow.dto;
 
 import com.source.rworkflow.misc.user.UserDto;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
-import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecutionAssignee;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
-import com.source.rworkflow.workflow.domain.reviewAssignee.WorkflowRequestReviewAssignee;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.Getter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,11 +41,28 @@ public class WorkflowRequestDto {
             private List<Long> reviewAssignees;
 
             @Valid
-            private List<AccessControlConnectionDto.Request> accessControlConnections;
-            @Valid
-            private List<SqlExecutionDto.Request> sqlExecutions;
-            @Valid
-            private List<DataExportDto.Request> dataExports;
+            @NotNull
+            private Detail detail;
+
+            @Getter
+            public static class Detail{
+                private LocalDateTime executionExpiryAt;
+                private LocalDateTime requestExpiryAt;
+                @Valid
+                private AccessControlDto.Request accessControl;
+                @Valid
+                private List<SqlExecutionDto.Request> sqlExecutions;
+                @Valid
+                private List<DataExportDto.Request> dataExports;
+
+                public void setDefaultExecutionExpiryAt() {
+                    this.executionExpiryAt = LocalDateTime.now().plusDays(4);
+                }
+
+                public void setDefaultRequestExpiryAt() {
+                    this.requestExpiryAt = LocalDateTime.now().plusDays(5);
+                }
+            }
         }
 
         @Getter

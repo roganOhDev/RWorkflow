@@ -5,6 +5,7 @@ import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecu
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 public class WorkflowRequestReviewAssigneeCompositeService {
     private final WorkflowRequestReviewAssigneeService service;
 
+    @Transactional
     public List<WorkflowRequestReviewAssignee> createCollection(final Long requestId, final List<Long> createRequests, final WorkflowRuleSuite workflowRuleSuite) {
         final var assignees = new ArrayList<>(createRequests);
 

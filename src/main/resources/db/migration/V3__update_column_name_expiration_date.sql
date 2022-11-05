@@ -1,0 +1,1 @@
+ALTER TABLE workflow_request_detail_access_controls CHANGE expiration_date request_expiry_at datetime(6);

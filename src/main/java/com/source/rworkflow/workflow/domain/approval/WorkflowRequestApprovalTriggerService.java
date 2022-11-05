@@ -12,8 +12,11 @@ public class WorkflowRequestApprovalTriggerService {
     private final WorkflowRequestApprovalService service;
 
     public WorkflowRequestApproval create(final List<Long> assignees, final Long requestId, final WorkflowRequestApproval approval) {
-        trigger.beforeCreate(assignees, requestId, approval.getId());
 
-        return service.create(approval);
+        final var created = service.create(approval);
+
+        trigger.afterCreate(assignees, requestId, created.getId());
+
+        return created;
     }
 }

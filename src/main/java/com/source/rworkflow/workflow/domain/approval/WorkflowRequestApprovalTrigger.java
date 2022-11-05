@@ -11,7 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkflowRequestApprovalTrigger {
     private final WorkflowRequestApprovalAssigneeCompositeService workflowRequestApprovalAssigneeCompositeService;
-    public List<WorkflowRequestApprovalAssignee> beforeCreate(final List<Long> ids, final Long requestId, final Long approvalId){
+    public List<WorkflowRequestApprovalAssignee> afterCreate(final List<Long> ids, final Long requestId, final Long approvalId){
         return workflowRequestApprovalAssigneeCompositeService.createCollection(ids, requestId, approvalId);
     }
 

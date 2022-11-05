@@ -45,7 +45,7 @@ public class WorkflowRequestDetailSqlExecution {
     @Column(name = "execution_expiry_at", nullable = false)
     private LocalDateTime executionExpiryAt;
 
-    @Column(name = "execution_request_at", nullable = false)
-    private LocalDateTime request_expiry_at;
+    @Column(name = "request_expiry_at", nullable = false)
+    private LocalDateTime requestExpiryAt;
 
 }

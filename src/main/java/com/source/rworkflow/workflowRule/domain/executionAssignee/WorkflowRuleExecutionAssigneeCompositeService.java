@@ -39,13 +39,15 @@ public class WorkflowRuleExecutionAssigneeCompositeService {
                 this::delete
         );
 
-        if(ListUtil.hasDuplicateElement(assginees)) {
+        if (ListUtil.hasDuplicateElement(assginees)) {
             throw new CanNotDuplicateAssigneeException();
-        };
+        }
+        ;
 
         return assginees;
     }
 
+    @Transactional(readOnly = true)
     public List<WorkflowRuleExecutionAssignee> findAllByRuleId(final Long ruleId) {
         return service.find(ruleId);
     }

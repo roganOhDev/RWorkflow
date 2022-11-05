@@ -46,7 +46,7 @@ public class WorkflowTransferService {
 
         final var workflowRequest = compositeService.create(createRequest, sessionUserId, workflowRuleSuite);
 
-        final var approvals = workflowRequestApprovalCompositeService.createCollection(workflowRequest.getId(), createRequest.getApprovals(), workflowRuleSuite);
+        final var approvals = workflowRequestApprovalCompositeService.createCollection(workflowRequest.getId(), createRequest.getApprovals(), workflowRuleSuite, sessionUserId);
         approvals.forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
 
         final var executionAssignees = getApprovalAssigneeUser(workflowRequestExecutionAssigneeCompositeService.createCollection(workflowRequest.getId(), createRequest.getExecutionAssignees(), workflowRuleSuite));

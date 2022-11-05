@@ -2,30 +2,34 @@ package com.source.rworkflow.workflow.domain.request;
 
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
-import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
-import com.source.rworkflow.workflow.exception.OrderMustMatchWithOrderOfRule;
+import com.source.rworkflow.workflow.exception.ExecutionExpirationDateMustBeAfterRequestExpirationDateException;
+import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
+import com.source.rworkflow.workflow.exception.OrderMustMatchWithOrderOfRuleException;
+import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflowRule.domain.approval.WorkflowRuleApproval;
-import com.source.rworkflow.workflowRule.dto.AssigneeDto;
-import com.source.rworkflow.workflowRule.dto.WorkflowRuleApprovalDto;
-import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
 import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeNullException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssigneeException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateOrderException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class WorkflowRequestCompositeService {
+    private final WorkflowRequestTriggerService triggerService;
     private final WorkflowRequestService service;
 
+    @Transactional
     public WorkflowRequest create(final WorkflowRequestDto.Create.Request request, final SessionUserId sessionUserId, final WorkflowRuleSuite workflowRuleSuite) {
+        setDefaultExpirationDateAndValidate(request);
         validateCreate(request, workflowRuleSuite);
 
         final var workflowRequest = new WorkflowRequest();
@@ -36,7 +40,39 @@ public class WorkflowRequestCompositeService {
         workflowRequest.setUrgent(request.isUrgent());
         workflowRequest.setComment(request.getComment());
 
-        return service.create(workflowRequest, sessionUserId);
+        return triggerService.create(workflowRequest, request, sessionUserId);
+    }
+
+    private void setDefaultExpirationDateAndValidate(final WorkflowRequestDto.Create.Request request) {
+
+        final var detail = request.getDetail();
+
+        if (request.getDetail().getRequestExpiryAt() == null) {
+            detail.setDefaultRequestExpiryAt();
+        }
+
+        if (request.getType().isNotAutoExecution() && detail.getExecutionExpiryAt() == null) {
+            detail.setDefaultExecutionExpiryAt();
+        }
+
+        validateExpirationDate(request.getType().isNotAutoExecution(), detail);
+    }
+
+    private void validateExpirationDate(final boolean isNotAutoExecution, final WorkflowRequestDto.Create.Request.Detail detail) {
+
+        final var now = LocalDateTime.now();
+
+        if (isNotAutoExecution && detail.getRequestExpiryAt().isBefore(detail.getExecutionExpiryAt())) {
+            throw new ExecutionExpirationDateMustBeAfterRequestExpirationDateException();
+        }
+
+        if (detail.getRequestExpiryAt().isBefore(now)) {
+            throw new ExpirationDateIsBeforeNow("RequestExpiryAt");
+        }
+
+        if (detail.getExecutionExpiryAt().isBefore(now)) {
+            throw new ExpirationDateIsBeforeNow("ExecutionExpiryAt");
+        }
     }
 
     private void validateCreate(final WorkflowRequestDto.Create.Request request, final WorkflowRuleSuite workflowRuleSuite) {
@@ -62,7 +98,7 @@ public class WorkflowRequestCompositeService {
                 .collect(Collectors.toUnmodifiableList());
 
         if (!requestOrders.equals(ruleOrders)) {
-            throw new OrderMustMatchWithOrderOfRule();
+            throw new OrderMustMatchWithOrderOfRuleException();
         }
     }
 

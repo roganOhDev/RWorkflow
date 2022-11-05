@@ -42,6 +42,11 @@ public class WorkflowRuleApprovalCompositeService {
         );
     }
 
+    @Transactional(readOnly = true)
+    public List<WorkflowRuleApproval> findAllByRuleId(final Long ruleId) {
+        return service.findAllByRuleId(ruleId);
+    }
+
     private WorkflowRuleApproval create(final Long ruleId, final WorkflowRuleApprovalDto.Request request) {
         validateCreate(request);
 
@@ -54,9 +59,6 @@ public class WorkflowRuleApprovalCompositeService {
         return triggerService.create(approval, request.getAssignees());
     }
 
-    public List<WorkflowRuleApproval> findAllByRuleId(final Long ruleId) {
-        return service.findAllByRuleId(ruleId);
-    }
 
     private void validateCreate(final WorkflowRuleApprovalDto.Request request) {
         checkOrder(request.getOrder());

@@ -14,4 +14,8 @@ public enum WorkflowRequestType {
             throw new IllegalEnumStringException(name);
         }
     }
+
+    public boolean isNotAutoExecution() {
+        return this == WorkflowRequestType.ACCESS_CONTROL;
+    }
 }

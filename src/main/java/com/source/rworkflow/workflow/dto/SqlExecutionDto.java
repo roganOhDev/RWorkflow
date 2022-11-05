@@ -9,12 +9,11 @@ import java.time.LocalDateTime;
 public class SqlExecutionDto {
     @Getter
     public static class Request {
+        private Long connectionId;
         private String database;
         @NotNull(message = "Must Have ContentType")
         private SqlContentType contentType;
         @NotNull(message = "Must Have contentValue")
         private String contentValue;
-        private LocalDateTime executionExpiryAt;
-        private LocalDateTime expiryAt;
     }
 }
