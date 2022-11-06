@@ -16,7 +16,7 @@ public class ExceptionCode {
     }
 
     public static class Role {
-        final public static String ROLE_NOT_FOUND_EXCEPTION = "Rule Not Found";
+        final public static String ROLE_NOT_FOUND_EXCEPTION = "Role Not Found";
     }
 
     public static class WorkflowRule{
@@ -46,5 +46,7 @@ public class ExceptionCode {
         final public static String APPROVAL_HAVE_TO_FOLLOW_ITS_TURN_EXCEPTION = "Approval Have To Follow Its Turn Exception";
         final public static String CAN_NOT_APPROVE_BY_URGENT_EXCEPTION = "You Cannot Approve This Request BeCause Urgent. Move To Execute";
         final public static String WORKFLOW_IS_CANCELED = "Workflow Is Canceled";
+        final public static String ACCESS_CONTROL_CAN_NOT_BE_URGENT = "Access Control Request Can Not Be Urgent";
+        final public static String ASSIGNEE_CAN_NOT_ACTION = "Assignee Cannot Action";
     }
 }

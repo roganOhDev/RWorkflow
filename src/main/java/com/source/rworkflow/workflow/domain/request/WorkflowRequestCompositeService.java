@@ -2,8 +2,10 @@ package com.source.rworkflow.workflow.domain.request;
 
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
+import com.source.rworkflow.workflow.dto.AssigneeDto;
 import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
+import com.source.rworkflow.workflow.exception.AccessControlRequestCanNotBeUrgent;
 import com.source.rworkflow.workflow.exception.CanNotApproveByUrgentException;
 import com.source.rworkflow.workflow.exception.ExecutionExpirationDateMustBeAfterRequestExpirationDateException;
 import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
@@ -134,10 +136,17 @@ public class WorkflowRequestCompositeService {
     }
 
     private void validateCreate(final WorkflowRequestDto.Create.Request request, final WorkflowRuleSuite workflowRuleSuite) {
+        checkUrgentAccessControl(request);
         checkUrgentApproval(request);
         checkDuplicateAssignee(request.getApprovals(), request.getExecutionAssignees(), request.getReviewAssignees());
         validateOrder(request.getApprovals(), workflowRuleSuite);
         checkDuplicateOrder(request.getApprovals());
+    }
+
+    private void checkUrgentAccessControl(final WorkflowRequestDto.Create.Request request) {
+        if (request.getType().equals(WorkflowRequestType.ACCESS_CONTROL) && request.isUrgent()) {
+            throw new AccessControlRequestCanNotBeUrgent();
+        }
     }
 
     private void checkUrgentApproval(final WorkflowRequestDto.Create.Request request) {
@@ -174,7 +183,7 @@ public class WorkflowRequestCompositeService {
         }
     }
 
-    private void checkDuplicateAssignee(final List<WorkflowApprovalDto.Create.Request> workflowRuleApprovals, final List<Long> executionAssignees, final List<Long> reviewAssigneess) {
+    private void checkDuplicateAssignee(final List<WorkflowApprovalDto.Create.Request> workflowRuleApprovals, final List<AssigneeDto.Request> executionAssignees, final List<AssigneeDto.Request> reviewAssigneess) {
         if (workflowRuleApprovals != null) {
             final var assignees = workflowRuleApprovals.stream()
                     .flatMap(approval -> {

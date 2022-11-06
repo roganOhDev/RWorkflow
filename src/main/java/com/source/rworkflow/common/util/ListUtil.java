@@ -1,7 +1,10 @@
 package com.source.rworkflow.common.util;
 
+import com.source.rworkflow.workflow.dto.AssigneeDto;
+
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiPredicate;
 
 public class ListUtil {
     public static boolean hasDuplicateElement(final List<?> list) {

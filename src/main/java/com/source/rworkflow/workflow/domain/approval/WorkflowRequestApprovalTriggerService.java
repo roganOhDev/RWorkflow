@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.domain.approval;
 
 import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.workflow.dto.AssigneeDto;
 import com.source.rworkflow.workflow.type.ApprovalStatusType;
 import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.RequiredArgsConstructor;

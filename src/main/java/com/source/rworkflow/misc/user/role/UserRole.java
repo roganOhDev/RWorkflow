@@ -1,4 +1,4 @@
-package com.source.rworkflow.misc.user;
+package com.source.rworkflow.misc.user.role;
 
 import lombok.Getter;
 import lombok.Setter;

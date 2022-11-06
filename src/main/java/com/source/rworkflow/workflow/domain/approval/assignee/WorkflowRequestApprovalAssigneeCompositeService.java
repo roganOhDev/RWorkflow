@@ -3,6 +3,7 @@ package com.source.rworkflow.workflow.domain.approval.assignee;
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeNotFoundException;
+import com.source.rworkflow.workflow.exception.AssigneeCanNotAction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,8 +17,8 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
     private final WorkflowRequestApprovalAssigneeService service;
 
     @Transactional
-    public List<WorkflowRequestApprovalAssignee> createCollection(final List<Long> ids, final Long requestId, final Long approvalId) {
-        return ids.stream()
+    public List<WorkflowRequestApprovalAssignee> createCollection(final List<Long> assignees, final Long requestId, final Long approvalId) {
+        return assignees.stream()
                 .map(id -> create(id, requestId, approvalId))
                 .collect(Collectors.toUnmodifiableList());
     }
@@ -37,12 +38,18 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
         final var assignees = service.findAllByApprovalId(approval.getId());
 
         final var fitAssignee = assignees.stream()
+                .peek(this::validateStatus)
                 .filter(assignee -> assignee.getAssigneeId().equals(sessionUserId.getId()))
                 .findFirst().orElseThrow(() -> new ApprovalAssigneeNotFoundException(approval.getRequestId(), approval.getId(), approval.getOrder(), sessionUserId.getId()));
 
         return service.approve(fitAssignee, sessionUserId, approve);
     }
 
+    private void validateStatus(final WorkflowRequestApprovalAssignee assignee){
+        if (!assignee.getStatus().canChangeStatus()) {
+            throw new AssigneeCanNotAction("approve", assignee.getStatus());
+        }
+    }
     private WorkflowRequestApprovalAssignee create(final Long id, final Long requestId, final Long approvalId) {
         final var assignee = new WorkflowRequestApprovalAssignee();
 

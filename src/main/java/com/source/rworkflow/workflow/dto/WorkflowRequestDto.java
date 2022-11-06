@@ -2,13 +2,15 @@ package com.source.rworkflow.workflow.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.source.rworkflow.common.util.DateFormat;
-import com.source.rworkflow.misc.user.AssigneeDto;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
 import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControl;
 import com.source.rworkflow.workflow.domain.request.accessControl.connection.WorkflowRequestDetailAccessControlConnection;
 import com.source.rworkflow.workflow.domain.request.dataExport.WorkflowRequestDetailDataExport;
 import com.source.rworkflow.workflow.domain.request.sqlExecution.WorkflowRequestDetailSqlExecution;
+import com.source.rworkflow.workflow.type.ApprovalStatusType;
+import com.source.rworkflow.workflow.type.ExecutionStatusType;
+import com.source.rworkflow.workflow.type.ReviewStatusType;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -40,10 +42,13 @@ public class WorkflowRequestDto {
             @Valid
             @Size()
             private List<WorkflowApprovalDto.Create.Request> approvals;
+
+            @NotNull
+            @Valid
+            private List<AssigneeDto.Request> executionAssignees;
             @Size(min = 1)
-            private List<Long> executionAssignees;
-            @Size(min = 1)
-            private List<Long> reviewAssignees;
+            @Valid
+            private List<AssigneeDto.Request> reviewAssignees;
 
             @Valid
             @NotNull(message = "Must Have detail")
@@ -82,11 +87,14 @@ public class WorkflowRequestDto {
         protected boolean urgent;
         protected String comment;
         protected boolean canceled;
+        protected ApprovalStatusType approvalStatusType;
+        protected ExecutionStatusType executionStatusType;
+        protected ReviewStatusType reviewStatusType;
         protected List<WorkflowApprovalDto.Create.Response> approvals;
-        protected List<AssigneeDto> executionAssignees;
-        protected List<AssigneeDto> reviewAssignees;
+        protected List<AssigneeDto.Response> executionAssignees;
+        protected List<AssigneeDto.Response> reviewAssignees;
 
-        public Response(WorkflowRequest workflowRequest, List<WorkflowRequestApproval> approvals, Map<Long, ? extends List<AssigneeDto>> approvalAssignees, List<AssigneeDto> executionAssignees, List<AssigneeDto> reviewAssignees) {
+        public Response(WorkflowRequest workflowRequest, List<WorkflowRequestApproval> approvals, Map<Long, ? extends List<AssigneeDto.Response>> approvalAssignees, List<AssigneeDto.Response> executionAssignees, List<AssigneeDto.Response> reviewAssignees) {
             this.id = workflowRequest.getId();
             this.title = workflowRequest.getTitle();
             this.type = workflowRequest.getType();
@@ -99,9 +107,12 @@ public class WorkflowRequestDto {
             this.canceled = workflowRequest.isCanceled();
             this.executionAssignees = executionAssignees;
             this.reviewAssignees = reviewAssignees;
+            this.approvalStatusType = workflowRequest.getApprovalStatus();
+            this.executionStatusType = workflowRequest.getExecutionStatus();
+            this.reviewStatusType = workflowRequest.getReviewStatus();
         }
 
-        protected static List<WorkflowApprovalDto.Create.Response> approvals(final List<WorkflowRequestApproval> approvals, final Map<Long, ? extends List<AssigneeDto>> approvalAssignee) {
+        protected static List<WorkflowApprovalDto.Create.Response> approvals(final List<WorkflowRequestApproval> approvals, final Map<Long, ? extends List<AssigneeDto.Response>> approvalAssignee) {
             return approvals.stream()
                     .map(approval -> WorkflowApprovalDto.Create.Response.from(approval, approvalAssignee.get(approval.getId())))
                     .collect(Collectors.toUnmodifiableList());
@@ -158,8 +169,8 @@ public class WorkflowRequestDto {
         }
 
         public DetailResponse(final WorkflowRequest workflowRequest, final List<WorkflowRequestApproval> approvals,
-                              final Map<Long, ? extends List<AssigneeDto>> approvalAssignees, final List<AssigneeDto> executionAssignees,
-                              final List<AssigneeDto> reviewAssignees, final WorkflowRequestDetailAccessControl detailAccessControl,
+                              final Map<Long, ? extends List<AssigneeDto.Response>> approvalAssignees, final List<AssigneeDto.Response> executionAssignees,
+                              final List<AssigneeDto.Response> reviewAssignees, final WorkflowRequestDetailAccessControl detailAccessControl,
                               final List<WorkflowRequestDetailAccessControlConnection> detailAccessControlConnections, final List<WorkflowRequestDetailSqlExecution> detailSqlExecutions,
                               final List<WorkflowRequestDetailDataExport> detailDataExecutions) {
 
@@ -194,7 +205,7 @@ public class WorkflowRequestDto {
             protected boolean canceled;
             protected List<WorkflowApprovalDto.Create.Response> approvals;
 
-            public static Response from(final WorkflowRequest request, List<WorkflowRequestApproval> approvals, Map<Long, List<AssigneeDto>> approvalAssignees) {
+            public static Response from(final WorkflowRequest request, List<WorkflowRequestApproval> approvals, Map<Long, List<AssigneeDto.Response>> approvalAssignees) {
                 final var response = new Response();
 
                 response.id = request.getId();
@@ -209,7 +220,7 @@ public class WorkflowRequestDto {
 
             }
 
-            private static List<WorkflowApprovalDto.Create.Response> approvals(final List<WorkflowRequestApproval> approvals, final Map<Long, ? extends List<AssigneeDto>> approvalAssignee) {
+            private static List<WorkflowApprovalDto.Create.Response> approvals(final List<WorkflowRequestApproval> approvals, final Map<Long, ? extends List<AssigneeDto.Response>> approvalAssignee) {
                 return approvals.stream()
                         .map(approval -> WorkflowApprovalDto.Create.Response.from(approval, approvalAssignee.get(approval.getId())))
                         .collect(Collectors.toUnmodifiableList());

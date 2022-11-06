@@ -4,6 +4,9 @@ import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.common.util.Patch;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
+import com.source.rworkflow.workflow.exception.AccessControlRequestCanNotBeUrgent;
+import com.source.rworkflow.workflow.exception.OrdersMustBeInCrement;
+import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleApprovalDto;
 import com.source.rworkflow.workflowRule.dto.WorkflowRuleDto;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,16 +72,37 @@ public class WorkflowRuleCompositeService {
     }
 
     private void validateDelete(final List<WorkflowRequest> usingWorkflowRequests) {
-        if (usingWorkflowRequests.size() > 0 ) {
+        if (usingWorkflowRequests.size() > 0) {
             throw new CanNotDeleteWorkflowRuleException("Rule Is Used In " + usingWorkflowRequests.size() + " Workflows");
         }
     }
 
     private void validateCreate(final WorkflowRuleDto.Create.Request request) {
+        checkUrgentAccessControl(request);
         checkAssigneeNull(request);
         checkUrgentApproval(request);
         checkDuplicateAssignee(request.getApprovals(), request.getExecutionAssignees(), request.getReviewAssignees());
         checkDuplicateOrder(request.getApprovals());
+        validateOrder(request);
+    }
+
+    private void validateOrder(final WorkflowRuleDto.Create.Request request) {
+        if (!request.isUrgent()) {
+            final var orders = request.getApprovals().stream()
+                    .map(WorkflowRuleApprovalDto.Request::getOrder)
+                    .collect(Collectors.toUnmodifiableList());
+
+            if (orders.size() == 0 || (Set.copyOf(orders).containsAll(List.of(1L, 2L, 3L)) || Set.copyOf(orders).containsAll(List.of(1L, 2L)) || orders.equals(List.of(1L)))) {
+                return;
+            }
+            throw new OrdersMustBeInCrement();
+        }
+    }
+
+    private void checkUrgentAccessControl(final WorkflowRuleDto.Create.Request request) {
+        if (request.getType().equals(WorkflowRequestType.ACCESS_CONTROL) && request.isUrgent()) {
+            throw new AccessControlRequestCanNotBeUrgent();
+        }
     }
 
     private void validateUpdate(final WorkflowRuleDto.Update.Request request) {

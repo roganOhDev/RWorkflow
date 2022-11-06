@@ -1,14 +1,15 @@
 package com.source.rworkflow.workflow.domain.approval;
 
 import com.source.rworkflow.common.domain.SessionUserId;
-import com.source.rworkflow.common.exception.RException;
 import com.source.rworkflow.common.util.ListUtil;
+import com.source.rworkflow.workflow.dto.AssigneeDto;
 import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
 import com.source.rworkflow.workflow.exception.ApprovalHaveToFollowItsTurnException;
 import com.source.rworkflow.workflow.exception.ApprovalNotFoundByOrderException;
 import com.source.rworkflow.workflow.exception.AssigneeCanNotBeEmpty;
 import com.source.rworkflow.workflow.exception.SelfApproveException;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
+import com.source.rworkflow.workflowRule.type.AssigneeType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,14 +27,17 @@ public class WorkflowRequestApprovalCompositeService {
 
     @Transactional
     public List<WorkflowRequestApproval> createCollection(final Long requestId, final List<WorkflowApprovalDto.Create.Request> createRequests,
-                                                          final WorkflowRuleSuite workflowRuleSuite, final SessionUserId sessionUserId) {
-        final var resultList = createRequests.stream()
-                .map(createRequest -> workflowRuleSuite == null
-                        ? create(requestId, createRequest, sessionUserId)
-                        : create(requestId, createRequest, workflowRuleSuite.findAllApprovalAssigneeByOrder(createRequest.getOrder()), sessionUserId))
-                .collect(Collectors.toUnmodifiableList());
+                                                          final Map<Long, List<Long>> assignees, final WorkflowRuleSuite workflowRuleSuite, final SessionUserId sessionUserId) {
+        return createRequests.stream()
+                .map(createRequest -> {
+                    validateSelfApprove(createRequest.getAssignees(), sessionUserId);
 
-        return ListUtil.removeDuplicateElement(resultList);
+                    return workflowRuleSuite == null
+                            ? create(requestId, assignees.get(createRequest.getOrder()), createRequest)
+                            : create(requestId, assignees.get(createRequest.getOrder()), createRequest, workflowRuleSuite.findAllApprovalAssigneeByOrder(createRequest.getOrder()), sessionUserId);
+
+                })
+                .collect(Collectors.toUnmodifiableList());
     }
 
     @Transactional(readOnly = true)
@@ -78,43 +82,45 @@ public class WorkflowRequestApprovalCompositeService {
         return approvals.size();
     }
 
-    private WorkflowRequestApproval create(final Long requestId, final WorkflowApprovalDto.Create.Request creatRequest, final SessionUserId sessionUserId) {
+    private WorkflowRequestApproval create(final Long requestId, final List<Long> assignees, final WorkflowApprovalDto.Create.Request creatRequest) {
         final var workflowRequestApproval = getNewWorkflowRequestApproval(requestId, creatRequest);
 
-        validateSelfApprove(creatRequest.getAssignees(), sessionUserId);
-        validateAssigneeCount((long) creatRequest.getAssignees().size());
-
-        return triggerService.create(creatRequest.getAssignees(), requestId, workflowRequestApproval);
-    }
-
-    private WorkflowRequestApproval create(final Long requestId, final WorkflowApprovalDto.Create.Request creatRequest,
-                                           final List<Long> assigneesByRule, final SessionUserId sessionUserId) {
-        final var workflowRequestApproval = getNewWorkflowRequestApproval(requestId, creatRequest);
-
-        validateSelfApprove(creatRequest.getAssignees(), sessionUserId);
-
-        final var assignees = mergeAssignees(creatRequest, assigneesByRule, sessionUserId);
         validateAssigneeCount((long) assignees.size());
 
         return triggerService.create(assignees, requestId, workflowRequestApproval);
     }
 
+    private WorkflowRequestApproval create(final Long requestId, final List<Long> assignees, final WorkflowApprovalDto.Create.Request creatRequest,
+                                           final List<Long> assigneesByRule, final SessionUserId sessionUserId) {
+        final var workflowRequestApproval = getNewWorkflowRequestApproval(requestId, creatRequest);
+
+        final var mergedAssignees = mergeAssignees(assignees, assigneesByRule, sessionUserId);
+        validateAssigneeCount((long) assignees.size());
+
+        return triggerService.create(mergedAssignees, requestId, workflowRequestApproval);
+    }
+
     private void validateAssigneeCount(final Long size) {
         if (size == 0) {
-            throw new AssigneeCanNotBeEmpty("Execution");
+            throw new AssigneeCanNotBeEmpty("Approval");
         }
     }
 
-    private void validateSelfApprove(final List<Long> assignees, final SessionUserId sessionUserId) {
-        if (assignees.contains(sessionUserId.getId())) {
+    private void validateSelfApprove(final List<AssigneeDto.Request> assignees, final SessionUserId sessionUserId) {
+        final var requests = assignees.stream()
+                .filter(request -> request.getType() == AssigneeType.USER)
+                .map(AssigneeDto.Request::getId)
+                .collect(Collectors.toUnmodifiableList());
+
+        if (requests.contains(sessionUserId.getId())) {
             throw new SelfApproveException(sessionUserId);
         }
     }
 
-    private List<Long> mergeAssignees(WorkflowApprovalDto.Create.Request creatRequest, List<Long> assigneesByRule, SessionUserId sessionUserId) {
+    private List<Long> mergeAssignees(final List<Long> assignees, List<Long> assigneesByRule, SessionUserId sessionUserId) {
         final var ruleAssignees = removeSelfFromAssigneesByRule(assigneesByRule, sessionUserId);
 
-        final var resultList = new ArrayList<>(creatRequest.getAssignees());
+        final var resultList = new ArrayList<>(assignees);
         resultList.addAll(ruleAssignees);
         return ListUtil.removeDuplicateElement(resultList);
     }

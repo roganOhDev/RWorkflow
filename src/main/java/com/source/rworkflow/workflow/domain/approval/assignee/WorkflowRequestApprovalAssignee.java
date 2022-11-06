@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -30,13 +28,9 @@ public class WorkflowRequestApprovalAssignee extends Assignee {
     @Column(name = "request_approval_id", nullable = false)
     private Long requestApprovalId;
 
-    @Column(name = "action_at")
+    @Column(name = "action_at", nullable = false)
     private LocalDateTime actionAt;
 
-    @Column(name = "action_by")
+    @Column(name = "action_by", nullable = false)
     private Long actionBy;
-
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private AssigneeStatusType status;
 }

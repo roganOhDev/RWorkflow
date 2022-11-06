@@ -1,5 +1,7 @@
 package com.source.rworkflow.workflow.type;
 
+import java.util.List;
+
 public enum AssigneeStatusType {
     None(false, true, true),
     PENDING(true, true, true),
@@ -28,5 +30,11 @@ public enum AssigneeStatusType {
 
     public boolean canUsedForReviewAssignee(AssigneeStatusType type) {
         return type.review;
+    }
+
+    public boolean canChangeStatus() {
+        final var canChangeStatusTypes = List.of(AssigneeStatusType.None, AssigneeStatusType.PENDING);
+
+        return canChangeStatusTypes.contains(this);
     }
 }
