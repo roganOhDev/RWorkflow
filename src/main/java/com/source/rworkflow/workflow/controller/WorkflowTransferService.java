@@ -1,15 +1,13 @@
 package com.source.rworkflow.workflow.controller;
 
 import com.source.rworkflow.common.domain.SessionUserId;
-import com.source.rworkflow.misc.user.UserDto;
+import com.source.rworkflow.misc.user.AssigneeDto;
 import com.source.rworkflow.misc.user.UserService;
 import com.source.rworkflow.workflow.domain.Assignee;
-import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApprovalCompositeService;
 import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApprovalAssignee;
 import com.source.rworkflow.workflow.domain.approval.assignee.WorkflowRequestApprovalAssigneeCompositeService;
 import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecutionAssigneeCompositeService;
-import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequestCompositeService;
 import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControlCompositeService;
 import com.source.rworkflow.workflow.domain.request.accessControl.connection.WorkflowRequestDetailAccessControlConnectionCompositeService;
@@ -57,7 +55,7 @@ public class WorkflowTransferService {
 
     public WorkflowRequestDto.Response create(final WorkflowRequestDto.Create.Request createRequest, final SessionUserId sessionUserId) {
         WorkflowRuleSuite workflowRuleSuite = null;
-        final var approvalAssignees = new HashMap<Long, List<UserDto>>();
+        final var approvalAssignees = new HashMap<Long, List<AssigneeDto>>();
 
         if (createRequest.getRuleId() != null) {
             final var workflowRule = workflowRuleCompositeService.find(createRequest.getRuleId());
@@ -79,7 +77,7 @@ public class WorkflowTransferService {
     }
 
     public WorkflowRequestDto.DetailResponse find(final Long id) {
-        final var approvalAssignees = new HashMap<Long, List<UserDto>>();
+        final var approvalAssignees = new HashMap<Long, List<AssigneeDto>>();
 
         final var workflowRequest = compositeService.find(id);
         final var approvals = workflowRequestApprovalCompositeService.findAllByRequestId(workflowRequest.getId());
@@ -103,7 +101,7 @@ public class WorkflowTransferService {
 
         final var approvals = workflowRequestApprovalCompositeService.findAll();
 
-        final var mappedApprovalAssignees = new HashMap<Long, Map<Long, ArrayList<UserDto>>>();
+        final var mappedApprovalAssignees = new HashMap<Long, Map<Long, ArrayList<AssigneeDto>>>();
         workflowRequestApprovalAssigneeCompositeService.findAll()
                 .forEach(assignee -> pushInTriple(mappedApprovalAssignees, assignee));
 
@@ -131,16 +129,15 @@ public class WorkflowTransferService {
     public WorkflowRequestDto.Approve.Response approve(final Long id, final Long order, final SessionUserId sessionUserId, final boolean approve) {
         final var updated = compositeService.approve(id, order, sessionUserId, approve);
 
-        final var approvalAssignees = new HashMap<Long, List<UserDto>>();
+        final var approvalAssignees = new HashMap<Long, List<AssigneeDto>>();
 
         final var approvals = workflowRequestApprovalCompositeService.findAllByRequestId(id);
-        approvals
-                .forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
+        approvals.forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
 
         return WorkflowRequestDto.Approve.Response.from(updated, approvals, approvalAssignees);
     }
 
-    private void pushInTriple(final Map<Long, Map<Long, ArrayList<UserDto>>> mappedApprovalAssignees, WorkflowRequestApprovalAssignee assignee) {
+    private void pushInTriple(final Map<Long, Map<Long, ArrayList<AssigneeDto>>> mappedApprovalAssignees, WorkflowRequestApprovalAssignee assignee) {
         final var first = assignee.getRequestId();
         final var second = assignee.getRequestApprovalId();
         final var third = changeToUserDto(assignee);
@@ -157,23 +154,23 @@ public class WorkflowTransferService {
         }
     }
 
-    private Map<Long, List<UserDto>> approvalAssigneeMap(final Long approvalId) {
+    private Map<Long, List<AssigneeDto>> approvalAssigneeMap(final Long approvalId) {
         final var assigneeUser = getUserDtosByApprovalId(approvalId);
         return Map.of(approvalId, assigneeUser);
     }
 
-    private List<UserDto> getUserDtosByApprovalId(final Long approvalId) {
+    private List<AssigneeDto> getUserDtosByApprovalId(final Long approvalId) {
         return changeToUserDtos(workflowRequestApprovalAssigneeCompositeService.findAllByApprovalId(approvalId));
     }
 
-    private List<UserDto> changeToUserDtos(final List<? extends Assignee> assignees) {
-        return assignees.stream()
-                .map(this::changeToUserDto)
-                .collect(Collectors.toUnmodifiableList());
+    private List<AssigneeDto> changeToUserDtos(final List<? extends Assignee> assignees) {
+            return assignees.stream()
+                    .map(this::changeToUserDto)
+                    .collect(Collectors.toUnmodifiableList());
     }
 
-    private UserDto changeToUserDto(final Assignee assignee) {
-        return UserDto.of(userService.find(assignee.getAssigneeId()));
+    private AssigneeDto changeToUserDto(final Assignee assignee) {
+        return AssigneeDto.of(userService.find(assignee.getAssigneeId()));
     }
 
     private void validateWithRule(final WorkflowRule workflowRule, final WorkflowRuleSuite workflowRuleSuite, final WorkflowRequestDto.Create.Request createRequest) {

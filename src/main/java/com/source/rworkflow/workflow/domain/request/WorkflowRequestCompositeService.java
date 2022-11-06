@@ -8,6 +8,7 @@ import com.source.rworkflow.workflow.exception.CanNotApproveByUrgentException;
 import com.source.rworkflow.workflow.exception.ExecutionExpirationDateMustBeAfterRequestExpirationDateException;
 import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
 import com.source.rworkflow.workflow.exception.OrdersMustBeInCrement;
+import com.source.rworkflow.workflow.exception.WorkflowIsCanceledException;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
@@ -64,6 +65,8 @@ public class WorkflowRequestCompositeService {
     public WorkflowRequest cancel(final Long id, final SessionUserId sessionUserId) {
         final var workflowRequest = service.find(id);
 
+        validateAction(workflowRequest);
+
         return service.cancel(workflowRequest, sessionUserId);
     }
 
@@ -71,6 +74,7 @@ public class WorkflowRequestCompositeService {
     public WorkflowRequest approve(final Long id, final Long order, final SessionUserId sessionUserId, final boolean approve) {
         final var workflowRequest = service.find(id);
 
+        validateAction(workflowRequest);
         validateUrgent(workflowRequest.isUrgent());
 
         if (approve) {
@@ -79,6 +83,16 @@ public class WorkflowRequestCompositeService {
             return triggerService.approveReject(workflowRequest, order, sessionUserId);
         }
 
+    }
+
+    private void validateAction(final WorkflowRequest workflowRequest){
+        validateCancel(workflowRequest);
+    }
+
+    private void validateCancel(final WorkflowRequest workflowRequest) {
+        if (workflowRequest.isCanceled()) {
+            throw new WorkflowIsCanceledException(workflowRequest.getId());
+        }
     }
 
     private void validateUrgent(final boolean urgent) {
@@ -144,7 +158,7 @@ public class WorkflowRequestCompositeService {
                 .map(WorkflowApprovalDto.Create.Request::getOrder)
                 .collect(Collectors.toUnmodifiableList());
 
-        if (Set.copyOf(orders).containsAll(List.of(1L, 2L, 3L)) || Set.copyOf(orders).containsAll(List.of(1L, 2L)) || orders.equals(List.of(1L))) {
+        if (orders.size() == 0 || (Set.copyOf(orders).containsAll(List.of(1L, 2L, 3L)) || Set.copyOf(orders).containsAll(List.of(1L, 2L)) || orders.equals(List.of(1L)))) {
             return;
         }
         throw new OrdersMustBeInCrement();

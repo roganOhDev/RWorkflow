@@ -1,6 +1,6 @@
 package com.source.rworkflow.workflow.dto;
 
-import com.source.rworkflow.misc.user.UserDto;
+import com.source.rworkflow.misc.user.AssigneeDto;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.Getter;
@@ -33,9 +33,9 @@ public class WorkflowApprovalDto {
         public static class Response {
             private Long order;
             private ApproveType approveType;
-            private List<UserDto> assignees;
+            private List<AssigneeDto> assignees;
 
-            public static Response from(final WorkflowRequestApproval approval, List<UserDto> approvalAssignees) {
+            public static Response from(final WorkflowRequestApproval approval, List<AssigneeDto> approvalAssignees) {
                 final var response = new Response();
 
                 response.order = approval.getOrder();

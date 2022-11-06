@@ -38,7 +38,7 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
 
         final var fitAssignee = assignees.stream()
                 .filter(assignee -> assignee.getAssigneeId().equals(sessionUserId.getId()))
-                .findFirst().orElseThrow(() -> new ApprovalAssigneeNotFoundException(approval.getId(), approval.getOrder(), sessionUserId.getId()));
+                .findFirst().orElseThrow(() -> new ApprovalAssigneeNotFoundException(approval.getRequestId(), approval.getId(), approval.getOrder(), sessionUserId.getId()));
 
         return service.approve(fitAssignee, sessionUserId, approve);
     }

@@ -44,7 +44,7 @@ public class ExceptionCode {
         final public static String CAN_NOT_FOUND_APPROVAL_ASSIGNEE = "Approval Assignee Not Found";
         final public static String ORDERS_MUST_BE_INCREMENT = "Orders Must Be Increment";
         final public static String APPROVAL_HAVE_TO_FOLLOW_ITS_TURN_EXCEPTION = "Approval Have To Follow Its Turn Exception";
-
         final public static String CAN_NOT_APPROVE_BY_URGENT_EXCEPTION = "You Cannot Approve This Request BeCause Urgent. Move To Execute";
+        final public static String WORKFLOW_IS_CANCELED = "Workflow Is Canceled";
     }
 }
