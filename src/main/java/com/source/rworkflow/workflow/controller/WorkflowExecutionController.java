@@ -29,6 +29,7 @@ public class WorkflowExecutionController {
 
     @PostMapping(value = "/success")
     public void executeSuccess(@PathVariable Long id) {
+        transferService.execute();
 
     }
 

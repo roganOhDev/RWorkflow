@@ -4,6 +4,7 @@ import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.type.ApprovalStatusType;
 import com.source.rworkflow.workflow.type.ExecutionStatusType;
+import com.source.rworkflow.workflow.type.ReviewStatusType;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,8 +32,8 @@ public class WorkflowRequestTriggerService {
 
             if (workflowRequest.getType() == WorkflowRequestType.ACCESS_CONTROL) {
                 workflowRequest.setExecutionStatus(ExecutionStatusType.SUCCEEDED);
+                workflowRequest.setReviewStatus(ReviewStatusType.PENDING);
             }
-
 
         } else {
             workflowRequest.setApprovalStatus(ApprovalStatusType.IN_PROGRESS);
