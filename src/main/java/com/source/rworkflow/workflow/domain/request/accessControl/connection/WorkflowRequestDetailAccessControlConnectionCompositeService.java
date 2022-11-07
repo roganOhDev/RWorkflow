@@ -20,6 +20,17 @@ public class WorkflowRequestDetailAccessControlConnectionCompositeService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    @Transactional
+    public void grant(final Long accessControlId) {
+        final var requestAccessControls = service.findAllByDetailAccessControlId(accessControlId);
+
+        requestAccessControls
+                .forEach(accessControl -> {
+                    accessControl.setGranted(true);
+                    service.grant(accessControl);
+                });
+    }
+
     @Transactional(readOnly = true)
     public List<WorkflowRequestDetailAccessControlConnection> findAllByDetailAccessControlId(final Long accessControlId) {
         return service.findAllByDetailAccessControlId(accessControlId);

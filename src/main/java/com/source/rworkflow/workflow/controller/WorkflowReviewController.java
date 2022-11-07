@@ -7,7 +7,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.source.rworkflow.common.domain.UserTokenHeader.HEADER_KEY;
 
 @Slf4j
 @RestController
@@ -18,7 +21,9 @@ public class WorkflowReviewController {
     private final UserTokenService userTokenService;
 
     @PostMapping
-    public void review(@PathVariable Long id) {
+    public void review(@PathVariable Long id, @RequestParam(HEADER_KEY) String userToken) {
+        final var sessionUserId = userTokenService.findUserId(userToken);
 
+        transferService.review(id, sessionUserId);
     }
 }

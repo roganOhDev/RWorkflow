@@ -10,6 +10,7 @@ import com.source.rworkflow.workflow.domain.request.dataExport.WorkflowRequestDe
 import com.source.rworkflow.workflow.domain.request.dataExport.WorkflowRequestDetailDataExportCompositeService;
 import com.source.rworkflow.workflow.domain.request.sqlExecution.WorkflowRequestDetailSqlExecution;
 import com.source.rworkflow.workflow.domain.request.sqlExecution.WorkflowRequestDetailSqlExecutionCompositeService;
+import com.source.rworkflow.workflow.domain.reviewAssignee.WorkflowRequestReviewAssigneeCompositeService;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +23,7 @@ import java.util.List;
 public class WorkflowRequestTrigger {
     private final WorkflowRequestApprovalCompositeService approvalCompositeService;
     private final WorkflowRequestExecutionAssigneeCompositeService executionAssigneeCompositeService;
+    private final WorkflowRequestReviewAssigneeCompositeService reviewAssigneeCompositeService;
     private final WorkflowRequestDetailSqlExecutionCompositeService sqlExecutionCompositeService;
     private final WorkflowRequestDetailDataExportCompositeService dataExportCompositeService;
     private final WorkflowRequestDetailAccessControlCompositeService accessControlCompositeService;
@@ -41,7 +43,7 @@ public class WorkflowRequestTrigger {
         }
     }
 
-    public int beforeApprove(final Long requestId, final Long order, final SessionUserId sessionUserId, final boolean approve) {
+    public boolean beforeApprove(final Long requestId, final Long order, final SessionUserId sessionUserId, final boolean approve) {
         return approvalCompositeService.approve(requestId, order, sessionUserId, approve);
     }
 
@@ -53,20 +55,29 @@ public class WorkflowRequestTrigger {
         executionAssigneeCompositeService.executeResult(requestId, executeUserId, success);
     }
 
-    public void updateUserAccessControl() {
+    public void grantAccessControl(final Long requestId){
+        accessControlCompositeService.grant(requestId);
         userAccessControlService.update();
     }
 
-    private List<WorkflowRequestDetailDataExport> createDataExport(final Long requestId, final WorkflowRequestDto.Create.Request.Detail request) {
-        return dataExportCompositeService.createCollection(requestId, request.getRequestExpiryAt(), request.getExecutionExpiryAt(), request.getDataExports());
+    public void afterExecuteFinishReviewAssigneesPending(final Long requestId, final Long executeUserId) {
+        reviewAssigneeCompositeService.makeReviewAssigneesPending(requestId, executeUserId);
     }
 
-    private List<WorkflowRequestDetailSqlExecution> createSqlExecution(final Long requestId, final WorkflowRequestDto.Create.Request.Detail request) {
-        return sqlExecutionCompositeService.createCollection(requestId, request.getRequestExpiryAt(), request.getExecutionExpiryAt(), request.getSqlExecutions());
+    public boolean beforeReview(final Long requestId, final SessionUserId sessionUserId) {
+        return reviewAssigneeCompositeService.review(requestId, sessionUserId);
+    }
+
+    private WorkflowRequestDetailDataExport createDataExport(final Long requestId, final WorkflowRequestDto.Create.Request.Detail request) {
+        return dataExportCompositeService.create(requestId, request);
+    }
+
+    private WorkflowRequestDetailSqlExecution createSqlExecution(final Long requestId, final WorkflowRequestDto.Create.Request.Detail request) {
+        return sqlExecutionCompositeService.create(requestId, request);
     }
 
     private WorkflowRequestDetailAccessControl createAccessControl(final Long requestId, final WorkflowRequestDto.Create.Request.Detail request) {
-        return accessControlCompositeService.create(requestId, request.getRequestExpiryAt(), request.getAccessControl());
+        return accessControlCompositeService.create(requestId, request);
     }
 
 }

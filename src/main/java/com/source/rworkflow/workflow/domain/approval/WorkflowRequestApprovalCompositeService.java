@@ -60,7 +60,7 @@ public class WorkflowRequestApprovalCompositeService {
 
 
     @Transactional
-    public int approve(final Long requestId, final Long order, final SessionUserId sessionUserId, final boolean approve) {
+    public boolean approve(final Long requestId, final Long order, final SessionUserId sessionUserId, final boolean approve) {
 
         final var approvals = findAllByRequestId(requestId);
 
@@ -82,11 +82,13 @@ public class WorkflowRequestApprovalCompositeService {
 
         if (approve) {
             triggerService.approveOk(fitApproval.get(0), sessionUserId);
+            return approvals.stream()
+                    .filter(e -> e.getStatus().equals(ApprovalStatusType.APPROVED))
+                    .count() == approvals.size() - 1;
         } else {
             triggerService.approveReject(fitApproval.get(0), sessionUserId);
+            return false;
         }
-
-        return approvals.size();
     }
 
     private WorkflowRequestApproval createUrgent(final Long requestId) {

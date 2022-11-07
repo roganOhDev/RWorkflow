@@ -19,4 +19,8 @@ public class WorkflowRequestDetailAccessControlTriggerService {
 
         return created;
     }
+
+    public void grant(final WorkflowRequestDetailAccessControl accessControl) {
+        trigger.beforeGrant(accessControl.getId());
+    }
 }

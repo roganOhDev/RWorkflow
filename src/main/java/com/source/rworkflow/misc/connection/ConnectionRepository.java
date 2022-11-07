@@ -7,6 +7,6 @@ import java.util.Optional;
 
 @Repository
 public interface ConnectionRepository extends JpaRepository<Connection, Long>{
-    Optional<Connection> findById(Long id);
+    Connection findByIdAndDeletedIsFalse(Long id);
 
 }

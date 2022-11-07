@@ -16,6 +16,10 @@ public class WorkflowRequestDetailAccessControlConnectionService {
         return repository.save(request);
     }
 
+    public void grant(final WorkflowRequestDetailAccessControlConnection request) {
+        repository.save(request);
+    }
+
     public List<WorkflowRequestDetailAccessControlConnection> findAllByDetailAccessControlId(final Long accessControlId) {
         return repository.findAllByDetailAccessControlId(accessControlId);
     }

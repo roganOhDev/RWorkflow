@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.controller;
 
 import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.misc.connection.ConnectionService;
 import com.source.rworkflow.misc.role.RoleService;
 import com.source.rworkflow.misc.user.role.UserRoleService;
 import com.source.rworkflow.workflow.dto.AssigneeDto;
@@ -30,6 +31,7 @@ import com.source.rworkflow.workflowRule.domain.rule.WorkflowRuleCompositeServic
 import com.source.rworkflow.workflowRule.type.AssigneeType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,10 +58,12 @@ public class WorkflowTransferService {
     private final UserRoleService userRoleService;
 
     private final RoleService roleService;
+    private final ConnectionService connectionService;
 
     private final WorkflowRuleCompositeService workflowRuleCompositeService;
     private final WorkflowRuleSuiteFactory workflowRuleSuiteFactory;
 
+    @Transactional
     public WorkflowRequestDto.Response create(final WorkflowRequestDto.Create.Request createRequest, final SessionUserId sessionUserId) {
         WorkflowRuleSuite workflowRuleSuite = null;
         final var approvalAssignees = new HashMap<Long, List<AssigneeDto.Response>>();
@@ -70,6 +74,8 @@ public class WorkflowTransferService {
 
             validateWithRule(workflowRule, workflowRuleSuite, createRequest);
         }
+
+        validateDetail(createRequest.getDetail());
 
         final var workflowRequest = compositeService.create(createRequest, sessionUserId);
 
@@ -87,6 +93,7 @@ public class WorkflowTransferService {
         return new WorkflowRequestDto.Response(workflowRequest, approvals, approvalAssignees, executionAssignees, reviewAssignees);
     }
 
+    @Transactional(readOnly = true)
     public WorkflowRequestDto.DetailResponse find(final Long id) {
         final var approvalAssignees = new HashMap<Long, List<AssigneeDto.Response>>();
 
@@ -107,6 +114,7 @@ public class WorkflowTransferService {
                 detailAccessControl, detailAccessControlConnections, detailSqlExecutions, detailDataExecutions);
     }
 
+    @Transactional(readOnly = true)
     public List<WorkflowRequestDto.Response> list(final WorkflowRequestType type) {
         final var workflowRequests = compositeService.findAllByType(type);
 
@@ -131,12 +139,14 @@ public class WorkflowTransferService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
+    @Transactional
     public WorkflowRequestDto.Cancel.Response cancel(final Long id, final SessionUserId sessionUserId) {
         final var canceled = compositeService.cancel(id, sessionUserId);
 
         return new WorkflowRequestDto.Cancel.Response(canceled.getType(), canceled.getId(), canceled.getTitle(), canceled.isCanceled());
     }
 
+    @Transactional
     public WorkflowRequestDto.Approve.Response approve(final Long id, final Long order, final SessionUserId sessionUserId, final boolean approve) {
         final var updated = compositeService.approve(id, order, sessionUserId, approve);
 
@@ -148,12 +158,34 @@ public class WorkflowTransferService {
         return WorkflowRequestDto.Approve.Response.from(updated, approvals, approvalAssignees);
     }
 
+    @Transactional
     public void execute(final Long workflowRequestId, final SessionUserId sessionUserId) {
         compositeService.execute(workflowRequestId, sessionUserId);
     }
 
+    @Transactional
+    public void review(final Long workflowRequestId, final SessionUserId sessionUserId) {
+        compositeService.review(workflowRequestId, sessionUserId);
+    }
+
+    @Transactional
     public void executeResult(final Long workflowRequestId, final boolean success) {
         compositeService.executeResult(workflowRequestId, success);
+    }
+
+    private void validateDetail(final WorkflowRequestDto.Create.Request.Detail detail) {
+        final var accessControlConnections = detail.getAccessControl().getConnections();
+        final var sqlExecution = detail.getSqlExecution();
+        final var dataExport = detail.getDataExport();
+
+        accessControlConnections
+                .forEach(connection -> {
+                    connectionService.validateExist(connection.getConnectionId());
+                    roleService.validateExist(connection.getConnectionId());
+                });
+
+        connectionService.validateExist(sqlExecution.getConnectionId());
+        connectionService.validateExist(dataExport.getConnectionId());
     }
 
     private Map<Long, List<Long>> convertApprovalAssigneesToUsers(final List<WorkflowApprovalDto.Create.Request> approvals) {

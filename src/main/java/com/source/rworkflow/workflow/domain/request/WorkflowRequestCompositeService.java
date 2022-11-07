@@ -109,6 +109,15 @@ public class WorkflowRequestCompositeService {
         }
     }
 
+    @Transactional
+    public void review(final Long workflowRequestId, final SessionUserId sessionUserId){
+        final var workflowRequest = service.find(workflowRequestId);
+
+        validateAction(workflowRequest, ActionType.REVIEW);
+
+        triggerService.review(workflowRequest, sessionUserId);
+    }
+
     private void validateAction(final WorkflowRequest workflowRequest, final ActionType actionType) {
         validateCancel(workflowRequest);
 

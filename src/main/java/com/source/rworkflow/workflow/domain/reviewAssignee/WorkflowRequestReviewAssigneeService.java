@@ -24,4 +24,8 @@ public class WorkflowRequestReviewAssigneeService {
     public List<WorkflowRequestReviewAssignee> findByRequestId(final Long requestId) {
         return repository.findByRequestId(requestId);
     }
+
+    public void updateStatus(final WorkflowRequestReviewAssignee assignee) {
+        repository.save(assignee);
+    }
 }

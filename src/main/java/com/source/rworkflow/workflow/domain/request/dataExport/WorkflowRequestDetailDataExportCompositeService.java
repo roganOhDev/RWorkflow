@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.domain.request.dataExport;
 
 import com.source.rworkflow.workflow.dto.DataExportDto;
+import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.RequestDetailNullException;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.RequiredArgsConstructor;
@@ -17,16 +18,24 @@ public class WorkflowRequestDetailDataExportCompositeService {
     private final WorkflowRequestDetailDataExportService service;
 
     @Transactional
-    public List<WorkflowRequestDetailDataExport> createCollection(final Long requestId, final LocalDateTime requestExpiryAt,
-                                                                  final LocalDateTime executionExpiryAt, final List<DataExportDto.Request> createRequests) {
+    public WorkflowRequestDetailDataExport create(final Long requestId, final WorkflowRequestDto.Create.Request.Detail detailRequest) {
 
-        if (createRequests == null) {
+        final var createRequest = detailRequest.getDataExport();
+        if (createRequest == null) {
             throw new RequestDetailNullException(WorkflowRequestType.DATA_EXPORT);
         }
 
-        return createRequests.stream()
-                .map(createRequest -> create(requestId, requestExpiryAt, executionExpiryAt, createRequest))
-                .collect(Collectors.toUnmodifiableList());
+        final var dataExport = new WorkflowRequestDetailDataExport();
+
+        dataExport.setRequestId(requestId);
+        dataExport.setDatabase(createRequest.getDatabase());
+        dataExport.setConnectionId(createRequest.getConnectionId());
+        dataExport.setRequestExpiryAt(detailRequest.getRequestExpiryAt());
+        dataExport.setExecutionExpiryAt(detailRequest.getExecutionExpiryAt());
+        dataExport.setContentValue(createRequest.getContentValue());
+        dataExport.setContentType(createRequest.getContentType());
+
+        return service.create(dataExport);
     }
 
     @Transactional(readOnly = true)
@@ -34,18 +43,5 @@ public class WorkflowRequestDetailDataExportCompositeService {
         return service.findAllByRequestId(requestId);
     }
 
-    private WorkflowRequestDetailDataExport create(final Long requestId, final LocalDateTime requestExpiryAt,
-                                                   final LocalDateTime executionExpiryAt, final DataExportDto.Request createRequest) {
-        final var dataExport = new WorkflowRequestDetailDataExport();
 
-        dataExport.setRequestId(requestId);
-        dataExport.setDatabase(createRequest.getDatabase());
-        dataExport.setConnectionId(createRequest.getConnectionId());
-        dataExport.setRequestExpiryAt(requestExpiryAt);
-        dataExport.setExecutionExpiryAt(executionExpiryAt);
-        dataExport.setContentValue(createRequest.getContentValue());
-        dataExport.setContentType(createRequest.getContentType());
-
-        return service.create(dataExport);
-    }
 }

@@ -3,6 +3,7 @@ package com.source.rworkflow.workflow.domain.request.accessControl;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflow.dto.AccessControlConnectionDto;
 import com.source.rworkflow.workflow.dto.AccessControlDto;
+import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.CanNotDuplicateRequestAccessControlConnectionException;
 import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
 import com.source.rworkflow.workflow.exception.RequestDetailNullException;
@@ -21,18 +22,26 @@ public class WorkflowRequestDetailAccessControlCompositeService {
     private final WorkflowRequestDetailAccessControlService service;
 
     @Transactional
-    public WorkflowRequestDetailAccessControl create(final Long requestId, final LocalDateTime requestExpiryAt,
-                                                           final AccessControlDto.Request createRequest) {
+    public WorkflowRequestDetailAccessControl create(final Long requestId, final WorkflowRequestDto.Create.Request.Detail detailRequest) {
 
-        validate(createRequest);
+        final var createRequest = detailRequest.getAccessControl();
+
+        validate(detailRequest.getAccessControl());
 
         final var accessControl = new WorkflowRequestDetailAccessControl();
 
         accessControl.setRequestId(requestId);
-        accessControl.setRequestExpiryAt(requestExpiryAt);
+        accessControl.setRequestExpiryAt(detailRequest.getRequestExpiryAt());
         accessControl.setExpirationDate(getExpirationDate(createRequest.getExpirationDate()));
 
         return triggerService.create(accessControl, createRequest.getConnections());
+    }
+
+    @Transactional
+    public void grant(final Long requestId) {
+        final var accessControl = service.findByRequestId(requestId);
+
+        triggerService.grant(accessControl);
     }
 
     @Transactional(readOnly = true)

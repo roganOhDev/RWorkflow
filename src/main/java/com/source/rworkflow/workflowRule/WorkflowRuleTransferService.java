@@ -68,6 +68,7 @@ public class WorkflowRuleTransferService {
         return WorkflowRuleDto.Response.from(created, ruleSuite);
     }
 
+    @Transactional
     public WorkflowRuleDto.Delete.Response delete(final Long id, final SessionUserId sessionUserId) {
         final var workflowRequests = workflowRequestCompositeService.findByRuleId(id);
 
@@ -76,6 +77,7 @@ public class WorkflowRuleTransferService {
         return new WorkflowRuleDto.Delete.Response(deleted.getId(), deleted.getName(), deleted.getRequestType());
     }
 
+    @Transactional
     public WorkflowRuleDto.Response update(final WorkflowRuleDto.Update.Request request, final SessionUserId sessionUserId) {
         final var ruleSuite = new WorkflowRuleSuite();
 
@@ -114,6 +116,7 @@ public class WorkflowRuleTransferService {
         return WorkflowRuleDto.Response.from(updated, ruleSuite);
     }
 
+    @Transactional(readOnly = true)
     public WorkflowRuleDto.Read.Response list(final String workflowRequestTypeString) {
         final var workflowRules = workflowRequestTypeString == null
                 ? service.findAll()
@@ -124,6 +127,7 @@ public class WorkflowRuleTransferService {
                 .collect(Collectors.toUnmodifiableList()));
     }
 
+    @Transactional(readOnly = true)
     public WorkflowRuleDto.Response find(final Long id) {
         final var workflowRule = service.find(id);
 

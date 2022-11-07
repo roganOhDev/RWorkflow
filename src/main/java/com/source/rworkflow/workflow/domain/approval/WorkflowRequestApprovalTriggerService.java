@@ -40,6 +40,7 @@ public class WorkflowRequestApprovalTriggerService {
             approval.setStatus(ApprovalStatusType.IN_PROGRESS);
         } else {
             approval.setStatus(ApprovalStatusType.APPROVED);
+
             trigger.afterApproveExecutionPending(approval.getRequestId(), sessionUserId);
         }
 

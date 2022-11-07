@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.domain.request.sqlExecution;
 
 import com.source.rworkflow.workflow.dto.SqlExecutionDto;
+import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.RequestDetailNullException;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.RequiredArgsConstructor;
@@ -17,35 +18,28 @@ public class WorkflowRequestDetailSqlExecutionCompositeService {
     private final WorkflowRequestDetailSqlExecutionService service;
 
     @Transactional
-    public List<WorkflowRequestDetailSqlExecution> createCollection(final Long requestId, final LocalDateTime requestExpiryAt,
-                                                                    final LocalDateTime executionExpiryAt, final List<SqlExecutionDto.Request> createRequests) {
+    public WorkflowRequestDetailSqlExecution create(final Long requestId, final WorkflowRequestDto.Create.Request.Detail detailRequest) {
 
-        if (createRequests == null) {
+        final var createRequest = detailRequest.getSqlExecution();
+        if (createRequest == null) {
             throw new RequestDetailNullException(WorkflowRequestType.SQL_EXECUTION);
         }
 
-        return createRequests.stream()
-                .map(createRequest -> create(requestId, requestExpiryAt, executionExpiryAt, createRequest))
-                .collect(Collectors.toUnmodifiableList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<WorkflowRequestDetailSqlExecution> findAllByRequestId(final Long requestId) {
-        return service.findAllByRequestId(requestId);
-    }
-
-    private WorkflowRequestDetailSqlExecution create(final Long requestId, final LocalDateTime requestExpiryAt,
-                                                     final LocalDateTime executionExpiryAt, final SqlExecutionDto.Request createRequest) {
         final var sqlExecution = new WorkflowRequestDetailSqlExecution();
 
         sqlExecution.setRequestId(requestId);
         sqlExecution.setDatabase(createRequest.getDatabase());
         sqlExecution.setConnectionId(createRequest.getConnectionId());
-        sqlExecution.setRequestExpiryAt(requestExpiryAt);
-        sqlExecution.setExecutionExpiryAt(executionExpiryAt);
+        sqlExecution.setRequestExpiryAt(detailRequest.getRequestExpiryAt());
+        sqlExecution.setExecutionExpiryAt(detailRequest.getExecutionExpiryAt());
         sqlExecution.setContentValue(createRequest.getContentValue());
         sqlExecution.setContentType(createRequest.getContentType());
 
         return service.create(sqlExecution);
+    }
+
+    @Transactional(readOnly = true)
+    public List<WorkflowRequestDetailSqlExecution> findAllByRequestId(final Long requestId) {
+        return service.findAllByRequestId(requestId);
     }
 }

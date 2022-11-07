@@ -50,5 +50,6 @@ public class ExceptionCode {
         final public static String CAN_NOT_ACTION_EXCEPTION = "Can Not Action Which User Requests. Not Status Is : ";
         final public static String ACCESS_CONTROL_REQUEST_CAN_NOT_HAS_EXECUTION_ASSIGNEES = "Access Control Request Cannot Has Execution Assignees";
         final public static String EXECUTION_ASSIGNEE_NOT_FOUND_EXCEPTION = "Execution Assignee Not Found";
+        final public static String REVIEW_ASSIGNEE_NOT_FOUND_EXCEPTION = "Review Assignee Not Found";
     }
 }

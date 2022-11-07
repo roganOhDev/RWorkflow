@@ -63,9 +63,9 @@ public class WorkflowRequestDto {
                 @Valid
                 private AccessControlDto.Request accessControl;
                 @Valid
-                private List<SqlExecutionDto.Request> sqlExecutions;
+                private SqlExecutionDto.Request sqlExecution;
                 @Valid
-                private List<DataExportDto.Request> dataExports;
+                private DataExportDto.Request dataExport;
 
                 public void setDefaultExecutionExpiryAt() {
                     this.executionExpiryAt = LocalDateTime.now().plusDays(4);

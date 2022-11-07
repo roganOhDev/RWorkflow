@@ -1,13 +1,18 @@
 package com.source.rworkflow.workflow.domain.reviewAssignee;
 
+import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
+import com.source.rworkflow.workflow.exception.AssigneeCanNotAction;
 import com.source.rworkflow.workflow.exception.AssigneeCanNotBeEmpty;
+import com.source.rworkflow.workflow.exception.ReviewAssigneeNotFoundException;
+import com.source.rworkflow.workflow.type.AssigneeStatusType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +47,48 @@ public class WorkflowRequestReviewAssigneeCompositeService {
     @Transactional(readOnly = true)
     public List<WorkflowRequestReviewAssignee> findByRequestId(final Long requestId) {
         return service.findByRequestId(requestId);
+    }
+
+
+    @Transactional
+    public boolean review(final Long requestId, final SessionUserId sessionUserId) {
+        final var executionAssignees = service.findByRequestId(requestId);
+        final var requestAssignee = executionAssignees.stream()
+                .filter(e -> e.getAssigneeId().equals(sessionUserId.getId()))
+                .findFirst().orElseThrow(() -> {
+                    throw new ReviewAssigneeNotFoundException(sessionUserId.getId());
+                });
+
+        if (!requestAssignee.getStatus().equals(AssigneeStatusType.PENDING)) {
+            throw new AssigneeCanNotAction("review", requestAssignee.getStatus());
+        }
+
+        requestAssignee.setStatus(AssigneeStatusType.APPROVED);
+        requestAssignee.setActionBy(sessionUserId.getId());
+        requestAssignee.setActionAt(LocalDateTime.now());
+
+        service.updateStatus(requestAssignee);
+
+        final var approvedAssigneesCount = executionAssignees.stream()
+                .filter(e -> e.getStatus().equals(AssigneeStatusType.APPROVED))
+                .count();
+
+        return executionAssignees.size() - 1 == approvedAssigneesCount;
+    }
+
+    @Transactional()
+    public void makeReviewAssigneesPending(final Long requestId, final Long executeUserId) {
+        final var assignees = service.findByRequestId(requestId);
+
+        assignees
+                .forEach(assignee -> {
+                    assignee.setStatus(AssigneeStatusType.PENDING);
+                    assignee.setActionAt(LocalDateTime.now());
+                    assignee.setActionBy(executeUserId);
+
+                    service.updateStatus(assignee);
+                });
+
     }
 
     private void validateAssigneeCount(final Long size) {

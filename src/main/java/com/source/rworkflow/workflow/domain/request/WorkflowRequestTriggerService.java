@@ -24,16 +24,16 @@ public class WorkflowRequestTriggerService {
     }
 
     public WorkflowRequest approveOk(final WorkflowRequest workflowRequest, final Long order, final SessionUserId sessionUserId) {
-        final var approvalCount = trigger.beforeApprove(workflowRequest.getId(), order, sessionUserId, true);
+        final var approveFinished = trigger.beforeApprove(workflowRequest.getId(), order, sessionUserId, true);
 
-        if (order == approvalCount) {
+        if (approveFinished) {
             workflowRequest.setApprovalStatus(ApprovalStatusType.APPROVED);
             workflowRequest.setExecutionStatus(ExecutionStatusType.PENDING);
 
             if (workflowRequest.getType() == WorkflowRequestType.ACCESS_CONTROL) {
                 workflowRequest.setExecutionStatus(ExecutionStatusType.SUCCEEDED);
                 workflowRequest.setReviewStatus(ReviewStatusType.PENDING);
-                trigger.updateUserAccessControl();
+                trigger.grantAccessControl(workflowRequest.getId());
             }
 
         } else {
@@ -54,6 +54,8 @@ public class WorkflowRequestTriggerService {
     public void execute(final WorkflowRequest workflowRequest, final SessionUserId sessionUserId) {
         trigger.beforeExecute(workflowRequest.getId(), sessionUserId);
 
+        workflowRequest.setExecutionStatus(ExecutionStatusType.IN_PROGRESS);
+
         service.updateWorkflowRequestStatus(workflowRequest, sessionUserId.getId());
     }
 
@@ -63,6 +65,8 @@ public class WorkflowRequestTriggerService {
 
         request.setExecutionStatus(ExecutionStatusType.SUCCEEDED);
         request.setReviewStatus(ReviewStatusType.PENDING);
+
+        trigger.afterExecuteFinishReviewAssigneesPending(request.getId(), request.getUpdatedBy());
 
         service.updateWorkflowRequestStatus(request, request.getUpdatedBy());
     }
@@ -75,4 +79,15 @@ public class WorkflowRequestTriggerService {
         service.updateWorkflowRequestStatus(request, request.getUpdatedBy());
     }
 
+    public void review(final WorkflowRequest request, final SessionUserId sessionUserId) {
+        final var isReviewFinished = trigger.beforeReview(request.getId(), sessionUserId);
+
+        if (isReviewFinished) {
+            request.setReviewStatus(ReviewStatusType.CONFIRMED);
+        } else {
+            request.setReviewStatus(ReviewStatusType.IN_PROGRESS);
+        }
+
+        service.updateWorkflowRequestStatus(request, sessionUserId.getId());
+    }
 }

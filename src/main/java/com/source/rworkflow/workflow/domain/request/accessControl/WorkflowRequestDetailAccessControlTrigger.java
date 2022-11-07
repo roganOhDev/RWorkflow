@@ -15,4 +15,8 @@ public class WorkflowRequestDetailAccessControlTrigger {
     public void afterCreate(final Long accessControlId, final List<AccessControlConnectionDto.Request> createRequests){
         accessControlConnectionCompositeService.createCollection(accessControlId, createRequests);
     }
+
+    public void beforeGrant(final Long accessControlId) {
+        accessControlConnectionCompositeService.grant(accessControlId);
+    }
 }
