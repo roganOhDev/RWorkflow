@@ -33,6 +33,7 @@ public class WorkflowRequestTriggerService {
             if (workflowRequest.getType() == WorkflowRequestType.ACCESS_CONTROL) {
                 workflowRequest.setExecutionStatus(ExecutionStatusType.SUCCEEDED);
                 workflowRequest.setReviewStatus(ReviewStatusType.PENDING);
+                trigger.updateUserAccessControl();
             }
 
         } else {

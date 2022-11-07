@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.domain.request;
 
 import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.misc.user.UserAccessControlService;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApprovalCompositeService;
 import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecutionAssigneeCompositeService;
 import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControl;
@@ -24,6 +25,7 @@ public class WorkflowRequestTrigger {
     private final WorkflowRequestDetailSqlExecutionCompositeService sqlExecutionCompositeService;
     private final WorkflowRequestDetailDataExportCompositeService dataExportCompositeService;
     private final WorkflowRequestDetailAccessControlCompositeService accessControlCompositeService;
+    private final UserAccessControlService userAccessControlService;
 
     public void afterCreate(final Long requestId, final WorkflowRequestDto.Create.Request request) {
         switch (request.getType()){
@@ -45,6 +47,10 @@ public class WorkflowRequestTrigger {
 
     public void beforeExecute(final Long requestId,final SessionUserId sessionUserId) {
         executionAssigneeCompositeService.execute(requestId, sessionUserId);
+    }
+
+    public void updateUserAccessControl() {
+        userAccessControlService.update();
     }
 
     private List<WorkflowRequestDetailDataExport> createDataExport(final Long requestId, final WorkflowRequestDto.Create.Request.Detail request) {

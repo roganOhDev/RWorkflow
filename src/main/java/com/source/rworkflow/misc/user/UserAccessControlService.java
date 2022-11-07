@@ -7,4 +7,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserAccessControlService {
     private final UserAccessControlRepository repository;
+
+    public void update(){
+
+    };
 }
