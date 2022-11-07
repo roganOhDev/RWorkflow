@@ -35,7 +35,7 @@ public class ExceptionCode {
         final public static String EXECUTION_EXPIRATION_DATE_MUST_BE_AFTER_REQUEST_EXPIRATION_DATE = "Execution Expiration Date Must Be After Request Expiration Date";
         final public static String REQUEST_DETAIL_NULL_EXCEPTION = "Request Doesn't Have Suitable Detail Request";
         final public static String EXPIRATION_DATE_IS_BEFORE_NOW = "Expiration Date Is Before Than Now";
-        final public static String SELF_APPROVE_EXCEPTION = "Cannot Opperate Self Approve";
+        final public static String SELF_APPROVE_EXCEPTION = "Cannot Operate Self Approve";
         final public static String URGENT_VALUE_NOT_MATCH_EXCEPTION = "Urgent Value Must Match With Rule's";
         final public static String TYPE_NOT_MATCH_EXCEPTION = "Type Must Match With Rule's";
         final public static String ASSIGNEE_CAN_NOT_BE_EMPTY = "Assignee Is Empty. Please Fill It";
@@ -44,9 +44,10 @@ public class ExceptionCode {
         final public static String CAN_NOT_FOUND_APPROVAL_ASSIGNEE = "Approval Assignee Not Found";
         final public static String ORDERS_MUST_BE_INCREMENT = "Orders Must Be Increment";
         final public static String APPROVAL_HAVE_TO_FOLLOW_ITS_TURN_EXCEPTION = "Approval Have To Follow Its Turn Exception";
-        final public static String CAN_NOT_APPROVE_BY_URGENT_EXCEPTION = "You Cannot Approve This Request BeCause Urgent. Move To Execute";
         final public static String WORKFLOW_IS_CANCELED = "Workflow Is Canceled";
         final public static String ACCESS_CONTROL_CAN_NOT_BE_URGENT = "Access Control Request Can Not Be Urgent";
         final public static String ASSIGNEE_CAN_NOT_ACTION = "Assignee Cannot Action";
+        final public static String CAN_NOT_ACTION_EXCEPTION = "Can Not Action Which User Requests. Not Status Is : ";
+        final public static String ACCESS_CONTROL_REQUEST_CAN_NOT_HAS_EXECUTION_ASSIGNEES = "Access Control Request Cannot Has Execution Assignees";
     }
 }

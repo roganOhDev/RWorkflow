@@ -6,11 +6,13 @@ import com.source.rworkflow.workflow.dto.AssigneeDto;
 import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.AccessControlRequestCanNotBeUrgent;
-import com.source.rworkflow.workflow.exception.CanNotApproveByUrgentException;
+import com.source.rworkflow.workflow.exception.AccessControlRequestCanNotHasExecutionAssigneesException;
+import com.source.rworkflow.workflow.exception.CanNotActionException;
 import com.source.rworkflow.workflow.exception.ExecutionExpirationDateMustBeAfterRequestExpirationDateException;
 import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
 import com.source.rworkflow.workflow.exception.OrdersMustBeInCrement;
 import com.source.rworkflow.workflow.exception.WorkflowIsCanceledException;
+import com.source.rworkflow.workflow.type.ApprovalStatusType;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
@@ -33,9 +35,8 @@ public class WorkflowRequestCompositeService {
     private final WorkflowRequestService service;
 
     @Transactional
-    public WorkflowRequest create(final WorkflowRequestDto.Create.Request request, final SessionUserId sessionUserId, final WorkflowRuleSuite workflowRuleSuite) {
-        setDefaultExpirationDateAndValidate(request);
-        validateCreate(request, workflowRuleSuite);
+    public WorkflowRequest create(final WorkflowRequestDto.Create.Request request, final SessionUserId sessionUserId) {
+        validateCreate(request);
 
         final var workflowRequest = new WorkflowRequest();
 
@@ -77,7 +78,6 @@ public class WorkflowRequestCompositeService {
         final var workflowRequest = service.find(id);
 
         validateAction(workflowRequest);
-        validateUrgent(workflowRequest.isUrgent());
 
         if (approve) {
             return triggerService.approveOk(workflowRequest, order, sessionUserId);
@@ -87,19 +87,29 @@ public class WorkflowRequestCompositeService {
 
     }
 
-    private void validateAction(final WorkflowRequest workflowRequest){
+    public void execute(final Long workflowRequestId, final SessionUserId sessionUserId) {
+        final var workflowRequest = service.find(workflowRequestId);
+
+        validateAction(workflowRequest);
+
+        triggerService.execute(workflowRequest, sessionUserId);
+    }
+
+    private void validateAction(final WorkflowRequest workflowRequest) {
         validateCancel(workflowRequest);
+        validateApproveAction(workflowRequest);
+    }
+
+    private void validateApproveAction(final WorkflowRequest workflowRequest) {
+        if (workflowRequest.getApprovalStatus().equals(ApprovalStatusType.PENDING)) {
+            return;
+        }
+        throw new CanNotActionException(workflowRequest.getApprovalStatus().name());
     }
 
     private void validateCancel(final WorkflowRequest workflowRequest) {
         if (workflowRequest.isCanceled()) {
             throw new WorkflowIsCanceledException(workflowRequest.getId());
-        }
-    }
-
-    private void validateUrgent(final boolean urgent) {
-        if (urgent) {
-            throw new CanNotApproveByUrgentException();
         }
     }
 
@@ -135,12 +145,20 @@ public class WorkflowRequestCompositeService {
         }
     }
 
-    private void validateCreate(final WorkflowRequestDto.Create.Request request, final WorkflowRuleSuite workflowRuleSuite) {
+    private void validateCreate(final WorkflowRequestDto.Create.Request request) {
+        setDefaultExpirationDateAndValidate(request);
         checkUrgentAccessControl(request);
         checkUrgentApproval(request);
+        checkAccessControlExecutionAssignee(request);
         checkDuplicateAssignee(request.getApprovals(), request.getExecutionAssignees(), request.getReviewAssignees());
-        validateOrder(request.getApprovals(), workflowRuleSuite);
+        validateOrder(request.getApprovals());
         checkDuplicateOrder(request.getApprovals());
+    }
+
+    private void checkAccessControlExecutionAssignee(final WorkflowRequestDto.Create.Request request) {
+        if (request.getType().equals(WorkflowRequestType.ACCESS_CONTROL) && request.getExecutionAssignees().size() > 0) {
+            throw new AccessControlRequestCanNotHasExecutionAssigneesException();
+        }
     }
 
     private void checkUrgentAccessControl(final WorkflowRequestDto.Create.Request request) {
@@ -157,7 +175,7 @@ public class WorkflowRequestCompositeService {
         }
     }
 
-    private void validateOrder(final List<WorkflowApprovalDto.Create.Request> requests, final WorkflowRuleSuite workflowRuleSuite) {
+    private void validateOrder(final List<WorkflowApprovalDto.Create.Request> requests) {
         checkDuplicateOrder(requests);
         validateIncreasment(requests);
     }

@@ -61,6 +61,17 @@ public class WorkflowRequestService {
         return repository.save(request);
     }
 
+    public void execute(final WorkflowRequest request, final SessionUserId sessionUserId) {
+        final var now = LocalDateTime.now();
+
+        request.setUpdatedAt(now);
+        request.setUpdatedBy(sessionUserId.getId());
+
+        request.setExecutionStatus(ExecutionStatusType.IN_PROGRESS);
+
+        repository.save(request);
+    }
+
     public WorkflowRequest approve(final WorkflowRequest request, final SessionUserId sessionUserId) {
         final var now = LocalDateTime.now();
 

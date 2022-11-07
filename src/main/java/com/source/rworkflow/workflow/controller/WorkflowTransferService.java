@@ -71,10 +71,10 @@ public class WorkflowTransferService {
             validateWithRule(workflowRule, workflowRuleSuite, createRequest);
         }
 
-        final var workflowRequest = compositeService.create(createRequest, sessionUserId, workflowRuleSuite);
+        final var workflowRequest = compositeService.create(createRequest, sessionUserId);
 
         final var requestApprovalAssignees = convertApprovalAssigneesToUsers(createRequest.getApprovals());
-        final var approvals = workflowRequestApprovalCompositeService.createCollection(workflowRequest.getId(), createRequest.getApprovals(),requestApprovalAssignees, workflowRuleSuite, sessionUserId);
+        final var approvals = workflowRequestApprovalCompositeService.createCollection(workflowRequest.getId(), createRequest.getApprovals(), requestApprovalAssignees, workflowRuleSuite, workflowRequest.isUrgent(), sessionUserId);
         approvals.forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
 
         final var requestExecutionAssignees = convertRoleToUsers(createRequest.getExecutionAssignees());
@@ -148,10 +148,14 @@ public class WorkflowTransferService {
         return WorkflowRequestDto.Approve.Response.from(updated, approvals, approvalAssignees);
     }
 
+    public void execute(final Long workflowRequestId, final SessionUserId sessionUserId) {
+        compositeService.execute(workflowRequestId, sessionUserId);
+    }
+
     private Map<Long, List<Long>> convertApprovalAssigneesToUsers(final List<WorkflowApprovalDto.Create.Request> approvals) {
         final var response = new HashMap<Long, List<Long>>();
 
-        approvals.forEach(e -> response.put(e.getOrder(),convertRoleToUsers(e.getAssignees())));
+        approvals.forEach(e -> response.put(e.getOrder(), convertRoleToUsers(e.getAssignees())));
 
         return response;
 

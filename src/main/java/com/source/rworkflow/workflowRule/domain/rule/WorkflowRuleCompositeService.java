@@ -4,7 +4,9 @@ import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.common.util.Patch;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
+import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.AccessControlRequestCanNotBeUrgent;
+import com.source.rworkflow.workflow.exception.AccessControlRequestCanNotHasExecutionAssigneesException;
 import com.source.rworkflow.workflow.exception.OrdersMustBeInCrement;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.dto.AssigneeDto;
@@ -78,12 +80,19 @@ public class WorkflowRuleCompositeService {
     }
 
     private void validateCreate(final WorkflowRuleDto.Create.Request request) {
+        checkAccessControlExecutionAssignee(request);
         checkUrgentAccessControl(request);
         checkAssigneeNull(request);
         checkUrgentApproval(request);
         checkDuplicateAssignee(request.getApprovals(), request.getExecutionAssignees(), request.getReviewAssignees());
         checkDuplicateOrder(request.getApprovals());
         validateOrder(request);
+    }
+
+    private void checkAccessControlExecutionAssignee(final WorkflowRuleDto.Create.Request request) {
+        if (request.getType().equals(WorkflowRequestType.ACCESS_CONTROL) && request.getExecutionAssignees().size() > 0) {
+            throw new AccessControlRequestCanNotHasExecutionAssigneesException();
+        }
     }
 
     private void validateOrder(final WorkflowRuleDto.Create.Request request) {

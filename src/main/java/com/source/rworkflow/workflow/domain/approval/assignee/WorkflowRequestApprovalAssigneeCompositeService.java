@@ -4,10 +4,12 @@ import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeNotFoundException;
 import com.source.rworkflow.workflow.exception.AssigneeCanNotAction;
+import com.source.rworkflow.workflow.type.AssigneeStatusType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,11 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
     @Transactional(readOnly = true)
     public List<WorkflowRequestApprovalAssignee> findAll() {
         return service.findAll();
+    }
+
+    @Transactional
+    public WorkflowRequestApprovalAssignee createUrgent(final Long requestId, final Long approvalId) {
+        return createUrgentAssignee(requestId, approvalId);
     }
 
     @Transactional
@@ -58,6 +65,19 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
         assignee.setRequestId(requestId);
 
         return service.create(assignee);
+    }
+
+    private WorkflowRequestApprovalAssignee createUrgentAssignee(final Long requestId, final Long approvalId) {
+        final var assignee = new WorkflowRequestApprovalAssignee();
+
+        assignee.setAssigneeId(1L);
+        assignee.setRequestApprovalId(approvalId);
+        assignee.setRequestId(requestId);
+        assignee.setStatus(AssigneeStatusType.APPROVED);
+        assignee.setActionAt(LocalDateTime.now());
+        assignee.setActionBy(1L);
+
+        return service.createUrgent(assignee);
     }
 
 }

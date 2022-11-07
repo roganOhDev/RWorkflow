@@ -19,6 +19,10 @@ public class WorkflowRequestApprovalAssigneeService {
         return repository.save(assignee);
     }
 
+    public WorkflowRequestApprovalAssignee createUrgent(final WorkflowRequestApprovalAssignee assignee) {
+        return repository.save(assignee);
+    }
+
     public List<WorkflowRequestApprovalAssignee> findAllByApprovalId(final Long approvalId) {
         return repository.findAllByRequestApprovalId(approvalId);
     }

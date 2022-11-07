@@ -18,6 +18,10 @@ public class WorkflowRequestApprovalService {
         return repository.save(approval);
     }
 
+    public WorkflowRequestApproval createUrgent(final WorkflowRequestApproval approval) {
+        return repository.save(approval);
+    }
+
     public List<WorkflowRequestApproval> findAll() {
         return repository.findAll();
     }

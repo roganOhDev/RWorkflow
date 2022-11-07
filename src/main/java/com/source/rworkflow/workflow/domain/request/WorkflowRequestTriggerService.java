@@ -3,6 +3,8 @@ package com.source.rworkflow.workflow.domain.request;
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.type.ApprovalStatusType;
+import com.source.rworkflow.workflow.type.ExecutionStatusType;
+import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,13 @@ public class WorkflowRequestTriggerService {
 
         if (order == approvalCount) {
             workflowRequest.setApprovalStatus(ApprovalStatusType.APPROVED);
+            workflowRequest.setExecutionStatus(ExecutionStatusType.PENDING);
+
+            if (workflowRequest.getType() == WorkflowRequestType.ACCESS_CONTROL) {
+                workflowRequest.setExecutionStatus(ExecutionStatusType.SUCCEEDED);
+            }
+
+
         } else {
             workflowRequest.setApprovalStatus(ApprovalStatusType.IN_PROGRESS);
         }
@@ -38,6 +47,12 @@ public class WorkflowRequestTriggerService {
         workflowRequest.setApprovalStatus(ApprovalStatusType.REJECTED);
 
         return service.approve(workflowRequest, sessionUserId);
+    }
+
+    public void execute(final WorkflowRequest workflowRequest, final SessionUserId sessionUserId) {
+        trigger.beforeExecute(workflowRequest.getId(), sessionUserId);
+
+        service.execute(workflowRequest, sessionUserId);
     }
 
 }

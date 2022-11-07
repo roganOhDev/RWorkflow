@@ -41,6 +41,9 @@ public class WorkflowRequestTrigger {
         return approvalCompositeService.approve(requestId, order, sessionUserId, approve);
     }
 
+    public void beforeExecute(final Long id,final SessionUserId sessionUserId) {
+    }
+
     private List<WorkflowRequestDetailDataExport> createDataExport(final Long requestId, final WorkflowRequestDto.Create.Request.Detail request) {
         return dataExportCompositeService.createCollection(requestId, request.getRequestExpiryAt(), request.getExecutionExpiryAt(), request.getDataExports());
     }

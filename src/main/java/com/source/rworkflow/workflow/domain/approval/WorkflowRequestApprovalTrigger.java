@@ -13,8 +13,11 @@ import java.util.List;
 public class WorkflowRequestApprovalTrigger {
     private final WorkflowRequestApprovalAssigneeCompositeService workflowRequestApprovalAssigneeCompositeService;
 
-    public List<WorkflowRequestApprovalAssignee> afterCreate(final List<Long> ids, final Long requestId, final Long approvalId) {
-        return workflowRequestApprovalAssigneeCompositeService.createCollection(ids, requestId, approvalId);
+    public WorkflowRequestApprovalAssignee afterUrgentCreate(final Long requestId, final Long approvalId){
+        return workflowRequestApprovalAssigneeCompositeService.createUrgent(requestId, approvalId);
+    }
+    public List<WorkflowRequestApprovalAssignee> afterCreate(final List<Long> assigneeIds, final Long requestId, final Long approvalId) {
+        return workflowRequestApprovalAssigneeCompositeService.createCollection(assigneeIds, requestId, approvalId);
     }
 
     public WorkflowRequestApprovalAssignee beforeApprove(final WorkflowRequestApproval approval, final SessionUserId sessionUserId, final boolean approve) {

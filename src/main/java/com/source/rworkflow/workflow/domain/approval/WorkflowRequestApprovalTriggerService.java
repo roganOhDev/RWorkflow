@@ -24,6 +24,15 @@ public class WorkflowRequestApprovalTriggerService {
         return created;
     }
 
+    public WorkflowRequestApproval createUrgent(final Long requestId, final WorkflowRequestApproval approval) {
+
+        final var created = service.createUrgent(approval);
+
+        trigger.afterUrgentCreate(requestId, created.getId());
+
+        return created;
+    }
+
     public WorkflowRequestApproval approveOk(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
         trigger.beforeApprove(approval, sessionUserId, true);
 

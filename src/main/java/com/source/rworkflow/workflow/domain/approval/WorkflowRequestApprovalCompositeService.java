@@ -8,7 +8,9 @@ import com.source.rworkflow.workflow.exception.ApprovalHaveToFollowItsTurnExcept
 import com.source.rworkflow.workflow.exception.ApprovalNotFoundByOrderException;
 import com.source.rworkflow.workflow.exception.AssigneeCanNotBeEmpty;
 import com.source.rworkflow.workflow.exception.SelfApproveException;
+import com.source.rworkflow.workflow.type.ApprovalStatusType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
+import com.source.rworkflow.workflowRule.type.ApproveType;
 import com.source.rworkflow.workflowRule.type.AssigneeType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,12 @@ public class WorkflowRequestApprovalCompositeService {
 
     @Transactional
     public List<WorkflowRequestApproval> createCollection(final Long requestId, final List<WorkflowApprovalDto.Create.Request> createRequests,
-                                                          final Map<Long, List<Long>> assignees, final WorkflowRuleSuite workflowRuleSuite, final SessionUserId sessionUserId) {
+                                                          final Map<Long, List<Long>> assignees, final WorkflowRuleSuite workflowRuleSuite, final boolean urgent,
+                                                          final SessionUserId sessionUserId) {
+        if (urgent) {
+            return List.of(createUrgent(requestId));
+        }
+
         return createRequests.stream()
                 .map(createRequest -> {
                     validateSelfApprove(createRequest.getAssignees(), sessionUserId);
@@ -69,7 +76,7 @@ public class WorkflowRequestApprovalCompositeService {
                 .filter(approval -> approval.getOrder().equals(order - 1))
                 .findFirst();
 
-        if (beforeApproval.isPresent() && !beforeApproval.get().getStatus().isFinished()) {
+        if (beforeApproval.isPresent() && !beforeApproval.get().getStatus().equals(ApprovalStatusType.APPROVED)) {
             throw new ApprovalHaveToFollowItsTurnException();
         }
 
@@ -82,8 +89,14 @@ public class WorkflowRequestApprovalCompositeService {
         return approvals.size();
     }
 
+    private WorkflowRequestApproval createUrgent(final Long requestId) {
+        final var workflowRequestApproval = createNewUrgentWorkflowRequestApproval(requestId);
+
+        return triggerService.createUrgent(requestId, workflowRequestApproval);
+    }
+
     private WorkflowRequestApproval create(final Long requestId, final List<Long> assignees, final WorkflowApprovalDto.Create.Request creatRequest) {
-        final var workflowRequestApproval = getNewWorkflowRequestApproval(requestId, creatRequest);
+        final var workflowRequestApproval = createNewWorkflowRequestApproval(requestId, creatRequest);
 
         validateAssigneeCount((long) assignees.size());
 
@@ -92,7 +105,7 @@ public class WorkflowRequestApprovalCompositeService {
 
     private WorkflowRequestApproval create(final Long requestId, final List<Long> assignees, final WorkflowApprovalDto.Create.Request creatRequest,
                                            final List<Long> assigneesByRule, final SessionUserId sessionUserId) {
-        final var workflowRequestApproval = getNewWorkflowRequestApproval(requestId, creatRequest);
+        final var workflowRequestApproval = createNewWorkflowRequestApproval(requestId, creatRequest);
 
         final var mergedAssignees = mergeAssignees(assignees, assigneesByRule, sessionUserId);
         validateAssigneeCount((long) assignees.size());
@@ -132,7 +145,18 @@ public class WorkflowRequestApprovalCompositeService {
         return mutableAssigneesByRule;
     }
 
-    private WorkflowRequestApproval getNewWorkflowRequestApproval(final Long requestId, final WorkflowApprovalDto.Create.Request creatRequest) {
+    private WorkflowRequestApproval createNewUrgentWorkflowRequestApproval(final Long requestId) {
+        final var workflowRequestApproval = new WorkflowRequestApproval();
+
+        workflowRequestApproval.setRequestId(requestId);
+        workflowRequestApproval.setApproveType(ApproveType.ALL);
+        workflowRequestApproval.setOrder(1L);
+        workflowRequestApproval.setStatus(ApprovalStatusType.APPROVED);
+
+        return workflowRequestApproval;
+    }
+
+    private WorkflowRequestApproval createNewWorkflowRequestApproval(final Long requestId, final WorkflowApprovalDto.Create.Request creatRequest) {
         final var workflowRequestApproval = new WorkflowRequestApproval();
 
         workflowRequestApproval.setRequestId(requestId);
