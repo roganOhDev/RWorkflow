@@ -13,6 +13,7 @@ import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
 import com.source.rworkflow.workflow.exception.OrdersMustBeInCrement;
 import com.source.rworkflow.workflow.exception.WorkflowIsCanceledException;
 import com.source.rworkflow.workflow.type.ActionType;
+import com.source.rworkflow.workflow.type.ExecutionStatusType;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
 import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeNullException;
@@ -86,6 +87,7 @@ public class WorkflowRequestCompositeService {
 
     }
 
+    @Transactional
     public void execute(final Long workflowRequestId, final SessionUserId sessionUserId) {
         final var workflowRequest = service.find(workflowRequestId);
 
@@ -94,12 +96,38 @@ public class WorkflowRequestCompositeService {
         triggerService.execute(workflowRequest, sessionUserId);
     }
 
+    @Transactional
+    public void executeResult(final Long workflowRequestId, final boolean success) {
+        final var workflowRequest = service.find(workflowRequestId);
+
+        validateAction(workflowRequest, ActionType.EXECUTION_END);
+
+        if (success) {
+            triggerService.executeResultSuccess(workflowRequest);
+        } else {
+            triggerService.executeResultFail(workflowRequest);
+        }
+    }
+
     private void validateAction(final WorkflowRequest workflowRequest, final ActionType actionType) {
         validateCancel(workflowRequest);
 
         validateApproveAction(workflowRequest, actionType);
         validateExecutionAction(workflowRequest, actionType);
+        validateExecutionResultAction(workflowRequest, actionType);
         validateReviewAction(workflowRequest, actionType);
+    }
+
+    private  void validateExecutionResultAction(final WorkflowRequest workflowRequest, final ActionType actionType) {
+        if (!actionType.equals(ActionType.EXECUTION_END)) {
+            return;
+        }
+
+        if (workflowRequest.getExecutionStatus().equals(ExecutionStatusType.IN_PROGRESS)) {
+            return;
+        }
+
+        throw new CanNotActionException(workflowRequest.getExecutionStatus().name());
     }
 
     private void validateReviewAction(final WorkflowRequest workflowRequest, ActionType actionType) {

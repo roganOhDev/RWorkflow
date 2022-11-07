@@ -40,7 +40,7 @@ public class WorkflowRequestTriggerService {
             workflowRequest.setApprovalStatus(ApprovalStatusType.IN_PROGRESS);
         }
 
-        return service.approve(workflowRequest, sessionUserId);
+        return service.updateWorkflowRequestStatus(workflowRequest, sessionUserId.getId());
     }
 
     public WorkflowRequest approveReject(final WorkflowRequest workflowRequest, final Long order, final SessionUserId sessionUserId) {
@@ -48,13 +48,31 @@ public class WorkflowRequestTriggerService {
 
         workflowRequest.setApprovalStatus(ApprovalStatusType.REJECTED);
 
-        return service.approve(workflowRequest, sessionUserId);
+        return service.updateWorkflowRequestStatus(workflowRequest, sessionUserId.getId());
     }
 
     public void execute(final WorkflowRequest workflowRequest, final SessionUserId sessionUserId) {
         trigger.beforeExecute(workflowRequest.getId(), sessionUserId);
 
-        service.execute(workflowRequest, sessionUserId);
+        service.updateWorkflowRequestStatus(workflowRequest, sessionUserId.getId());
+    }
+
+
+    public void executeResultSuccess(final WorkflowRequest request) {
+        trigger.beforeExecuteResult(request.getId(), request.getUpdatedBy(), true);
+
+        request.setExecutionStatus(ExecutionStatusType.SUCCEEDED);
+        request.setReviewStatus(ReviewStatusType.PENDING);
+
+        service.updateWorkflowRequestStatus(request, request.getUpdatedBy());
+    }
+
+    public void executeResultFail(final WorkflowRequest request) {
+        trigger.beforeExecuteResult(request.getId(), request.getUpdatedBy(), false);
+
+        request.setExecutionStatus(ExecutionStatusType.FAILED);
+
+        service.updateWorkflowRequestStatus(request, request.getUpdatedBy());
     }
 
 }

@@ -49,6 +49,10 @@ public class WorkflowRequestTrigger {
         executionAssigneeCompositeService.execute(requestId, sessionUserId);
     }
 
+    public void beforeExecuteResult(final Long requestId, final Long executeUserId, final boolean success) {
+        executionAssigneeCompositeService.executeResult(requestId, executeUserId, success);
+    }
+
     public void updateUserAccessControl() {
         userAccessControlService.update();
     }

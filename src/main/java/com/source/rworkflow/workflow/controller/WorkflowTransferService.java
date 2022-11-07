@@ -152,6 +152,10 @@ public class WorkflowTransferService {
         compositeService.execute(workflowRequestId, sessionUserId);
     }
 
+    public void executeResult(final Long workflowRequestId, final boolean success) {
+        compositeService.executeResult(workflowRequestId, success);
+    }
+
     private Map<Long, List<Long>> convertApprovalAssigneesToUsers(final List<WorkflowApprovalDto.Create.Request> approvals) {
         final var response = new HashMap<Long, List<Long>>();
 

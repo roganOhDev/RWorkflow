@@ -50,12 +50,12 @@ public class WorkflowRequestExecutionAssigneeCompositeService {
 
         final var now = LocalDateTime.now();
 
-        executionAssignees.forEach(assignee ->{
+        executionAssignees.forEach(assignee -> {
             assignee.setActionBy(sessionUserId.getId());
             assignee.setActionAt(now);
         });
 
-        final var executionAssigneesMap = convertToAssigneesMapByIsRequested(executionAssignees, sessionUserId);
+        final var executionAssigneesMap = convertToAssigneesMapByIsRequested(executionAssignees, sessionUserId.getId());
         final var requestAssignee = executionAssigneesMap.get(REQUEST_EXECUTION_ASSIGNEE).get(0);
         final var otherAssignees = executionAssigneesMap.get(OTHER_EXECUTION_ASSIGNEES);
 
@@ -66,6 +66,37 @@ public class WorkflowRequestExecutionAssigneeCompositeService {
         otherAssignees.forEach(otherAssignee -> {
             otherAssignee.setStatus(AssigneeStatusType.AUTO_CONFIRMED);
         });
+    }
+
+    @Transactional
+    public void executeResult(final Long requestId, final Long executeUserId, boolean success) {
+        final var executionAssignees = service.findByRequestId(requestId);
+
+        final var now = LocalDateTime.now();
+
+        executionAssignees.forEach(assignee -> {
+            assignee.setActionBy(executeUserId);
+            assignee.setActionAt(now);
+        });
+
+        final var executionAssigneesMap = convertToAssigneesMapByIsRequested(executionAssignees, executeUserId);
+        final var requestAssignee = executionAssigneesMap.get(REQUEST_EXECUTION_ASSIGNEE).get(0);
+        final var otherAssignees = executionAssigneesMap.get(OTHER_EXECUTION_ASSIGNEES);
+
+        if (!requestAssignee.getStatus().equals(AssigneeStatusType.IN_PROGRESS)) {
+            throw new AssigneeCanNotAction("ExecutionResult", requestAssignee.getStatus());
+        }
+
+        if (success) {
+            requestAssignee.setStatus(AssigneeStatusType.SUCCEEDED);
+            otherAssignees.forEach(otherAssignee -> {
+                otherAssignee.setStatus(AssigneeStatusType.AUTO_CONFIRMED);
+            });
+
+        } else {
+            requestAssignee.setStatus(AssigneeStatusType.FAILED);
+        }
+
     }
 
     @Transactional
@@ -94,18 +125,18 @@ public class WorkflowRequestExecutionAssigneeCompositeService {
         return service.findByRequestId(requestId);
     }
 
-    private HashMap<String, List<WorkflowRequestExecutionAssignee>> convertToAssigneesMapByIsRequested(List<WorkflowRequestExecutionAssignee> executionAssignees, SessionUserId sessionUserId){
+    private HashMap<String, List<WorkflowRequestExecutionAssignee>> convertToAssigneesMapByIsRequested(List<WorkflowRequestExecutionAssignee> executionAssignees, final Long sessionUserId) {
         Map<Boolean, List<WorkflowRequestExecutionAssignee>> executionAssigneesMap = executionAssignees.stream()
-                .collect(Collectors.groupingBy(assignee -> assignee.getAssigneeId().equals(sessionUserId.getId()), Collectors.toUnmodifiableList()));
+                .collect(Collectors.groupingBy(assignee -> assignee.getAssigneeId().equals(sessionUserId), Collectors.toUnmodifiableList()));
 
         if (executionAssigneesMap.get(true).isEmpty()) {
-            throw new ExecutionAssigneeNotFoundException(sessionUserId.getId());
+            throw new ExecutionAssigneeNotFoundException(sessionUserId);
         }
 
         final var requestAssignee = executionAssigneesMap.get(true).get(0);
 
         List<WorkflowRequestExecutionAssignee> otherAssignees = executionAssigneesMap.get(false);
-        if (otherAssignees == null){
+        if (otherAssignees == null) {
             otherAssignees = List.of();
         }
 
