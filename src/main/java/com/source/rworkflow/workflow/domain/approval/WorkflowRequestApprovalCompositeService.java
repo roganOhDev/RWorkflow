@@ -98,17 +98,19 @@ public class WorkflowRequestApprovalCompositeService {
     private WorkflowRequestApproval create(final Long requestId, final List<Long> assignees, final WorkflowApprovalDto.Create.Request creatRequest) {
         final var workflowRequestApproval = createNewWorkflowRequestApproval(requestId, creatRequest);
 
-        validateAssigneeCount((long) assignees.size());
+        final var assigneeList = ListUtil.removeDuplicateElement(assignees);
+        validateAssigneeCount((long) assigneeList.size());
 
-        return triggerService.create(assignees, requestId, workflowRequestApproval);
+        return triggerService.create(assigneeList, requestId, workflowRequestApproval);
     }
 
     private WorkflowRequestApproval create(final Long requestId, final List<Long> assignees, final WorkflowApprovalDto.Create.Request creatRequest,
                                            final List<Long> assigneesByRule, final SessionUserId sessionUserId) {
         final var workflowRequestApproval = createNewWorkflowRequestApproval(requestId, creatRequest);
 
-        final var mergedAssignees = mergeAssignees(assignees, assigneesByRule, sessionUserId);
-        validateAssigneeCount((long) assignees.size());
+        final var assigneeList = ListUtil.removeDuplicateElement(assignees);
+        final var mergedAssignees = mergeAssignees(assigneeList, assigneesByRule, sessionUserId);
+        validateAssigneeCount((long) mergedAssignees.size());
 
         return triggerService.create(mergedAssignees, requestId, workflowRequestApproval);
     }

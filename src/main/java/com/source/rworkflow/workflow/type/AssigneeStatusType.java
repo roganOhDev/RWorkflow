@@ -3,7 +3,7 @@ package com.source.rworkflow.workflow.type;
 import java.util.List;
 
 public enum AssigneeStatusType {
-    None(false, true, true),
+    NONE(false, true, true),
     PENDING(true, true, true),
     APPROVED(true, true, true),
     REJECTED(true, true, true),
@@ -32,9 +32,4 @@ public enum AssigneeStatusType {
         return type.review;
     }
 
-    public boolean canChangeStatus() {
-        final var canChangeStatusTypes = List.of(AssigneeStatusType.None, AssigneeStatusType.PENDING);
-
-        return canChangeStatusTypes.contains(this);
-    }
 }

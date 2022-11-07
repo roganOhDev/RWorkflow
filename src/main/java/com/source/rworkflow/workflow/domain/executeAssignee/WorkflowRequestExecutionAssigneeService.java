@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.domain.executeAssignee;
 
 import com.source.rworkflow.workflow.type.AssigneeStatusType;
+import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +13,13 @@ public class WorkflowRequestExecutionAssigneeService {
     private final WorkflowRequestExecutionAssigneeRepository repository;
 
     public WorkflowRequestExecutionAssignee create(final WorkflowRequestExecutionAssignee assignee) {
-        assignee.setStatus(AssigneeStatusType.None);
+        assignee.setStatus(AssigneeStatusType.NONE);
+
+        return repository.save(assignee);
+    }
+
+    public WorkflowRequestExecutionAssignee createUrgent(final WorkflowRequestExecutionAssignee assignee) {
+        assignee.setStatus(AssigneeStatusType.PENDING);
 
         return repository.save(assignee);
     }
@@ -25,4 +32,7 @@ public class WorkflowRequestExecutionAssigneeService {
         return repository.findByRequestId(requestId);
     }
 
+    public void updateStatus(final WorkflowRequestExecutionAssignee assignee) {
+        repository.save(assignee);
+    }
 }

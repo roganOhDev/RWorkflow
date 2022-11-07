@@ -2,6 +2,7 @@ package com.source.rworkflow.workflow.domain.request;
 
 import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApprovalCompositeService;
+import com.source.rworkflow.workflow.domain.executeAssignee.WorkflowRequestExecutionAssigneeCompositeService;
 import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControl;
 import com.source.rworkflow.workflow.domain.request.accessControl.WorkflowRequestDetailAccessControlCompositeService;
 import com.source.rworkflow.workflow.domain.request.dataExport.WorkflowRequestDetailDataExport;
@@ -19,6 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WorkflowRequestTrigger {
     private final WorkflowRequestApprovalCompositeService approvalCompositeService;
+    private final WorkflowRequestExecutionAssigneeCompositeService executionAssigneeCompositeService;
     private final WorkflowRequestDetailSqlExecutionCompositeService sqlExecutionCompositeService;
     private final WorkflowRequestDetailDataExportCompositeService dataExportCompositeService;
     private final WorkflowRequestDetailAccessControlCompositeService accessControlCompositeService;
@@ -41,7 +43,8 @@ public class WorkflowRequestTrigger {
         return approvalCompositeService.approve(requestId, order, sessionUserId, approve);
     }
 
-    public void beforeExecute(final Long id,final SessionUserId sessionUserId) {
+    public void beforeExecute(final Long requestId,final SessionUserId sessionUserId) {
+        executionAssigneeCompositeService.execute(requestId, sessionUserId);
     }
 
     private List<WorkflowRequestDetailDataExport> createDataExport(final Long requestId, final WorkflowRequestDto.Create.Request.Detail request) {

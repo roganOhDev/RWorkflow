@@ -3,7 +3,7 @@ package com.source.rworkflow.workflow.type;
 import lombok.Getter;
 
 public enum ApprovalStatusType {
-    PENDING(false),
+    PENDING(true),
 
     IN_PROGRESS(true),
 

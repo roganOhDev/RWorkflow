@@ -12,7 +12,7 @@ public class WorkflowRequestReviewAssigneeService {
     private final WorkflowRequestReviewAssigneeRepository repository;
 
     public WorkflowRequestReviewAssignee create(final WorkflowRequestReviewAssignee assignee) {
-        assignee.setStatus(AssigneeStatusType.None);
+        assignee.setStatus(AssigneeStatusType.NONE);
 
         return repository.save(assignee);
     }

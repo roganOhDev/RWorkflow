@@ -53,9 +53,11 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
     }
 
     private void validateStatus(final WorkflowRequestApprovalAssignee assignee){
-        if (!assignee.getStatus().canChangeStatus()) {
-            throw new AssigneeCanNotAction("approve", assignee.getStatus());
+        if (assignee.getStatus().equals(AssigneeStatusType.NONE) || assignee.getStatus().equals(AssigneeStatusType.PENDING)) {
+            return;
         }
+
+        throw new AssigneeCanNotAction("approve", assignee.getStatus());
     }
     private WorkflowRequestApprovalAssignee create(final Long id, final Long requestId, final Long approvalId) {
         final var assignee = new WorkflowRequestApprovalAssignee();

@@ -78,9 +78,9 @@ public class WorkflowTransferService {
         approvals.forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
 
         final var requestExecutionAssignees = convertRoleToUsers(createRequest.getExecutionAssignees());
-        final var requestReviewAssignees = convertRoleToUsers(createRequest.getReviewAssignees());
+        final var executionAssignees = changeToAssigneeDtos(workflowRequestExecutionAssigneeCompositeService.createCollection(workflowRequest, requestExecutionAssignees, workflowRuleSuite));
 
-        final var executionAssignees = changeToAssigneeDtos(workflowRequestExecutionAssigneeCompositeService.createCollection(workflowRequest.getId(), requestExecutionAssignees, workflowRuleSuite));
+        final var requestReviewAssignees = convertRoleToUsers(createRequest.getReviewAssignees());
         final var reviewAssignees = changeToAssigneeDtos(workflowRequestReviewAssigneeCompositeService.createCollection(workflowRequest.getId(), requestReviewAssignees, workflowRuleSuite));
 
 

@@ -12,9 +12,8 @@ import com.source.rworkflow.workflow.exception.ExecutionExpirationDateMustBeAfte
 import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
 import com.source.rworkflow.workflow.exception.OrdersMustBeInCrement;
 import com.source.rworkflow.workflow.exception.WorkflowIsCanceledException;
-import com.source.rworkflow.workflow.type.ApprovalStatusType;
+import com.source.rworkflow.workflow.type.ActionType;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
-import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
 import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeNullException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssigneeException;
@@ -68,7 +67,7 @@ public class WorkflowRequestCompositeService {
     public WorkflowRequest cancel(final Long id, final SessionUserId sessionUserId) {
         final var workflowRequest = service.find(id);
 
-        validateAction(workflowRequest);
+        validateAction(workflowRequest, ActionType.CANCEL);
 
         return service.cancel(workflowRequest, sessionUserId);
     }
@@ -77,7 +76,7 @@ public class WorkflowRequestCompositeService {
     public WorkflowRequest approve(final Long id, final Long order, final SessionUserId sessionUserId, final boolean approve) {
         final var workflowRequest = service.find(id);
 
-        validateAction(workflowRequest);
+        validateAction(workflowRequest, ActionType.APPROVE);
 
         if (approve) {
             return triggerService.approveOk(workflowRequest, order, sessionUserId);
@@ -90,20 +89,52 @@ public class WorkflowRequestCompositeService {
     public void execute(final Long workflowRequestId, final SessionUserId sessionUserId) {
         final var workflowRequest = service.find(workflowRequestId);
 
-        validateAction(workflowRequest);
+        validateAction(workflowRequest, ActionType.EXECUTION);
 
         triggerService.execute(workflowRequest, sessionUserId);
     }
 
-    private void validateAction(final WorkflowRequest workflowRequest) {
+    private void validateAction(final WorkflowRequest workflowRequest, final ActionType actionType) {
         validateCancel(workflowRequest);
-        validateApproveAction(workflowRequest);
+
+        validateApproveAction(workflowRequest, actionType);
+        validateExecutionAction(workflowRequest, actionType);
+        validateReviewAction(workflowRequest, actionType);
     }
 
-    private void validateApproveAction(final WorkflowRequest workflowRequest) {
-        if (workflowRequest.getApprovalStatus().equals(ApprovalStatusType.PENDING)) {
+    private void validateReviewAction(final WorkflowRequest workflowRequest, ActionType actionType) {
+        if(!actionType.equals(ActionType.APPROVE)) {
             return;
         }
+
+        if (workflowRequest.getReviewStatus().isProceeding()) {
+            return;
+        }
+
+        throw new CanNotActionException(workflowRequest.getExecutionStatus().name());
+    }
+
+    private void validateExecutionAction(final WorkflowRequest workflowRequest, ActionType actionType) {
+        if(!actionType.equals(ActionType.EXECUTION)) {
+            return;
+        }
+
+        if (workflowRequest.getExecutionStatus().isProceeding()) {
+            return;
+        }
+
+        throw new CanNotActionException(workflowRequest.getExecutionStatus().name());
+    }
+
+    private void validateApproveAction(final WorkflowRequest workflowRequest, ActionType actionType) {
+        if (!actionType.equals(ActionType.APPROVE)) {
+            return;
+        }
+
+        if (workflowRequest.getApprovalStatus().isProceeding()) {
+            return;
+        }
+
         throw new CanNotActionException(workflowRequest.getApprovalStatus().name());
     }
 
