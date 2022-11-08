@@ -1,6 +1,5 @@
 package com.source.rworkflow.workflow.domain.request.sqlExecution;
 
-import com.source.rworkflow.workflow.dto.SqlExecutionDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.RequestDetailNullException;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
@@ -9,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +36,20 @@ public class WorkflowRequestDetailSqlExecutionCompositeService {
     }
 
     @Transactional(readOnly = true)
-    public List<WorkflowRequestDetailSqlExecution> findAllByRequestId(final Long requestId) {
-        return service.findAllByRequestId(requestId);
+    public WorkflowRequestDetailSqlExecution findByRequestId(final Long requestId) {
+        return service.findByRequestId(requestId);
     }
-}
+
+    @Transactional
+    public void executionExpire(final Long requestId) {
+        final var sqlExecution = service.findByRequestId(requestId);
+
+        if (sqlExecution == null) {
+            return;
+        }
+
+        sqlExecution.set
+        sqlExecution.setExecutionExpiryAt(); setExpirationDate(LocalDateTime.now());
+
+        service.expire(sqlExecution);
+    }

@@ -1,16 +1,11 @@
 package com.source.rworkflow.workflow.domain.request.dataExport;
 
-import com.source.rworkflow.workflow.dto.DataExportDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.RequestDetailNullException;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +34,8 @@ public class WorkflowRequestDetailDataExportCompositeService {
     }
 
     @Transactional(readOnly = true)
-    public List<WorkflowRequestDetailDataExport> findAllByRequestId(final Long requestId) {
-        return service.findAllByRequestId(requestId);
+    public WorkflowRequestDetailDataExport findByRequestId(final Long requestId) {
+        return service.findByRequestId(requestId);
     }
 
 

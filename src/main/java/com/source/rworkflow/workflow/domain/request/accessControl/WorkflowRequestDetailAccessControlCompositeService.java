@@ -4,6 +4,7 @@ import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflow.dto.AccessControlConnectionDto;
 import com.source.rworkflow.workflow.dto.AccessControlDto;
 import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
+import com.source.rworkflow.workflow.exception.AccessControlRequestNotFoundException;
 import com.source.rworkflow.workflow.exception.CanNotDuplicateRequestAccessControlConnectionException;
 import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
 import com.source.rworkflow.workflow.exception.RequestDetailNullException;
@@ -31,8 +32,7 @@ public class WorkflowRequestDetailAccessControlCompositeService {
         final var accessControl = new WorkflowRequestDetailAccessControl();
 
         accessControl.setRequestId(requestId);
-        accessControl.setRequestExpiryAt(detailRequest.getRequestExpiryAt());
-        accessControl.setExpirationDate(getExpirationDate(createRequest.getExpirationDate()));
+        accessControl.setExpirationDate(detailRequest.getRequestExpiryAt());
 
         return triggerService.create(accessControl, createRequest.getConnections());
     }
@@ -40,6 +40,9 @@ public class WorkflowRequestDetailAccessControlCompositeService {
     @Transactional
     public void grant(final Long requestId) {
         final var accessControl = service.findByRequestId(requestId);
+        if (accessControl == null) {
+            throw new AccessControlRequestNotFoundException(requestId);
+        }
 
         triggerService.grant(accessControl);
     }

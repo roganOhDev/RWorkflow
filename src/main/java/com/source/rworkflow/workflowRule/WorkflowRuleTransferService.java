@@ -79,12 +79,14 @@ public class WorkflowRuleTransferService {
 
     @Transactional
     public WorkflowRuleDto.Response update(final WorkflowRuleDto.Update.Request request, final SessionUserId sessionUserId) {
+        final var workflowRequests = workflowRequestCompositeService.findByRuleId(request.getId());
+
         final var ruleSuite = new WorkflowRuleSuite();
 
         final var ruleId = request.getId();
         final var workflowRule = service.find(ruleId);
 
-        final var updated = compositeService.update(workflowRule, request, sessionUserId);
+        final var updated = compositeService.update(workflowRule, request, workflowRequests, sessionUserId);
 
         if (request.getApprovals() != null) {
             request.getApprovals().forEach(approval -> {

@@ -4,7 +4,6 @@ import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.common.util.Patch;
 import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
-import com.source.rworkflow.workflow.dto.WorkflowRequestDto;
 import com.source.rworkflow.workflow.exception.AccessControlRequestCanNotBeUrgent;
 import com.source.rworkflow.workflow.exception.AccessControlRequestCanNotHasExecutionAssigneesException;
 import com.source.rworkflow.workflow.exception.OrdersMustBeInCrement;
@@ -18,6 +17,7 @@ import com.source.rworkflow.workflowRule.exception.AssigneeCanNotBeNullException
 import com.source.rworkflow.workflowRule.exception.CanNotDeleteWorkflowRuleException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateAssigneeException;
 import com.source.rworkflow.workflowRule.exception.CanNotDuplicateOrderException;
+import com.source.rworkflow.workflowRule.exception.CanNotUpdateWorkflowRuleException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,8 +59,8 @@ public class WorkflowRuleCompositeService {
     }
 
     @Transactional
-    public WorkflowRule update(final WorkflowRule workflowRule, final WorkflowRuleDto.Update.Request request, final SessionUserId sessionUserId) {
-        validateUpdate(request);
+    public WorkflowRule update(final WorkflowRule workflowRule, final WorkflowRuleDto.Update.Request request,final List<WorkflowRequest> workflowRequests, final SessionUserId sessionUserId) {
+        validateUpdate(request, workflowRequests);
 
         final var entityMapperDto = WorkflowRuleDto.Update.EntityMapperDto.from(request);
         final var updated = Patch.entityByRequest(workflowRule, WorkflowRule.class, entityMapperDto);
@@ -114,11 +114,19 @@ public class WorkflowRuleCompositeService {
         }
     }
 
-    private void validateUpdate(final WorkflowRuleDto.Update.Request request) {
+    private void validateUpdate(final WorkflowRuleDto.Update.Request request,final List<WorkflowRequest> workflowRequests) {
         checkDuplicateAssignee(request.getApprovals(), request.getExecutionAssignees(), request.getReviewAssignees());
+        checkIfUsedByWorkflowRequests(workflowRequests);
+
 
         if (request.getApprovals() != null) {
             checkDuplicateOrder(request.getApprovals());
+        }
+    }
+
+    private void checkIfUsedByWorkflowRequests(final List<WorkflowRequest> usingWorkflowRequests){
+        if (usingWorkflowRequests.size() > 0) {
+            throw new CanNotUpdateWorkflowRuleException("Rule Is Used In " + usingWorkflowRequests.size() + " Workflows");
         }
     }
 

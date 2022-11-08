@@ -7,5 +7,5 @@ import java.util.List;
 
 @Repository
 public interface WorkflowRequestDetailDataExportRepository extends JpaRepository<WorkflowRequestDetailDataExport, Long> {
-    List<WorkflowRequestDetailDataExport> findAllByRequestId(Long requestId);
+    WorkflowRequestDetailDataExport findByRequestId(Long requestId);
 }

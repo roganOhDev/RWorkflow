@@ -3,8 +3,6 @@ package com.source.rworkflow.workflow.domain.request.dataExport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class WorkflowRequestDetailDataExportService {
@@ -14,7 +12,7 @@ public class WorkflowRequestDetailDataExportService {
         return repository.save(request);
     }
 
-    public List<WorkflowRequestDetailDataExport> findAllByRequestId(final Long requestId) {
-        return repository.findAllByRequestId(requestId);
+    public WorkflowRequestDetailDataExport findByRequestId(final Long requestId) {
+        return repository.findByRequestId(requestId);
     }
 }

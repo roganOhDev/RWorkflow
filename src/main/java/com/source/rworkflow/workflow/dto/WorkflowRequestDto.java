@@ -131,33 +131,29 @@ public class WorkflowRequestDto {
             @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DateFormat.FORMAT, timezone = "Asia/Seoul")
             private LocalDateTime requestExpiryAt;
             private List<AccessControlConnectionDto.Response> accessControl;
-            private List<SqlExecutionDto.Response> sqlExecutions;
-            private List<DataExportDto.Response> dataExports;
+            private SqlExecutionDto.Response sqlExecution;
+            private DataExportDto.Response dataExports;
 
             public Detail(WorkflowRequest request, WorkflowRequestDetailAccessControl accessControl,
-                          List<WorkflowRequestDetailAccessControlConnection> accessControlConnections, List<WorkflowRequestDetailSqlExecution> sqlExecutions,
-                          List<WorkflowRequestDetailDataExport> dataExecutions) {
+                          List<WorkflowRequestDetailAccessControlConnection> accessControlConnections, WorkflowRequestDetailSqlExecution sqlExecution,
+                          WorkflowRequestDetailDataExport dataExport) {
 
                 final var type = request.getType();
 
                 switch (type) {
                     case ACCESS_CONTROL:
-                        setExpiryAt(this, null, accessControl.getRequestExpiryAt());
+                        setExpiryAt(this, null, accessControl.getExpirationDate());
                         this.accessControl = accessControlConnections.stream()
                                 .map(connection -> AccessControlConnectionDto.Response.from(connection, accessControl.getExpirationDate()))
                                 .collect(Collectors.toUnmodifiableList());
                         break;
                     case SQL_EXECUTION:
-                        setExpiryAt(this, sqlExecutions.get(0).getExecutionExpiryAt(), sqlExecutions.get(0).getRequestExpiryAt());
-                        this.sqlExecutions = sqlExecutions.stream()
-                                .map(SqlExecutionDto.Response::from)
-                                .collect(Collectors.toUnmodifiableList());
+                        setExpiryAt(this, sqlExecution.getExecutionExpiryAt(), sqlExecution.getRequestExpiryAt());
+                        this.sqlExecution = SqlExecutionDto.Response.from(sqlExecution);
                         break;
                     case DATA_EXPORT:
-                        setExpiryAt(this, dataExecutions.get(0).getExecutionExpiryAt(), dataExecutions.get(0).getRequestExpiryAt());
-                        this.dataExports = dataExecutions.stream()
-                                .map(DataExportDto.Response::from)
-                                .collect(Collectors.toUnmodifiableList());
+                        setExpiryAt(this, dataExport.getExecutionExpiryAt(), dataExport.getRequestExpiryAt());
+                        this.dataExports = DataExportDto.Response.from(dataExport);
                         break;
                 }
             }
@@ -171,12 +167,12 @@ public class WorkflowRequestDto {
         public DetailResponse(final WorkflowRequest workflowRequest, final List<WorkflowRequestApproval> approvals,
                               final Map<Long, ? extends List<AssigneeDto.Response>> approvalAssignees, final List<AssigneeDto.Response> executionAssignees,
                               final List<AssigneeDto.Response> reviewAssignees, final WorkflowRequestDetailAccessControl detailAccessControl,
-                              final List<WorkflowRequestDetailAccessControlConnection> detailAccessControlConnections, final List<WorkflowRequestDetailSqlExecution> detailSqlExecutions,
-                              final List<WorkflowRequestDetailDataExport> detailDataExecutions) {
+                              final List<WorkflowRequestDetailAccessControlConnection> detailAccessControlConnections, final WorkflowRequestDetailSqlExecution detailSqlExecution,
+                              final WorkflowRequestDetailDataExport detailDataExecution) {
 
             super(workflowRequest, approvals, approvalAssignees, executionAssignees, reviewAssignees);
 
-            this.detail = new Detail(workflowRequest, detailAccessControl, detailAccessControlConnections, detailSqlExecutions, detailDataExecutions);
+            this.detail = new Detail(workflowRequest, detailAccessControl, detailAccessControlConnections, detailSqlExecution, detailDataExecution);
         }
     }
 

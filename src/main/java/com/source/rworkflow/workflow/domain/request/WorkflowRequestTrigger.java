@@ -30,7 +30,7 @@ public class WorkflowRequestTrigger {
     private final UserAccessControlService userAccessControlService;
 
     public void afterCreate(final Long requestId, final WorkflowRequestDto.Create.Request request) {
-        switch (request.getType()){
+        switch (request.getType()) {
             case ACCESS_CONTROL:
                 createAccessControl(requestId, request.getDetail());
                 break;
@@ -47,7 +47,7 @@ public class WorkflowRequestTrigger {
         return approvalCompositeService.approve(requestId, order, sessionUserId, approve);
     }
 
-    public void beforeExecute(final Long requestId,final SessionUserId sessionUserId) {
+    public void beforeExecute(final Long requestId, final SessionUserId sessionUserId) {
         executionAssigneeCompositeService.execute(requestId, sessionUserId);
     }
 
@@ -55,7 +55,7 @@ public class WorkflowRequestTrigger {
         executionAssigneeCompositeService.executeResult(requestId, executeUserId, success);
     }
 
-    public void grantAccessControl(final Long requestId){
+    public void grantAccessControl(final Long requestId) {
         accessControlCompositeService.grant(requestId);
         userAccessControlService.update();
     }

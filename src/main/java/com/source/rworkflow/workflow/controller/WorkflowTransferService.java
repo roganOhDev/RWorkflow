@@ -107,11 +107,11 @@ public class WorkflowTransferService {
         final var detailAccessControlConnections = detailAccessControl == null
                 ? null
                 : workflowRequestDetailAccessControlConnectionCompositeService.findAllByDetailAccessControlId(detailAccessControl.getId());
-        final var detailSqlExecutions = workflowRequestDetailSqlExecutionCompositeService.findAllByRequestId(workflowRequest.getId());
-        final var detailDataExecutions = workflowRequestDetailDataExportCompositeService.findAllByRequestId(workflowRequest.getId());
+        final var detailSqlExecution = workflowRequestDetailSqlExecutionCompositeService.findByRequestId(workflowRequest.getId());
+        final var detailDataExecution = workflowRequestDetailDataExportCompositeService.findByRequestId(workflowRequest.getId());
 
         return new WorkflowRequestDto.DetailResponse(workflowRequest, approvals, approvalAssignees, executionAssignees, reviewAssignees,
-                detailAccessControl, detailAccessControlConnections, detailSqlExecutions, detailDataExecutions);
+                detailAccessControl, detailAccessControlConnections, detailSqlExecution, detailDataExecution);
     }
 
     @Transactional(readOnly = true)
@@ -171,6 +171,16 @@ public class WorkflowTransferService {
     @Transactional
     public void executeResult(final Long workflowRequestId, final boolean success) {
         compositeService.executeResult(workflowRequestId, success);
+    }
+
+    @Transactional
+    public void executionExpire(final Long id) {
+        compositeService.executionExpire(id);
+    }
+
+    @Transactional
+    public void requestExpire(final Long id) {
+        compositeService.requestExpire(id);
     }
 
     private void validateDetail(final WorkflowRequestDto.Create.Request.Detail detail) {

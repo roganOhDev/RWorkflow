@@ -27,6 +27,7 @@ public class ExceptionCode {
         final public static String ASSIGNEE_CAN_NOT_BE_NULL = "Assignee Field Cannot Be Null";
         final public static String CANNOT_DUPLICATE_ORDER = "Order Can Not Be Duplicated";
         final public static String CANNOT_DELETE = "Can Not Delete";
+        final public static String CANNOT_UPDATE = "Can Not Update";
     }
 
     public static class WorkflowRequest{
@@ -51,5 +52,6 @@ public class ExceptionCode {
         final public static String ACCESS_CONTROL_REQUEST_CAN_NOT_HAS_EXECUTION_ASSIGNEES = "Access Control Request Cannot Has Execution Assignees";
         final public static String EXECUTION_ASSIGNEE_NOT_FOUND_EXCEPTION = "Execution Assignee Not Found";
         final public static String REVIEW_ASSIGNEE_NOT_FOUND_EXCEPTION = "Review Assignee Not Found";
+        final public static String ACCESS_CONTROL_REQUEST_NOT_FOUND_EXCEPTION = "Access Control Request Not Found";
     }
 }

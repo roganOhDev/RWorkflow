@@ -13,6 +13,7 @@ import com.source.rworkflow.workflow.exception.ExpirationDateIsBeforeNow;
 import com.source.rworkflow.workflow.exception.OrdersMustBeInCrement;
 import com.source.rworkflow.workflow.exception.WorkflowIsCanceledException;
 import com.source.rworkflow.workflow.type.ActionType;
+import com.source.rworkflow.workflow.type.ApprovalStatusType;
 import com.source.rworkflow.workflow.type.ExecutionStatusType;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeCanNotBeCreatedWhenUrgentException;
@@ -110,7 +111,7 @@ public class WorkflowRequestCompositeService {
     }
 
     @Transactional
-    public void review(final Long workflowRequestId, final SessionUserId sessionUserId){
+    public void review(final Long workflowRequestId, final SessionUserId sessionUserId) {
         final var workflowRequest = service.find(workflowRequestId);
 
         validateAction(workflowRequest, ActionType.REVIEW);
@@ -118,7 +119,50 @@ public class WorkflowRequestCompositeService {
         triggerService.review(workflowRequest, sessionUserId);
     }
 
+    @Transactional
+    public void executionExpire(final Long workflowRequestId) {
+        final var workflowRequest = service.find(workflowRequestId);
+
+        if (workflowRequest.isCanceled()) {
+            return;
+        }
+        if (!workflowRequest.getExecutionStatus().isProceeding() && !workflowRequest.getExecutionStatus().equals(ExecutionStatusType.NONE)) {
+            return;
+        }
+        if (workflowRequest.isExpired()) {
+            return;
+        }
+
+        if (workflowRequest.getExecutionStatus().isProceeding()) {
+            workflowRequest.setExecutionStatus(ExecutionStatusType.EXPIRED);
+
+        } else if (workflowRequest.getExecutionStatus().equals(ExecutionStatusType.NONE)) {
+            workflowRequest.setApprovalStatus(ApprovalStatusType.EXPIRED);
+        }
+
+        service.expire(workflowRequest);
+    }
+
+    @Transactional
+    public void requestExpire(final Long workflowRequestId) {
+        final var workflowRequest = service.find(workflowRequestId);
+
+        if (!workflowRequest.isProceeding()) {
+            return;
+        }
+
+        if (workflowRequest.getApprovalStatus().isProceeding()) {
+            workflowRequest.setApprovalStatus(ApprovalStatusType.EXPIRED);
+
+        } else if (workflowRequest.getExecutionStatus().isProceeding()) {
+            workflowRequest.setExecutionStatus(ExecutionStatusType.EXPIRED);
+        }
+
+        service.expire(workflowRequest);
+    }
+
     private void validateAction(final WorkflowRequest workflowRequest, final ActionType actionType) {
+        validateExpire(workflowRequest);
         validateCancel(workflowRequest);
 
         validateApproveAction(workflowRequest, actionType);
@@ -127,7 +171,7 @@ public class WorkflowRequestCompositeService {
         validateReviewAction(workflowRequest, actionType);
     }
 
-    private  void validateExecutionResultAction(final WorkflowRequest workflowRequest, final ActionType actionType) {
+    private void validateExecutionResultAction(final WorkflowRequest workflowRequest, final ActionType actionType) {
         if (!actionType.equals(ActionType.EXECUTION_END)) {
             return;
         }
@@ -140,7 +184,7 @@ public class WorkflowRequestCompositeService {
     }
 
     private void validateReviewAction(final WorkflowRequest workflowRequest, ActionType actionType) {
-        if(!actionType.equals(ActionType.APPROVE)) {
+        if (!actionType.equals(ActionType.APPROVE)) {
             return;
         }
 
@@ -152,7 +196,7 @@ public class WorkflowRequestCompositeService {
     }
 
     private void validateExecutionAction(final WorkflowRequest workflowRequest, ActionType actionType) {
-        if(!actionType.equals(ActionType.EXECUTION)) {
+        if (!actionType.equals(ActionType.EXECUTION)) {
             return;
         }
 
@@ -173,6 +217,12 @@ public class WorkflowRequestCompositeService {
         }
 
         throw new CanNotActionException(workflowRequest.getApprovalStatus().name());
+    }
+
+    private void validateExpire(final WorkflowRequest workflowRequest) {
+        if (workflowRequest.isExpired()) {
+            throw new CanNotActionException("EXPIRED");
+        }
     }
 
     private void validateCancel(final WorkflowRequest workflowRequest) {

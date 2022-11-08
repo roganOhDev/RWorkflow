@@ -74,4 +74,13 @@ public class WorkflowRequestService {
         return repository.findById(id).orElseThrow(() -> new WorkflowRequestNotFoundException(id));
     }
 
+    public void expire(final WorkflowRequest request) {
+
+        request.setExpired(true);
+        request.setUpdatedBy(1L);
+        request.setUpdatedAt(LocalDateTime.now());
+
+        repository.save(request);
+
+    }
 }
