@@ -5,6 +5,7 @@ import com.source.rworkflow.workflow.domain.approval.WorkflowRequestApproval;
 import com.source.rworkflow.workflow.exception.ApprovalAssigneeNotFoundException;
 import com.source.rworkflow.workflow.exception.AssigneeCanNotAction;
 import com.source.rworkflow.workflow.type.AssigneeStatusType;
+import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
     }
 
     @Transactional
-    public WorkflowRequestApprovalAssignee approve(final WorkflowRequestApproval approval, final SessionUserId sessionUserId, final boolean approve) {
+    public boolean approve(final WorkflowRequestApproval approval, final SessionUserId sessionUserId, final boolean approve) {
         final var assignees = service.findAllByApprovalId(approval.getId());
 
         final var fitAssignee = assignees.stream()
@@ -49,7 +50,19 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
                 .filter(assignee -> assignee.getAssigneeId().equals(sessionUserId.getId()))
                 .findFirst().orElseThrow(() -> new ApprovalAssigneeNotFoundException(approval.getRequestId(), approval.getId(), approval.getOrder(), sessionUserId.getId()));
 
-        return service.approve(fitAssignee, sessionUserId, approve);
+        service.approve(fitAssignee, sessionUserId, approve);
+
+        if (approve) {
+            if (approval.getApproveType().equals(ApproveType.ANY)) {
+                return true;
+            } else {
+                return assignees.stream()
+                        .filter(assignee -> assignee.getStatus().equals(AssigneeStatusType.APPROVED))
+                        .count() == assignees.size() - 1;
+            }
+        }
+
+        return false;
     }
 
     private void validateStatus(final WorkflowRequestApprovalAssignee assignee){

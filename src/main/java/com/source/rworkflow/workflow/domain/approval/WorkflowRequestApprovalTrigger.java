@@ -22,7 +22,7 @@ public class WorkflowRequestApprovalTrigger {
         return approvalAssigneeCompositeService.createCollection(assigneeIds, requestId, approvalId);
     }
 
-    public WorkflowRequestApprovalAssignee beforeApprove(final WorkflowRequestApproval approval, final SessionUserId sessionUserId, final boolean approve) {
+    public boolean beforeApprove(final WorkflowRequestApproval approval, final SessionUserId sessionUserId, final boolean approve) {
         return approvalAssigneeCompositeService.approve(approval, sessionUserId, approve);
     }
 

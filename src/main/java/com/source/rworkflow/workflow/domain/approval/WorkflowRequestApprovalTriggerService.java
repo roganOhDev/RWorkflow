@@ -34,14 +34,13 @@ public class WorkflowRequestApprovalTriggerService {
     }
 
     public WorkflowRequestApproval approveOk(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
-        trigger.beforeApprove(approval, sessionUserId, true);
+        final var approvalFinished = trigger.beforeApprove(approval, sessionUserId, true);
 
-        if (approval.getApproveType().equals(ApproveType.ALL)) {
-            approval.setStatus(ApprovalStatusType.IN_PROGRESS);
-        } else {
+        if (approvalFinished) {
             approval.setStatus(ApprovalStatusType.APPROVED);
-
             trigger.afterApproveExecutionPending(approval.getRequestId(), sessionUserId);
+        } else {
+            approval.setStatus(ApprovalStatusType.IN_PROGRESS);
         }
 
         return service.approve(approval);
