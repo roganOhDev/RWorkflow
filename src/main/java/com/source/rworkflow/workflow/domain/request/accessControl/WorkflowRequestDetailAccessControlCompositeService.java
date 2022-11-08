@@ -32,7 +32,7 @@ public class WorkflowRequestDetailAccessControlCompositeService {
         final var accessControl = new WorkflowRequestDetailAccessControl();
 
         accessControl.setRequestId(requestId);
-        accessControl.setExpirationDate(getExpirationDate(detailRequest.getRequestExpiryAt()));
+        accessControl.setExpirationDate(getExpirationDate(createRequest.getExpirationDate()));
 
         return triggerService.create(accessControl, createRequest.getConnections());
     }

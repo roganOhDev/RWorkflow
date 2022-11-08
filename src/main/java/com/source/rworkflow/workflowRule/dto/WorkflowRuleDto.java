@@ -12,6 +12,7 @@ import lombok.Getter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,10 +29,13 @@ public class WorkflowRuleDto {
             @NotNull(message = "need urgent")
             private Boolean urgent;
             @Valid
+            @Size
             private List<WorkflowRuleApprovalDto.Request> approvals;
             @Valid
+            @Size
             private List<AssigneeDto.Request> executionAssignees;
             @Valid
+            @Size
             private List<AssigneeDto.Request> reviewAssignees;
 
             public boolean isUrgent() {

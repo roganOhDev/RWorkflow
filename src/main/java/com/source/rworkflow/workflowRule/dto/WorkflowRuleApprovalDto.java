@@ -6,7 +6,10 @@ import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.Getter;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,12 +17,14 @@ public class WorkflowRuleApprovalDto {
     @Getter
     public static class Request {
         private Long id;
-        @NotNull
+        @NotNull(message = "must have approveType")
         private ApproveType approveType;
-        @NotNull
+        @NotNull(message = "must have order")
+        @Min(1)
+        @Max(3)
         private Long order;
         @Valid
-        @NotNull
+        @NotNull(message = "must have assignees")
         private List<AssigneeDto.Request> assignees;
     }
 
