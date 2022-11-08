@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class WorkflowRequestDetailSqlExecutionCompositeService {
     private final WorkflowRequestDetailSqlExecutionService service;
+    private final WorkflowRequestDetailSqlExecutionTriggerService triggerService;
 
     @Transactional
     public WorkflowRequestDetailSqlExecution create(final Long requestId, final WorkflowRequestDto.Create.Request.Detail detailRequest) {
@@ -32,7 +33,7 @@ public class WorkflowRequestDetailSqlExecutionCompositeService {
         sqlExecution.setContentValue(createRequest.getContentValue());
         sqlExecution.setContentType(createRequest.getContentType());
 
-        return service.create(sqlExecution);
+        return triggerService.create(sqlExecution);
     }
 
     @Transactional(readOnly = true)
@@ -40,16 +41,4 @@ public class WorkflowRequestDetailSqlExecutionCompositeService {
         return service.findByRequestId(requestId);
     }
 
-    @Transactional
-    public void executionExpire(final Long requestId) {
-        final var sqlExecution = service.findByRequestId(requestId);
-
-        if (sqlExecution == null) {
-            return;
-        }
-
-        sqlExecution.set
-        sqlExecution.setExecutionExpiryAt(); setExpirationDate(LocalDateTime.now());
-
-        service.expire(sqlExecution);
-    }
+}

@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class WorkflowRequestDetailDataExportCompositeService {
     private final WorkflowRequestDetailDataExportService service;
+    private final WorkflowRequestDetailDataExportTriggerService triggerService;
 
     @Transactional
     public WorkflowRequestDetailDataExport create(final Long requestId, final WorkflowRequestDto.Create.Request.Detail detailRequest) {
@@ -30,7 +31,7 @@ public class WorkflowRequestDetailDataExportCompositeService {
         dataExport.setContentValue(createRequest.getContentValue());
         dataExport.setContentType(createRequest.getContentType());
 
-        return service.create(dataExport);
+        return triggerService.create(dataExport);
     }
 
     @Transactional(readOnly = true)

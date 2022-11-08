@@ -15,7 +15,7 @@ public class WorkflowRequestDetailAccessControlTriggerService {
     public WorkflowRequestDetailAccessControl create(final WorkflowRequestDetailAccessControl accessControl, final List<AccessControlConnectionDto.Request> createRequests){
         final var created = service.create(accessControl);
 
-        trigger.afterCreate(created.getId(), createRequests);
+        trigger.afterCreate(created, createRequests);
 
         return created;
     }
