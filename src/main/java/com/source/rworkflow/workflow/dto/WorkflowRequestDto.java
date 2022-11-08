@@ -142,7 +142,7 @@ public class WorkflowRequestDto {
 
                 switch (type) {
                     case ACCESS_CONTROL:
-                        setExpiryAt(this, null, accessControl.getExpirationDate());
+                        setExpiryAt(this, null, null);
                         this.accessControl = accessControlConnections.stream()
                                 .map(connection -> AccessControlConnectionDto.Response.from(connection, accessControl.getExpirationDate()))
                                 .collect(Collectors.toUnmodifiableList());

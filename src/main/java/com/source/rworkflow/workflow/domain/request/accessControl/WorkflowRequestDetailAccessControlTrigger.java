@@ -16,7 +16,7 @@ public class WorkflowRequestDetailAccessControlTrigger {
 
     public void afterCreate(final WorkflowRequestDetailAccessControl accessControlId, final List<AccessControlConnectionDto.Request> createRequests){
         accessControlConnectionCompositeService.createCollection(accessControlId.getId(), createRequests);
-        scheduleService.enrollJob(accessControlId.getExpirationDate(), "accessControl_expiration");
+        scheduleService.enrollJob(accessControlId.getId(),accessControlId.getExpirationDate(), "accessControl_expiration");
     }
 
     public void beforeGrant(final Long accessControlId) {

@@ -15,8 +15,4 @@ public class WorkflowRequestDetailAccessControlService {
     public WorkflowRequestDetailAccessControl findByRequestId(final Long requestId) {
         return repository.findByRequestId(requestId);
     }
-
-    public void expire(final WorkflowRequestDetailAccessControl request) {
-        repository.save(request)
-    }
 }
