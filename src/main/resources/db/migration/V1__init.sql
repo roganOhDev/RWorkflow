@@ -218,8 +218,8 @@ INSERT INTO `RWorkflow`.`users` (`id`, `username`, `password`, `name`, `email`, 
 INSERT INTO `RWorkflow`.`users` (`id`, `username`, `password`, `name`, `email`, `deleted`) VALUES (2, 'admin', 'UGFzc3dvcmQx', 'admin', 'admin@rogan.com', 0);
 INSERT INTO `RWorkflow`.`users` (`id`, `username`, `password`, `name`, `email`, `deleted`) VALUES (3, 'user', 'cGFzc3dvcmQ=', 'user', 'user@rogan.com', 0);
 
-INSERT INTO `RWorkflow`.`connection` (`id`, `name`, `database_type`, `host`, `port`, `username`, `password`, `deleted`) VALUES (1, 'mysqlConnection', 'MYSQL', '127.0.0.1', 3306, 'name', 'cGFzc3dvcmQ=', 0);
-INSERT INTO `RWorkflow`.`connection` (`id`, `name`, `database_type`, `host`, `port`, `username`, `password`, `deleted`) VALUES (2, 'postgresqlConnection', 'POSTGRESQL', '127.0.0.1', 5432, 'name', 'cGFzc3dvcmQ=', 0);
+INSERT INTO `RWorkflow`.`connections` (`id`, `name`, `database_type`, `host`, `port`, `username`, `password`, `deleted`) VALUES (1, 'mysqlConnection', 'MYSQL', '127.0.0.1', 3306, 'name', 'cGFzc3dvcmQ=', 0);
+INSERT INTO `RWorkflow`.`connections` (`id`, `name`, `database_type`, `host`, `port`, `username`, `password`, `deleted`) VALUES (2, 'postgresqlConnection', 'POSTGRESQL', '127.0.0.1', 5432, 'name', 'cGFzc3dvcmQ=', 0);
 
 INSERT INTO `RWorkflow`.`privileges` (`id`, `name`, `permissions`, `deleted`) VALUES (1, 'READ/WRITE', 'SELECT,DELETE,INSERT,UPDATE,MERGE_INTO,GRANT,REVOKE,COMMIT,ROLLBACK,DROP,ALTER,CREATE,RENAME,TRUNCATE,OTHERS,BEGIN,EXECUTE', 0);
 INSERT INTO `RWorkflow`.`privileges` (`id`, `name`, `permissions`, `deleted`) VALUES (2, 'READONLY', 'SELECT', 0);

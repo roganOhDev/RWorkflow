@@ -1,5 +1,6 @@
 package com.source.rworkflow.misc.connection;
 
+import com.source.rworkflow.misc.role.exception.ConnectionNotFoundException;
 import com.source.rworkflow.misc.role.exception.RoleNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ public class ConnectionService {
         final var connection = repository.findByIdAndDeletedIsFalse(id);
 
         if (connection == null) {
-            throw new ConnectionNotFound(id);
+            throw new ConnectionNotFoundException(id);
         }
     }
 }
