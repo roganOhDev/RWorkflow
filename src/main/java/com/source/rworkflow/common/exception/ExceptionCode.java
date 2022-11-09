@@ -17,6 +17,7 @@ public class ExceptionCode {
 
     public static class Role {
         final public static String ROLE_NOT_FOUND_EXCEPTION = "Role Not Found";
+        final public static String ConectionNotFoundException = "Connection Not Found";
     }
 
     public static class WorkflowRule{

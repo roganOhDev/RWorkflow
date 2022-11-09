@@ -172,7 +172,7 @@ create table user_roles (
                             primary key (id)
 );
 
-create table connection (
+create table connections (
                             id int AUTO_INCREMENT,
                             name varchar(64),
                             database_type enum ('MYSQL', 'POSTGRESQL'),

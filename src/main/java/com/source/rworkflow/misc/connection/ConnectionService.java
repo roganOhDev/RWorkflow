@@ -13,7 +13,7 @@ public class ConnectionService {
         final var connection = repository.findByIdAndDeletedIsFalse(id);
 
         if (connection == null) {
-            throw new RoleNotFoundException(id);
+            throw new ConnectionNotFound(id);
         }
     }
 }
