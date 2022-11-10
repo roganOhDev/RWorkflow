@@ -40,7 +40,7 @@ public class WorkflowRequestDto {
             private String comment;
 
             @Valid
-            @Size()
+            @Size
             private List<WorkflowApprovalDto.Create.Request> approvals;
 
             @NotNull

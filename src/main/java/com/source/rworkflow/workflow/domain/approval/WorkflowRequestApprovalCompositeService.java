@@ -1,6 +1,7 @@
 package com.source.rworkflow.workflow.domain.approval;
 
 import com.source.rworkflow.common.domain.SessionUserId;
+import com.source.rworkflow.common.exception.RException;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflow.dto.AssigneeDto;
 import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
@@ -64,29 +65,25 @@ public class WorkflowRequestApprovalCompositeService {
 
         final var approvals = findAllByRequestId(requestId);
 
-        final var fitApproval = approvals.stream()
+        final var currentApproval = approvals.stream()
                 .filter(approval -> approval.getOrder().equals(order))
-                .collect(Collectors.toUnmodifiableList());
+                .findFirst().orElseThrow(() -> new ApprovalNotFoundByOrderException(requestId, order));
 
-        if (fitApproval.size() == 0) {
-            throw new ApprovalNotFoundByOrderException(requestId, order);
-        }
-
-        final var beforeApproval = approvals.stream()
+        final var previousApproval = approvals.stream()
                 .filter(approval -> approval.getOrder().equals(order - 1))
                 .findFirst();
 
-        if (beforeApproval.isPresent() && !beforeApproval.get().getStatus().equals(ApprovalStatusType.APPROVED)) {
+        if (previousApproval.isPresent() && !previousApproval.get().getStatus().equals(ApprovalStatusType.APPROVED)) {
             throw new ApprovalHaveToFollowItsTurnException();
         }
 
         if (approve) {
-            triggerService.approveOk(fitApproval.get(0), sessionUserId);
+            triggerService.approveOk(currentApproval, sessionUserId);
             return approvals.stream()
                     .filter(e -> e.getStatus().equals(ApprovalStatusType.APPROVED))
                     .count() == approvals.size() - 1;
         } else {
-            triggerService.approveReject(fitApproval.get(0), sessionUserId);
+            triggerService.approveReject(currentApproval, sessionUserId);
             return false;
         }
     }

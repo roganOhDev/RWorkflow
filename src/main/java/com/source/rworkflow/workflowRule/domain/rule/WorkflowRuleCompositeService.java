@@ -109,7 +109,7 @@ public class WorkflowRuleCompositeService {
     }
 
     private void checkUrgentAccessControl(final WorkflowRuleDto.Create.Request request) {
-        if (request.getType().equals(WorkflowRequestType.ACCESS_CONTROL) && request.isUrgent()) {
+        if (!request.getType().isNotAutoExecution() && request.isUrgent()) {
             throw new AccessControlRequestCanNotBeUrgent();
         }
     }

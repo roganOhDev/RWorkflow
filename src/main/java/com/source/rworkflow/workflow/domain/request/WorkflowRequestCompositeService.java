@@ -208,7 +208,7 @@ public class WorkflowRequestCompositeService {
     }
 
     private void validateApproveAction(final WorkflowRequest workflowRequest, ActionType actionType) {
-        if (!actionType.equals(ActionType.APPROVE)) {
+        if (actionType != ActionType.APPROVE) {
             return;
         }
 
