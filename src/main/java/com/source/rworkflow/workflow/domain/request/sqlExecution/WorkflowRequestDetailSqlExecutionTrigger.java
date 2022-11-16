@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowRequestDetailSqlExecutionTrigger {
     private final ScheduleService scheduleService;
 
-    public void afterCreate(final WorkflowRequestDetailSqlExecution sqlExecution) {
+    public void enrollSchedulerJob(final WorkflowRequestDetailSqlExecution sqlExecution) {
         scheduleService.enrollJob(sqlExecution.getExecutionExpiryAt(), "sqlExecution_execution_expiry");
         scheduleService.enrollJob(sqlExecution.getRequestExpiryAt(), "sqlExecution_request_expiry");
     }

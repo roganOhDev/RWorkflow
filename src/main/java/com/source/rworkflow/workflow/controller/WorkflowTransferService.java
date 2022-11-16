@@ -4,6 +4,7 @@ import com.source.rworkflow.common.domain.SessionUserId;
 import com.source.rworkflow.misc.connection.ConnectionService;
 import com.source.rworkflow.misc.role.RoleService;
 import com.source.rworkflow.misc.user.role.UserRoleService;
+import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
 import com.source.rworkflow.workflow.dto.AssigneeDto;
 import com.source.rworkflow.misc.user.UserService;
 import com.source.rworkflow.workflow.domain.Assignee;
@@ -81,6 +82,7 @@ public class WorkflowTransferService {
 
         final var requestApprovalAssignees = convertApprovalAssigneesToUsers(createRequest.getApprovals());
         final var approvals = workflowRequestApprovalCompositeService.createCollection(workflowRequest.getId(), createRequest.getApprovals(), requestApprovalAssignees, workflowRuleSuite, workflowRequest.isUrgent(), sessionUserId);
+
         approvals.forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
 
         final var requestExecutionAssignees = convertRoleToUsers(createRequest.getExecutionAssignees());
@@ -98,9 +100,10 @@ public class WorkflowTransferService {
         final var approvalAssignees = new HashMap<Long, List<AssigneeDto.Response>>();
 
         final var workflowRequest = compositeService.find(id);
+
         final var approvals = workflowRequestApprovalCompositeService.findAllByRequestId(workflowRequest.getId());
         approvals.forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
-        final var executionAssignees = changeToAssigneeDtos(workflowRequestExecutionAssigneeCompositeService.findByRequestId(workflowRequest.getId()));
+        var executionAssignees = changeToAssigneeDtos(workflowRequestExecutionAssigneeCompositeService.findByRequestId(workflowRequest.getId()));
         final var reviewAssignees = changeToAssigneeDtos(workflowRequestReviewAssigneeCompositeService.findByRequestId(workflowRequest.getId()));
 
         final var detailAccessControl = workflowRequestDetailAccessControlCompositeService.findByRequestId(workflowRequest.getId());
@@ -147,15 +150,17 @@ public class WorkflowTransferService {
     }
 
     @Transactional
-    public WorkflowRequestDto.Approve.Response approve(final Long id, final Long order, final SessionUserId sessionUserId, final boolean approve) {
-        final var updated = compositeService.approve(id, order, sessionUserId, approve);
+    public WorkflowRequestDto.Approve.Response approve(final Long id, final Long order, final SessionUserId sessionUserId) {
+        final var updated = compositeService.approve(id, order, sessionUserId);
 
-        final var approvalAssignees = new HashMap<Long, List<AssigneeDto.Response>>();
+        return getApproveResponse(id, updated);
+    }
 
-        final var approvals = workflowRequestApprovalCompositeService.findAllByRequestId(id);
-        approvals.forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
+    @Transactional
+    public WorkflowRequestDto.Approve.Response disApprove(final Long id, final Long order, final SessionUserId sessionUserId) {
+        final var updated = compositeService.disApprove(id, order, sessionUserId);
 
-        return WorkflowRequestDto.Approve.Response.from(updated, approvals, approvalAssignees);
+        return getApproveResponse(id, updated);
     }
 
     @Transactional
@@ -169,8 +174,13 @@ public class WorkflowTransferService {
     }
 
     @Transactional
-    public void executeResult(final Long workflowRequestId, final boolean success) {
-        compositeService.executeResult(workflowRequestId, success);
+    public void executeSuccess(final Long workflowRequestId) {
+        compositeService.executeSuccess(workflowRequestId);
+    }
+
+    @Transactional
+    public void executeFail(final Long workflowRequestId) {
+        compositeService.executeFail(workflowRequestId);
     }
 
     @Transactional
@@ -293,5 +303,14 @@ public class WorkflowTransferService {
         if (!requestOrders.equals(ruleOrders)) {
             throw new OrderMustMatchWithOrderOfRuleException();
         }
+    }
+
+    private WorkflowRequestDto.Approve.Response getApproveResponse(Long id, WorkflowRequest updated) {
+        final var approvalAssignees = new HashMap<Long, List<AssigneeDto.Response>>();
+
+        final var approvals = workflowRequestApprovalCompositeService.findAllByRequestId(id);
+        approvals.forEach(approval -> approvalAssignees.putAll(approvalAssigneeMap(approval.getId())));
+
+        return WorkflowRequestDto.Approve.Response.from(updated, approvals, approvalAssignees);
     }
 }

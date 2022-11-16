@@ -12,7 +12,7 @@ public class WorkflowRequestDetailSqlExecutionTriggerService {
     public WorkflowRequestDetailSqlExecution create(final WorkflowRequestDetailSqlExecution sqlExecution) {
         final var created = service.create(sqlExecution);
 
-        trigger.afterCreate(sqlExecution);
+        trigger.enrollSchedulerJob(sqlExecution);
 
         return created;
     }

@@ -16,4 +16,8 @@ public enum ApprovalStatusType {
 
     ApprovalStatusType(boolean proceeding) {
     }
+
+    public boolean isApproved() {
+        return this.equals(ApprovalStatusType.APPROVED);
+    }
 }

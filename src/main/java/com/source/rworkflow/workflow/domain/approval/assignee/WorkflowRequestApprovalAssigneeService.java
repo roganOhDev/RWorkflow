@@ -31,13 +31,7 @@ public class WorkflowRequestApprovalAssigneeService {
         return repository.findAll();
     }
 
-    public WorkflowRequestApprovalAssignee approve(final WorkflowRequestApprovalAssignee assignee, final SessionUserId sessionUserId, final boolean approve) {
-        if (approve) {
-            assignee.setStatus(AssigneeStatusType.APPROVED);
-        } else {
-            assignee.setStatus(AssigneeStatusType.REJECTED);
-        }
-
+    public WorkflowRequestApprovalAssignee changeApproveStatus(final WorkflowRequestApprovalAssignee assignee, final SessionUserId sessionUserId) {
         assignee.setActionAt(LocalDateTime.now());
         assignee.setActionBy(sessionUserId.getId());
 

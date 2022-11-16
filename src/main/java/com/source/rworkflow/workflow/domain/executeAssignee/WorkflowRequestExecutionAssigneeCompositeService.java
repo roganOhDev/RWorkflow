@@ -6,6 +6,7 @@ import com.source.rworkflow.workflow.domain.request.WorkflowRequest;
 import com.source.rworkflow.workflow.exception.AssigneeCanNotAction;
 import com.source.rworkflow.workflow.exception.AssigneeCanNotBeEmpty;
 import com.source.rworkflow.workflow.exception.ExecutionAssigneeNotFoundException;
+import com.source.rworkflow.workflow.type.ActionType;
 import com.source.rworkflow.workflow.type.AssigneeStatusType;
 import com.source.rworkflow.workflow.type.WorkflowRequestType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
@@ -34,7 +35,7 @@ public class WorkflowRequestExecutionAssigneeCompositeService {
                                                                    final WorkflowRuleSuite workflowRuleSuite) {
         var assignees = ListUtil.removeDuplicateElement(executeAssignees);
         if (workflowRuleSuite != null) {
-            assignees = mergeAssignees(workflowRuleSuite, executeAssignees);
+            assignees = mergeAssignees(workflowRuleSuite.getExecutionAssignees(), executeAssignees);
         }
 
         validateAssigneeCount((long) assignees.size(), request.getType());
@@ -46,24 +47,14 @@ public class WorkflowRequestExecutionAssigneeCompositeService {
 
     @Transactional
     public void execute(final Long requestId, final SessionUserId sessionUserId) {
-        final var executionAssignees = service.findByRequestId(requestId);
+        final HashMap<String, List<WorkflowRequestExecutionAssignee>> executionAssigneesMap = getAssigneeMapOfIsCurrentAssignee(requestId, sessionUserId.getId());
 
-        final var now = LocalDateTime.now();
-
-        executionAssignees.forEach(assignee -> {
-            assignee.setActionBy(sessionUserId.getId());
-            assignee.setActionAt(now);
-        });
-
-        final var executionAssigneesMap = convertToAssigneesMapByIsExecutionRequested(executionAssignees, sessionUserId.getId());
-        final var requestAssignee = executionAssigneesMap.get(REQUEST_EXECUTION_ASSIGNEE).get(0);
+        final var currentAssignee = getCurrentAssignee(executionAssigneesMap, ActionType.EXECUTION_END);
         final var otherAssignees = executionAssigneesMap.get(OTHER_EXECUTION_ASSIGNEES);
 
-        if (!requestAssignee.getStatus().equals(AssigneeStatusType.PENDING)) {
-            throw new AssigneeCanNotAction("Execution", requestAssignee.getStatus());
-        }
-        requestAssignee.setStatus(AssigneeStatusType.IN_PROGRESS);
-        service.updateStatus(requestAssignee);
+        currentAssignee.setStatus(AssigneeStatusType.IN_PROGRESS);
+        service.updateStatus(currentAssignee);
+
         otherAssignees.forEach(otherAssignee -> {
             otherAssignee.setStatus(AssigneeStatusType.AUTO_CONFIRMED);
             service.updateStatus(otherAssignee);
@@ -71,7 +62,46 @@ public class WorkflowRequestExecutionAssigneeCompositeService {
     }
 
     @Transactional
-    public void executeResult(final Long requestId, final Long executeUserId, boolean success) {
+    public void executeSuccess(final Long requestId, final Long executeUserId) {
+        final HashMap<String, List<WorkflowRequestExecutionAssignee>> executionAssigneesMap = getAssigneeMapOfIsCurrentAssignee(requestId, executeUserId);
+
+        final var currentAssignee = getCurrentAssignee(executionAssigneesMap, ActionType.EXECUTION_END);
+        final var otherAssignees = executionAssigneesMap.get(OTHER_EXECUTION_ASSIGNEES);
+
+        currentAssignee.setStatus(AssigneeStatusType.SUCCEEDED);
+        service.updateStatus(currentAssignee);
+
+        otherAssignees.forEach(otherAssignee -> {
+            otherAssignee.setStatus(AssigneeStatusType.AUTO_CONFIRMED);
+            service.updateStatus(otherAssignee);
+        });
+    }
+
+    @Transactional
+    public void executeFail(final Long requestId, final Long executeUserId) {
+        final WorkflowRequestExecutionAssignee currentAssignee = getCurrentAssignee(requestId, executeUserId);
+
+        currentAssignee.setStatus(AssigneeStatusType.FAILED);
+
+        service.updateStatus(currentAssignee);
+    }
+
+    private static WorkflowRequestExecutionAssignee getCurrentAssignee(HashMap<String, List<WorkflowRequestExecutionAssignee>> executionAssigneesMap, final ActionType actionType) {
+        final var requestAssignee = executionAssigneesMap.get(REQUEST_EXECUTION_ASSIGNEE).get(0);
+
+        if (!requestAssignee.getStatus().equals(AssigneeStatusType.IN_PROGRESS)) {
+            throw new AssigneeCanNotAction(actionType.name(), requestAssignee.getStatus());
+        }
+        return requestAssignee;
+    }
+
+    private WorkflowRequestExecutionAssignee getCurrentAssignee(Long requestId, Long executeUserId) {
+        final HashMap<String, List<WorkflowRequestExecutionAssignee>> executionAssigneesMap = getAssigneeMapOfIsCurrentAssignee(requestId, executeUserId);
+
+        return getCurrentAssignee(executionAssigneesMap, ActionType.EXECUTION_END);
+    }
+
+    private HashMap<String, List<WorkflowRequestExecutionAssignee>> getAssigneeMapOfIsCurrentAssignee(Long requestId, Long executeUserId) {
         final var executionAssignees = service.findByRequestId(requestId);
 
         final var now = LocalDateTime.now();
@@ -82,26 +112,8 @@ public class WorkflowRequestExecutionAssigneeCompositeService {
         });
 
         final var executionAssigneesMap = convertToAssigneesMapByIsExecutionRequested(executionAssignees, executeUserId);
-        final var requestAssignee = executionAssigneesMap.get(REQUEST_EXECUTION_ASSIGNEE).get(0);
-        final var otherAssignees = executionAssigneesMap.get(OTHER_EXECUTION_ASSIGNEES);
-
-        if (!requestAssignee.getStatus().equals(AssigneeStatusType.IN_PROGRESS)) {
-            throw new AssigneeCanNotAction("ExecutionResult", requestAssignee.getStatus());
-        }
-
-        if (success) {
-            requestAssignee.setStatus(AssigneeStatusType.SUCCEEDED);
-            service.updateStatus(requestAssignee);
-            otherAssignees.forEach(otherAssignee -> {
-                otherAssignee.setStatus(AssigneeStatusType.AUTO_CONFIRMED);
-                service.updateStatus(otherAssignee);
-            });
-        } else {
-            requestAssignee.setStatus(AssigneeStatusType.FAILED);
-            service.updateStatus(requestAssignee);
-        }
+        return executionAssigneesMap;
     }
-
 
 
     @Transactional
@@ -172,8 +184,8 @@ public class WorkflowRequestExecutionAssigneeCompositeService {
         return service.create(assignee);
     }
 
-    private List<Long> mergeAssignees(final WorkflowRuleSuite workflowRuleSuite, List<Long> executionAssignees) {
-        final var ruleAssignees = new ArrayList<>(workflowRuleSuite.getExecutionAssignees().stream()
+    private List<Long> mergeAssignees(final List<WorkflowRuleExecutionAssignee> ruleExecutionAssignees, List<Long> executionAssignees) {
+        final var ruleAssignees = new ArrayList<>(ruleExecutionAssignees.stream()
                 .map(WorkflowRuleExecutionAssignee::getAssigneeValue)
                 .collect(Collectors.toUnmodifiableList()));
 

@@ -1,7 +1,6 @@
 package com.source.rworkflow.workflow.domain.approval;
 
 import com.source.rworkflow.common.domain.SessionUserId;
-import com.source.rworkflow.common.exception.RException;
 import com.source.rworkflow.common.util.ListUtil;
 import com.source.rworkflow.workflow.dto.AssigneeDto;
 import com.source.rworkflow.workflow.dto.WorkflowApprovalDto;
@@ -59,32 +58,45 @@ public class WorkflowRequestApprovalCompositeService {
         return service.findAllByRequestId(requestId);
     }
 
-
     @Transactional
-    public boolean approve(final Long requestId, final Long order, final SessionUserId sessionUserId, final boolean approve) {
-
+    public boolean approve(final Long requestId, final Long order, final SessionUserId sessionUserId) {
         final var approvals = findAllByRequestId(requestId);
 
-        final var currentApproval = approvals.stream()
+        final var currentOrderApproval = getCurrentOrderApproval(requestId, order, approvals);
+
+        triggerService.approve(currentOrderApproval, sessionUserId);
+
+        return approvals.stream()
+                .filter(e -> e.getStatus().isApproved())
+                .count() == approvals.size() - 1;
+    }
+
+    @Transactional
+    public void disApprove(final Long requestId, final Long order, final SessionUserId sessionUserId) {
+        final var approvals = findAllByRequestId(requestId);
+
+        final var currentOrderApproval = getCurrentOrderApproval(requestId, order, approvals);
+
+        triggerService.disApprove(currentOrderApproval, sessionUserId);
+    }
+
+    private static WorkflowRequestApproval getCurrentOrderApproval(Long requestId, Long order, List<WorkflowRequestApproval> approvals) {
+        validateApprovalReady(order, approvals);
+
+        final var currentOrderApproval = approvals.stream()
                 .filter(approval -> approval.getOrder().equals(order))
                 .findFirst().orElseThrow(() -> new ApprovalNotFoundByOrderException(requestId, order));
 
-        final var previousApproval = approvals.stream()
+        return currentOrderApproval;
+    }
+
+    private static void validateApprovalReady(Long order, List<WorkflowRequestApproval> approvals) {
+        final var previousOrderApproval = approvals.stream()
                 .filter(approval -> approval.getOrder().equals(order - 1))
                 .findFirst();
 
-        if (previousApproval.isPresent() && !previousApproval.get().getStatus().equals(ApprovalStatusType.APPROVED)) {
+        if (previousOrderApproval.isPresent() && !previousOrderApproval.get().getStatus().equals(ApprovalStatusType.APPROVED)) {
             throw new ApprovalHaveToFollowItsTurnException();
-        }
-
-        if (approve) {
-            triggerService.approveOk(currentApproval, sessionUserId);
-            return approvals.stream()
-                    .filter(e -> e.getStatus().equals(ApprovalStatusType.APPROVED))
-                    .count() == approvals.size() - 1;
-        } else {
-            triggerService.approveReject(currentApproval, sessionUserId);
-            return false;
         }
     }
 
@@ -104,11 +116,11 @@ public class WorkflowRequestApprovalCompositeService {
     }
 
     private WorkflowRequestApproval create(final Long requestId, final List<Long> assignees, final WorkflowApprovalDto.Create.Request creatRequest,
-                                           final List<Long> assigneesByRule, final SessionUserId sessionUserId) {
+                                           final List<Long> ruleAssignees, final SessionUserId sessionUserId) {
         final var workflowRequestApproval = createNewWorkflowRequestApproval(requestId, creatRequest);
 
         final var assigneeList = ListUtil.removeDuplicateElement(assignees);
-        final var mergedAssignees = mergeAssignees(assigneeList, assigneesByRule, sessionUserId);
+        final var mergedAssignees = mergeAssignees(assigneeList, ruleAssignees, sessionUserId);
         validateAssigneeCount((long) mergedAssignees.size());
 
         return triggerService.create(mergedAssignees, requestId, workflowRequestApproval);
@@ -131,11 +143,11 @@ public class WorkflowRequestApprovalCompositeService {
         }
     }
 
-    private List<Long> mergeAssignees(final List<Long> assignees, List<Long> assigneesByRule, SessionUserId sessionUserId) {
-        final var ruleAssignees = removeSelfFromAssigneesByRule(assigneesByRule, sessionUserId);
+    private List<Long> mergeAssignees(final List<Long> assignees, List<Long> ruleAssignees, SessionUserId sessionUserId) {
+        final var refinedRuleAssignees = removeSelfFromAssigneesByRule(ruleAssignees, sessionUserId);
 
         final var resultList = new ArrayList<>(assignees);
-        resultList.addAll(ruleAssignees);
+        resultList.addAll(refinedRuleAssignees);
         return ListUtil.removeDuplicateElement(resultList);
     }
 

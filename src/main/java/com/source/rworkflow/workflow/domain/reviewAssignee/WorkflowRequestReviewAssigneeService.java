@@ -4,6 +4,7 @@ import com.source.rworkflow.workflow.type.AssigneeStatusType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -26,6 +27,8 @@ public class WorkflowRequestReviewAssigneeService {
     }
 
     public void updateStatus(final WorkflowRequestReviewAssignee assignee) {
+        assignee.setActionAt(LocalDateTime.now());
+
         repository.save(assignee);
     }
 }

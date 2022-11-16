@@ -1,9 +1,7 @@
 package com.source.rworkflow.workflow.domain.approval;
 
 import com.source.rworkflow.common.domain.SessionUserId;
-import com.source.rworkflow.workflow.dto.AssigneeDto;
 import com.source.rworkflow.workflow.type.ApprovalStatusType;
-import com.source.rworkflow.workflowRule.type.ApproveType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,16 +14,14 @@ public class WorkflowRequestApprovalTriggerService {
     private final WorkflowRequestApprovalService service;
 
     public WorkflowRequestApproval create(final List<Long> assignees, final Long requestId, final WorkflowRequestApproval approval) {
-
         final var created = service.create(approval);
 
-        trigger.afterCreate(assignees, requestId, created.getId());
+        trigger.createAssignees(assignees, requestId, created.getId());
 
         return created;
     }
 
     public WorkflowRequestApproval createUrgent(final Long requestId, final WorkflowRequestApproval approval) {
-
         final var created = service.createUrgent(approval);
 
         trigger.afterUrgentCreate(requestId, created.getId());
@@ -33,12 +29,13 @@ public class WorkflowRequestApprovalTriggerService {
         return created;
     }
 
-    public WorkflowRequestApproval approveOk(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
-        final var approvalFinished = trigger.beforeApprove(approval, sessionUserId, true);
+    public WorkflowRequestApproval approve(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
+        final var approvalFinish = trigger.assigneeApprove(approval, sessionUserId);
 
-        if (approvalFinished) {
+        if (approvalFinish) {
             approval.setStatus(ApprovalStatusType.APPROVED);
-            trigger.afterApproveExecutionPending(approval.getRequestId(), sessionUserId);
+
+            trigger.setExecutionPending(approval.getRequestId(), sessionUserId);
         } else {
             approval.setStatus(ApprovalStatusType.IN_PROGRESS);
         }
@@ -46,8 +43,8 @@ public class WorkflowRequestApprovalTriggerService {
         return service.approve(approval);
     }
 
-    public WorkflowRequestApproval approveReject(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
-        trigger.beforeApprove(approval, sessionUserId, false);
+    public WorkflowRequestApproval disApprove(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
+        trigger.assigneeDisApprove(approval, sessionUserId);
 
         approval.setStatus(ApprovalStatusType.REJECTED);
 

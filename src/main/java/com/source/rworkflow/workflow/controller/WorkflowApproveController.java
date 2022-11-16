@@ -26,13 +26,13 @@ public class WorkflowApproveController {
     public WorkflowRequestDto.Approve.Response approve(@PathVariable Long id, @RequestParam Long order, @RequestHeader(HEADER_KEY) String userToken) {
         final var sessionUserId = userTokenService.findUserId(userToken);
 
-        return transferService.approve(id, order, sessionUserId, true);
+        return transferService.approve(id, order, sessionUserId);
     }
 
     @PostMapping(value = "/reject")
     public WorkflowRequestDto.Approve.Response disApprove(@PathVariable Long id, @RequestParam Long order, @RequestHeader(HEADER_KEY) String userToken) {
         final var sessionUserId = userTokenService.findUserId(userToken);
 
-        return transferService.approve(id, order, sessionUserId, false);
+        return transferService.disApprove(id, order, sessionUserId);
     }
 }

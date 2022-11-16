@@ -7,12 +7,11 @@ import com.source.rworkflow.workflow.exception.AssigneeCanNotBeEmpty;
 import com.source.rworkflow.workflow.exception.ReviewAssigneeNotFoundException;
 import com.source.rworkflow.workflow.type.AssigneeStatusType;
 import com.source.rworkflow.workflowRule.domain.WorkflowRuleSuite;
-import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleExecutionAssignee;
+import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssignee;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,7 +26,7 @@ public class WorkflowRequestReviewAssigneeCompositeService {
         var assignees = reviewAssignees;
 
         if (workflowRuleSuite != null) {
-            assignees = mergeAssignees(workflowRuleSuite, reviewAssignees);
+            assignees = mergeAssignees(workflowRuleSuite.getReviewAssignees(), reviewAssignees);
         }
 
         validateAssigneeCount((long) assignees.size());
@@ -59,21 +58,14 @@ public class WorkflowRequestReviewAssigneeCompositeService {
                     throw new ReviewAssigneeNotFoundException(sessionUserId.getId());
                 });
 
-        if (!requestAssignee.getStatus().equals(AssigneeStatusType.PENDING)) {
-            throw new AssigneeCanNotAction("review", requestAssignee.getStatus());
-        }
+        validateAssigneeStatus(requestAssignee);
 
         requestAssignee.setStatus(AssigneeStatusType.APPROVED);
         requestAssignee.setActionBy(sessionUserId.getId());
-        requestAssignee.setActionAt(LocalDateTime.now());
 
         service.updateStatus(requestAssignee);
 
-        final var approvedAssigneesCount = executionAssignees.stream()
-                .filter(e -> e.getStatus().equals(AssigneeStatusType.APPROVED))
-                .count();
-
-        return executionAssignees.size() - 1 == approvedAssigneesCount;
+        return isReviewFinish(executionAssignees);
     }
 
     @Transactional()
@@ -83,12 +75,25 @@ public class WorkflowRequestReviewAssigneeCompositeService {
         assignees
                 .forEach(assignee -> {
                     assignee.setStatus(AssigneeStatusType.PENDING);
-                    assignee.setActionAt(LocalDateTime.now());
                     assignee.setActionBy(executeUserId);
 
                     service.updateStatus(assignee);
                 });
 
+    }
+
+    private boolean isReviewFinish(List<WorkflowRequestReviewAssignee> executionAssignees) {
+        final var approvedAssigneesCount = executionAssignees.stream()
+                .filter(e -> e.getStatus().equals(AssigneeStatusType.APPROVED))
+                .count();
+
+        return executionAssignees.size() - 1 == approvedAssigneesCount;
+    }
+
+    private void validateAssigneeStatus(final WorkflowRequestReviewAssignee requestAssignee) {
+        if (requestAssignee.getStatus() != AssigneeStatusType.PENDING) {
+            throw new AssigneeCanNotAction("review", requestAssignee.getStatus());
+        }
     }
 
     private void validateAssigneeCount(final Long size) {
@@ -106,9 +111,9 @@ public class WorkflowRequestReviewAssigneeCompositeService {
         return service.create(assignee);
     }
 
-    private List<Long> mergeAssignees(final WorkflowRuleSuite workflowRuleSuite, List<Long> reviewAssignees) {
-        final var ruleAssignees = new ArrayList<>(workflowRuleSuite.getExecutionAssignees().stream()
-                .map(WorkflowRuleExecutionAssignee::getAssigneeValue)
+    private List<Long> mergeAssignees(final List<WorkflowRuleReviewAssignee> ruleReviewAssignees, List<Long> reviewAssignees) {
+        final var ruleAssignees = new ArrayList<>(ruleReviewAssignees.stream()
+                .map(WorkflowRuleReviewAssignee::getAssigneeValue)
                 .collect(Collectors.toUnmodifiableList()));
 
         ruleAssignees.addAll(reviewAssignees);

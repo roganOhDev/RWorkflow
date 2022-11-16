@@ -12,7 +12,7 @@ public class WorkflowRequestDetailDataExportTriggerService {
     public WorkflowRequestDetailDataExport create(final WorkflowRequestDetailDataExport dataExport){
         final var created = service.create(dataExport);
 
-        trigger.afterCreate(dataExport);
+        trigger.enrollSchedulerJob(dataExport);
 
         return created;
     }

@@ -75,17 +75,21 @@ public class WorkflowRequestCompositeService {
     }
 
     @Transactional
-    public WorkflowRequest approve(final Long id, final Long order, final SessionUserId sessionUserId, final boolean approve) {
+    public WorkflowRequest approve(final Long id, final Long order, final SessionUserId sessionUserId) {
         final var workflowRequest = service.find(id);
 
         validateAction(workflowRequest, ActionType.APPROVE);
 
-        if (approve) {
-            return triggerService.approveOk(workflowRequest, order, sessionUserId);
-        } else {
-            return triggerService.approveReject(workflowRequest, order, sessionUserId);
-        }
+        return triggerService.approve(workflowRequest, order, sessionUserId);
+    }
 
+    @Transactional
+    public WorkflowRequest disApprove(final Long id, final Long order, final SessionUserId sessionUserId) {
+        final var workflowRequest = service.find(id);
+
+        validateAction(workflowRequest, ActionType.APPROVE);
+
+        return triggerService.disApprove(workflowRequest, order, sessionUserId);
     }
 
     @Transactional
@@ -98,16 +102,21 @@ public class WorkflowRequestCompositeService {
     }
 
     @Transactional
-    public void executeResult(final Long workflowRequestId, final boolean success) {
+    public void executeSuccess(final Long workflowRequestId) {
         final var workflowRequest = service.find(workflowRequestId);
 
         validateAction(workflowRequest, ActionType.EXECUTION_END);
 
-        if (success) {
-            triggerService.executeResultSuccess(workflowRequest);
-        } else {
-            triggerService.executeResultFail(workflowRequest);
-        }
+        triggerService.executeSuccess(workflowRequest);
+    }
+
+    @Transactional
+    public void executeFail(final Long workflowRequestId) {
+        final var workflowRequest = service.find(workflowRequestId);
+
+        validateAction(workflowRequest, ActionType.EXECUTION_END);
+
+        triggerService.executeFail(workflowRequest);
     }
 
     @Transactional

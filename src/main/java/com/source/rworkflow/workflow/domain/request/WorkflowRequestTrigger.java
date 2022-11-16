@@ -16,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class WorkflowRequestTrigger {
@@ -29,7 +27,7 @@ public class WorkflowRequestTrigger {
     private final WorkflowRequestDetailAccessControlCompositeService accessControlCompositeService;
     private final UserAccessControlService userAccessControlService;
 
-    public void afterCreate(final Long requestId, final WorkflowRequestDto.Create.Request request) {
+    public void createDetail(final Long requestId, final WorkflowRequestDto.Create.Request request) {
         switch (request.getType()) {
             case ACCESS_CONTROL:
                 createAccessControl(requestId, request.getDetail());
@@ -43,16 +41,24 @@ public class WorkflowRequestTrigger {
         }
     }
 
-    public boolean beforeApprove(final Long requestId, final Long order, final SessionUserId sessionUserId, final boolean approve) {
-        return approvalCompositeService.approve(requestId, order, sessionUserId, approve);
+    public boolean approveApproval(final Long requestId, final Long order, final SessionUserId sessionUserId) {
+        return approvalCompositeService.approve(requestId, order, sessionUserId);
     }
 
-    public void beforeExecute(final Long requestId, final SessionUserId sessionUserId) {
+    public void disApproveApproval(final Long requestId, final Long order, final SessionUserId sessionUserId) {
+        approvalCompositeService.disApprove(requestId, order, sessionUserId);
+    }
+
+    public void assigneeExecute(final Long requestId, final SessionUserId sessionUserId) {
         executionAssigneeCompositeService.execute(requestId, sessionUserId);
     }
 
-    public void beforeExecuteResult(final Long requestId, final Long executeUserId, final boolean success) {
-        executionAssigneeCompositeService.executeResult(requestId, executeUserId, success);
+    public void executionAssigneeSuccess(final Long requestId, final Long executeUserId) {
+        executionAssigneeCompositeService.executeSuccess(requestId, executeUserId);
+    }
+
+    public void executionAssigneeFail(final Long requestId, final Long executeUserId) {
+        executionAssigneeCompositeService.executeFail(requestId, executeUserId);
     }
 
     public void grantAccessControl(final Long requestId) {
@@ -60,11 +66,11 @@ public class WorkflowRequestTrigger {
         userAccessControlService.update();
     }
 
-    public void afterExecuteFinishReviewAssigneesPending(final Long requestId, final Long executeUserId) {
+    public void setReviewAssigneesPending(final Long requestId, final Long executeUserId) {
         reviewAssigneeCompositeService.makeReviewAssigneesPending(requestId, executeUserId);
     }
 
-    public boolean beforeReview(final Long requestId, final SessionUserId sessionUserId) {
+    public boolean assigneeReview(final Long requestId, final SessionUserId sessionUserId) {
         return reviewAssigneeCompositeService.review(requestId, sessionUserId);
     }
 

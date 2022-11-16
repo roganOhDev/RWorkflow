@@ -42,36 +42,49 @@ public class WorkflowRequestApprovalAssigneeCompositeService {
     }
 
     @Transactional
-    public boolean approve(final WorkflowRequestApproval approval, final SessionUserId sessionUserId, final boolean approve) {
+    public boolean approve(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
         final var assignees = service.findAllByApprovalId(approval.getId());
 
-        final var fitAssignee = assignees.stream()
+        final WorkflowRequestApprovalAssignee currentAssignee = getCurrentAssignee(approval, sessionUserId, assignees);
+
+        currentAssignee.setStatus(AssigneeStatusType.APPROVED);
+        service.changeApproveStatus(currentAssignee, sessionUserId);
+
+        if (approval.getApproveType().equals(ApproveType.ANY)) {
+            return true;
+        }
+        return assignees.stream()
+                .filter(assignee -> assignee.getStatus().equals(AssigneeStatusType.APPROVED))
+                .count() == assignees.size() - 1;
+    }
+
+    @Transactional
+    public void disApprove(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
+        final var assignees = service.findAllByApprovalId(approval.getId());
+
+        final WorkflowRequestApprovalAssignee currentAssignee = getCurrentAssignee(approval, sessionUserId, assignees);
+
+        currentAssignee.setStatus(AssigneeStatusType.REJECTED);
+        service.changeApproveStatus(currentAssignee, sessionUserId);
+    }
+
+    private WorkflowRequestApprovalAssignee getCurrentAssignee(WorkflowRequestApproval approval, SessionUserId sessionUserId, List<WorkflowRequestApprovalAssignee> assignees) {
+        final var currentAssignee = assignees.stream()
                 .peek(this::validateStatus)
                 .filter(assignee -> assignee.getAssigneeId().equals(sessionUserId.getId()))
                 .findFirst().orElseThrow(() -> new ApprovalAssigneeNotFoundException(approval.getRequestId(), approval.getId(), approval.getOrder(), sessionUserId.getId()));
 
-        service.approve(fitAssignee, sessionUserId, approve);
-
-        if (approve) {
-            if (approval.getApproveType().equals(ApproveType.ANY)) {
-                return true;
-            } else {
-                return assignees.stream()
-                        .filter(assignee -> assignee.getStatus().equals(AssigneeStatusType.APPROVED))
-                        .count() == assignees.size() - 1;
-            }
-        }
-
-        return false;
+        return currentAssignee;
     }
 
-    private void validateStatus(final WorkflowRequestApprovalAssignee assignee){
+    private void validateStatus(final WorkflowRequestApprovalAssignee assignee) {
         if (assignee.getStatus().equals(AssigneeStatusType.NONE) || assignee.getStatus().equals(AssigneeStatusType.PENDING)) {
             return;
         }
 
         throw new AssigneeCanNotAction("approve", assignee.getStatus());
     }
+
     private WorkflowRequestApprovalAssignee create(final Long id, final Long requestId, final Long approvalId) {
         final var assignee = new WorkflowRequestApprovalAssignee();
 

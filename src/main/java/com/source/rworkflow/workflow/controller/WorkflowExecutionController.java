@@ -29,12 +29,11 @@ public class WorkflowExecutionController {
 
     @PostMapping(value = "/success")
     public void executeSuccess(@PathVariable Long id) {
-        transferService.executeResult(id, true);
-
+        transferService.executeSuccess(id);
     }
 
     @PostMapping(value = "/fail")
     public void executeFail(@PathVariable Long id) {
-        transferService.executeResult(id, false);
+        transferService.executeFail(id);
     }
 }

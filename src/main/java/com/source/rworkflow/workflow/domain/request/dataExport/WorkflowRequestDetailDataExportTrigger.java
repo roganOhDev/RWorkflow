@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowRequestDetailDataExportTrigger {
     private final ScheduleService scheduleService;
 
-    public void afterCreate(final WorkflowRequestDetailDataExport dataExport){
+    public void enrollSchedulerJob(final WorkflowRequestDetailDataExport dataExport){
         scheduleService.enrollJob(dataExport.getExecutionExpiryAt(), "dataExport_execution_expiry");
         scheduleService.enrollJob(dataExport.getRequestExpiryAt(), "dataExport_request_expiry");
     }

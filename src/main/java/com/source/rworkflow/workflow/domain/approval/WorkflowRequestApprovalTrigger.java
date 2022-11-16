@@ -18,15 +18,19 @@ public class WorkflowRequestApprovalTrigger {
     public WorkflowRequestApprovalAssignee afterUrgentCreate(final Long requestId, final Long approvalId){
         return approvalAssigneeCompositeService.createUrgent(requestId, approvalId);
     }
-    public List<WorkflowRequestApprovalAssignee> afterCreate(final List<Long> assigneeIds, final Long requestId, final Long approvalId) {
+    public List<WorkflowRequestApprovalAssignee> createAssignees(final List<Long> assigneeIds, final Long requestId, final Long approvalId) {
         return approvalAssigneeCompositeService.createCollection(assigneeIds, requestId, approvalId);
     }
 
-    public boolean beforeApprove(final WorkflowRequestApproval approval, final SessionUserId sessionUserId, final boolean approve) {
-        return approvalAssigneeCompositeService.approve(approval, sessionUserId, approve);
+    public boolean assigneeApprove(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
+        return approvalAssigneeCompositeService.approve(approval, sessionUserId);
     }
 
-    public void afterApproveExecutionPending(final Long requestId, final SessionUserId sessionUserId) {
+    public void assigneeDisApprove(final WorkflowRequestApproval approval, final SessionUserId sessionUserId) {
+        approvalAssigneeCompositeService.disApprove(approval, sessionUserId);
+    }
+
+    public void setExecutionPending(final Long requestId, final SessionUserId sessionUserId) {
         executionAssigneeCompositeService.setAssigneesPending(requestId, sessionUserId);
     }
 }
