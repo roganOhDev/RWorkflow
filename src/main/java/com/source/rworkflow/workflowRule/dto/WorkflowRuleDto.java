@@ -8,6 +8,7 @@ import com.source.rworkflow.workflowRule.domain.executionAssignee.WorkflowRuleEx
 import com.source.rworkflow.workflowRule.domain.reviewAssignee.WorkflowRuleReviewAssignee;
 import com.source.rworkflow.workflowRule.domain.rule.WorkflowRule;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.validation.Valid;
@@ -21,6 +22,7 @@ public class WorkflowRuleDto {
     @Getter
     public static class Create {
         @Getter
+        @Builder /* use only in test */
         public static class Request {
             @NotNull(message = "need name")
             private String name;

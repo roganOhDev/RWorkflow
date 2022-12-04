@@ -2,14 +2,36 @@ spring:
   flyway:
     enabled: false
 
-datasource:
-  username: root
-  password: password
-  schema: RWorkflow_test
-  url: jdbc:mysql://localhost:13307/${datasource.schema}?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
-  driver-class-name: com.mysql.cj.jdbc.Driver
-  initial-size: 3
-  max-total: 3
-  max-wait-millis: 3000
-  slow-query-threshold: 3000
-  sql-output: true
+  datasource:
+    username: root
+    password: password
+    url: jdbc:mysql://localhost:13307/RWorkflow_test?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    dbcp2:
+      max-total: 3
+      max-wait-millis: 3000
+
+  sql:
+    init:
+      mode: always
+
+  jpa:
+    defer-datasource-initialization: true
+
+#    max-total: 3
+#    max-wait-millis: 3000
+#    slow-query-threshold: 3000
+#    sql-output: true
+
+
+#datasource:
+#  username: root
+#  password: password
+#  schema: RWorkflow_test
+#  url: jdbc:mysql://localhost:13307/${datasource.schema}?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+#  driver-class-name: com.mysql.cj.jdbc.Driver
+#  initial-size: 3
+#  max-total: 3
+#  max-wait-millis: 3000
+#  slow-query-threshold: 3000
+#  sql-output: true

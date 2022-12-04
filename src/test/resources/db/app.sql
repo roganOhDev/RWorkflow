@@ -259,3 +259,5 @@ INSERT INTO `RWorkflow_test`.`user_access_controls` (`id`, `user_id`, `connectio
 INSERT INTO `RWorkflow_test`.`user_tokens` (`id`, `token`, `user_id`) VALUES (1, 'eQjq1u2X', 1);
 INSERT INTO `RWorkflow_test`.`user_tokens` (`id`, `token`, `user_id`) VALUES (2, 'yCPDeOmN', 2);
 INSERT INTO `RWorkflow_test`.`user_tokens` (`id`, `token`, `user_id`) VALUES (3, 'xVW8kjnw', 3);
+
+INSERT INTO `RWorkflow_test`.`workflow_requests` (`id`, `title`, `type`, `rule_id`, `urgent`, `comment`, `approval_status`, `execution_status`, `review_status`, `requested_at`, `requested_by`, `expired`, `canceled`, `canceled_at`, `created_at`, `created_by`, `updated_at`, `updated_by`) VALUES (1, 'asdfasdf', 'ACCESS_CONTROL', 1, 0, 'asdfsda', 'PENDING', 'NONE', 'NONE', NOW(), 1, 0, 0, NULL, NOW(), 1, NOW(), 1);
